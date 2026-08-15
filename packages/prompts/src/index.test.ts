@@ -45,7 +45,20 @@ describe('renderPrompt', () => {
     expect(renderPrompt('prompts/D09/head.md')).toContain('Use leadgen.search for account/person discovery');
     expect(renderPrompt('prompts/D09/head.md')).toContain('leadgen.enrich for contact data');
     expect(renderPrompt('prompts/D10/head.md')).toContain('Use crm.upsert');
-    expect(renderPrompt('prompts/D11/head.md')).toContain('Use terac.post_requisition only for scoped human work');
+    expect(renderPrompt('prompts/D11/head.md')).toContain('Use terac.post_requisition only when a scoped human task has acceptance criteria');
     expect(renderPrompt('prompts/D13/head.md')).toContain('Validate any DepartmentManifestArtifact against schema');
+  });
+
+  it('keeps D07 build execution concrete and gated', () => {
+    const head = renderPrompt('prompts/D07/head.md');
+    expect(head).toContain('Use GitHub only after code review evidence is clean');
+    expect(head).toContain('Use Render only after the deploy gate is approved');
+    expect(head).toContain('Replay suite id');
+    expect(head).toContain('workstream_results');
+
+    expect(renderPrompt('prompts/D07/devops-engineer.md')).toContain('Do not call render.deploy until the deploy gate is approved');
+    expect(renderPrompt('prompts/D07/qa.md')).toContain('Block GitHub push or Render deploy');
+    expect(renderPrompt('prompts/D07/security-reviewer.md')).toContain('Block Render deploy');
+    expect(renderPrompt('prompts/D07/critic-rubric.md')).toContain('D07 blockers');
   });
 });

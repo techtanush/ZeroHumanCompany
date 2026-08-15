@@ -6,6 +6,8 @@ head:
   model: opus
   system_prompt_ref: prompts/D07/head.md
   tools:
+    - github.push
+    - render.deploy
     - replay.run_suite
     - memory_read
     - memory_write
@@ -21,8 +23,6 @@ workers:
     replicas: 1
     system_prompt_ref: prompts/D07/architect.md
     tools:
-      - github.push
-      - render.deploy
       - replay.run_suite
       - memory_read
       - memory_write
@@ -33,7 +33,6 @@ workers:
     system_prompt_ref: prompts/D07/implementer.md
     tools:
       - github.push
-      - render.deploy
       - replay.run_suite
       - memory_read
       - memory_write
@@ -43,8 +42,6 @@ workers:
     replicas: 1
     system_prompt_ref: prompts/D07/qa.md
     tools:
-      - github.push
-      - render.deploy
       - replay.run_suite
       - memory_read
       - memory_write
@@ -53,55 +50,65 @@ workers:
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D07/technical-pm.md
-    tools: &a1
+    tools: &planning_tools
       - web_search
       - web_fetch
       - calc
       - memory_read
-      - github.push
       - replay.run_suite
     max_tokens_per_run: 60000
   - agent_id: build.frontend-engineer
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D07/frontend-engineer.md
-    tools: *a1
+    tools: &engineering_tools
+      - web_search
+      - web_fetch
+      - calc
+      - memory_read
+      - replay.run_suite
     max_tokens_per_run: 60000
   - agent_id: build.backend-engineer
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D07/backend-engineer.md
-    tools: *a1
+    tools: *engineering_tools
     max_tokens_per_run: 60000
   - agent_id: build.database-engineer
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D07/database-engineer.md
-    tools: *a1
+    tools: *engineering_tools
     max_tokens_per_run: 60000
   - agent_id: build.integration-engineer
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D07/integration-engineer.md
-    tools: *a1
+    tools: *engineering_tools
     max_tokens_per_run: 60000
   - agent_id: build.security-reviewer
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D07/security-reviewer.md
-    tools: *a1
+    tools: *engineering_tools
     max_tokens_per_run: 60000
   - agent_id: build.devops-engineer
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D07/devops-engineer.md
-    tools: *a1
+    tools:
+      - web_search
+      - web_fetch
+      - calc
+      - memory_read
+      - render.deploy
+      - replay.run_suite
     max_tokens_per_run: 60000
   - agent_id: build.accessibility-reviewer
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D07/accessibility-reviewer.md
-    tools: *a1
+    tools: *engineering_tools
     max_tokens_per_run: 60000
 concurrency: 8
 budget:

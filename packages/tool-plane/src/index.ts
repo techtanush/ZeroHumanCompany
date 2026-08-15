@@ -4,7 +4,16 @@ import { toolDefs, type ToolName } from './definitions.js';
 import { runRealTool } from './drivers/real/index.js';
 import { stableHash } from './mock.js';
 
-export type GateType = 'outbound_to_real_person' | 'money_out' | 'deploy';
+export type GateType =
+  | 'money_out'
+  | 'public_content'
+  | 'outbound_to_real_person'
+  | 'account_creation'
+  | 'pivot_approval'
+  | 'deploy'
+  | 'refund'
+  | 'new_department'
+  | 'niche_selection';
 
 export interface ToolCtx {
   venture_id: string;

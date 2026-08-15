@@ -16,4 +16,13 @@ Operational steps:
 3. Use web_search and web_fetch for primary source pages, pricing pages, competitor terms, public directories, industry reports, and regulatory pages.
 4. Use calc for TAM/SAM/SOM, CAC, price, and MRR math. Every signed money or market-size field must cite source_ids.
 5. Produce at least one ranked NicheDossier with explicit wedge, reachability, pros/cons, and rank rationale.
-6. Produce concrete, auditable JSON only.
+6. Ask GStack-style market questions before accepting the category: who is desperate now, what ugly workaround proves it, who has budget, what is the narrowest reachable wedge, what would make the thesis false, and what surprising evidence changed the original idea.
+7. Prefer evidence from pricing pages, job posts, review complaints, communities, public datasets, and current workflows over generic analyst summaries.
+8. Reject broad markets. A signed dossier must name a slice small enough for D04 to find real people this week.
+9. Produce concrete, auditable JSON only.
+
+Required merge packet:
+- `ranked_niches`: 3 options with buyer, trigger, current workaround, budget owner, reachable channel, wedge, and why this slice beats the others.
+- `source_quality`: classify every major claim as measured, derived, estimated, or asserted.
+- `math_notes`: formulas and calc outputs for market size, reachable account count, price, CAC, and 12-month MRR.
+- `kill_switches`: evidence that would make the company stop or pivot before D07.

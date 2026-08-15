@@ -82,6 +82,7 @@ const gates: Partial<Record<ToolName, GateType>> = {
   'stripe.create_payment_link': 'money_out',
   'terac.post_requisition': 'money_out',
   'render.deploy': 'deploy',
+  'github.push': 'deploy',
 };
 
 const nonSideEffecting = new Set<ToolName>(['web_search', 'web_fetch', 'calc', 'memory_read', 'pioneer.classify', 'simpop.build_panel', 'simpop.poll', 'leadgen.search', 'leadgen.enrich']);

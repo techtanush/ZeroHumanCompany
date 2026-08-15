@@ -54,6 +54,7 @@ membership is what's interesting:
 
 | Room | Members | Purpose | Demo beat |
 |---|---|---|---|
+| `executive-briefing` | D01-D13 heads, D13 facilitator | Daily 7:00 AM goals meeting; publishes the `DailyBriefing` operating plan | first screen / daily reset |
 | `sales↔finance` | D10, D11 | Collections, invoice aging, discount authority, rail choice | 2:55, 3:15 |
 | `support↔build` | D12, D07 | Bug triage, repro handoff, severity negotiation, Replay recording links | ambient (2:25) |
 | `market↔pivot` | D03, D06 | Evidence exchange, contested claims, confidence disputes | 1:00 → 2:10 |
@@ -158,6 +159,10 @@ await room.send({
   idempotency_key: hash(work_order_id, 'escalation', escalation.id),
 });
 ```
+
+The `executive-briefing` room is created at venture start and reused every morning. D13 posts one
+final internal broadcast after the heads converge on the day's goals; raw debate, speculative
+changes, and unresolved budget fights stay out of the all-company broadcast.
 
 **Shared context** is the room's small mutable blob — the aging invoice list in `sales↔finance`, the
 open-requisition list and remaining envelope in `hr↔all`. It lets two departments hold a *running

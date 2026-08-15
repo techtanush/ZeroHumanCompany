@@ -384,6 +384,30 @@ describe('projections and routing', () => {
     const wos = await k.db.query(`SELECT * FROM work_orders WHERE venture_id = $1 AND to_dept = 'D09'`, [v.venture_id]);
     expect(wos.rows).toHaveLength(0);
   });
+
+  it('routes the 7am daily briefing trigger to D13', async () => {
+    const routing = [{
+      id: 'daily_0700_to_executive_briefing',
+      when: { event: 'ops.daily_briefing_started', min_count: 1, all_signed: [], once: false },
+      emit: [{ work_order: { to: 'D13', intent: 'run_daily_executive_briefing', budget_usd: 2, params: { cadence: 'daily_0700', band_room: 'executive-briefing' } } }],
+    }];
+    const k = await freshKernel(routing);
+    const v = await venture(k);
+    await k.events.append({
+      venture_id: v.venture_id,
+      type: 'ops.daily_briefing_started',
+      actor_id: 'system.cron',
+      department_id: 'D13',
+      trace_id: v.trace_id,
+      payload: { meeting_date: '2026-08-15' },
+    });
+    await new Promise((r) => setTimeout(r, 80));
+
+    const wos = await k.db.query(`SELECT to_dept, intent, params FROM work_orders WHERE venture_id = $1 AND to_dept = 'D13'`, [v.venture_id]);
+    expect(wos.rows).toHaveLength(1);
+    expect(wos.rows[0]).toMatchObject({ to_dept: 'D13', intent: 'run_daily_executive_briefing' });
+    expect(wos.rows[0].params).toMatchObject({ band_room: 'executive-briefing' });
+  });
 });
 
 describe('vault', () => {
@@ -428,6 +452,15 @@ describe('http surface', () => {
 
     const timeline = await app.inject({ method: 'GET', url: `/v1/ventures/${venture_id}/timeline`, headers: { authorization: 'Bearer tok' } });
     expect(timeline.json().events.map((e: any) => e.type)).toContain('venture.created');
+
+    const briefing = await app.inject({
+      method: 'POST',
+      url: `/v1/ventures/${venture_id}/daily-briefing`,
+      headers: { authorization: 'Bearer tok' },
+      payload: { meeting_date: '2026-08-15', idempotency_key: 'daily-2026-08-15' },
+    });
+    expect(briefing.statusCode).toBe(201);
+    expect(briefing.json().event.type).toBe('ops.daily_briefing_started');
 
     const budgets = await app.inject({ method: 'GET', url: `/v1/budgets/${venture_id}`, headers: { authorization: 'Bearer tok' } });
     expect(budgets.json().budgets.length).toBe(13);

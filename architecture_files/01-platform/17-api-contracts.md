@@ -28,6 +28,7 @@ export const ApiError = z.object({
 | `POST` | `/v1/ventures` | Create venture from founder-led or autonomous mode |
 | `GET` | `/v1/ventures/:id` | Read venture projection |
 | `GET` | `/v1/ventures/:id/timeline` | Paged event timeline |
+| `POST` | `/v1/ventures/:id/daily-briefing` | Start the 7:00 AM executive briefing flow |
 | `GET` | `/v1/ventures/:id/artifacts` | Filter artifacts by type/quality |
 | `GET` | `/v1/artifacts/:id` | Fetch artifact body and source map |
 | `POST` | `/v1/work-orders` | Create a typed work order |
@@ -36,6 +37,30 @@ export const ApiError = z.object({
 | `POST` | `/v1/gates/:id/decision` | Approve/reject/provide code/text |
 | `GET` | `/v1/budgets/:venture_id` | Department envelopes and spend |
 | `POST` | `/v1/kill-switch` | Pause all side effects for a venture |
+
+## Daily briefing trigger
+
+The onboarding/morning-room flow is driven by an event, not a special frontend-only state. A local
+cron, founder click, or demo seed can emit:
+
+```ts
+export const StartDailyBriefing = z.object({
+  venture_id: z.string().uuid(),
+  type: z.literal('ops.daily_briefing_started'),
+  actor_id: z.string().default('system.cron'),
+  department_id: z.literal('D13'),
+  payload: z.object({
+    meeting_date: z.string(),             // YYYY-MM-DD is acceptable for display
+    timezone: z.string().default('America/Los_Angeles'),
+    band_room: z.string().default('executive-briefing'),
+    lookback_hours: z.number().int().positive().default(24),
+  }),
+});
+```
+
+Routing issues a D13 `run_daily_executive_briefing` work order. The frontend reads the latest signed
+`DailyBriefing` from `GET /v1/ventures/:id/artifacts?type=DailyBriefing&quality=signed` and displays
+its `company_goals`, `department_briefs`, `decisions`, `risks`, and `broadcasts`.
 
 ## Create venture
 

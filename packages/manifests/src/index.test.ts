@@ -49,8 +49,10 @@ describe('department manifests', () => {
 describe('routing table', () => {
   it('parses structured routing rules', () => {
     const routing = loadRouting();
-    expect(routing).toHaveLength(8);
-    expect(routing[0].when).toMatchObject({ event: 'artifact.signed', artifact_type: 'SharpenedIdea' });
+    expect(routing).toHaveLength(9);
+    expect(routing[0].when).toMatchObject({ event: 'ops.daily_briefing_started' });
+    expect(routing[1].when).toMatchObject({ event: 'artifact.signed', artifact_type: 'SharpenedIdea' });
     expect(routing.some((rule) => rule.when.gate_type === 'niche_selection')).toBe(true);
+    expect(routing.some((rule) => rule.id === 'daily_0700_to_executive_briefing')).toBe(true);
   });
 });

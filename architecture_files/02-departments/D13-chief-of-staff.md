@@ -1,6 +1,6 @@
 # D13 — Chief of Staff (Continuous Improvement)
 
-**Cluster:** meta · **Head:** `cos.head` · **Critic:** `cos.critic` · **Resident:** yes (wakes on cron `cos.daily` / `cos.weekly` / `cos.monthly` / `cos.quarterly`, on `Escalation(needs_capability)`, and on any escalation reaching rung 3)
+**Cluster:** meta · **Head:** `cos.head` · **Critic:** `cos.critic` · **Resident:** yes (wakes on `ops.daily_briefing_started` at ~7:00 AM, cron `cos.daily` / `cos.weekly` / `cos.monthly` / `cos.quarterly`, on `Escalation(needs_capability)`, and on any escalation reaching rung 3)
 
 ---
 
@@ -31,12 +31,14 @@ output is *changes to the company itself*.
 | Escalations (all, rung ≥ 3 routed here) | kernel | The company's pain log |
 | Critic verdicts + rubric scores (all departments) | artifact registry | Quality trend lines |
 | Gate decisions + founder redirect notes | gate engine | What the founder keeps correcting |
+| `executive-briefing` Band room | D01-D13 heads | Morning goals, blockers, cross-department asks |
 
 ### Outputs
 
 | Artifact | To | Contents |
 |---|---|---|
 | `CapabilityGap[]` | founder, Boardroom | Detected, classified, evidence-backed gaps |
+| `DailyBriefing` | all departments, Boardroom | 7:00 AM operating plan with company goals, department briefs, decisions, risks, and Band broadcast |
 | `ImprovementProposal[]` | founder (material ones), or self-executed (safe ones) | One of the seven proposal types with an eval plan |
 | `DepartmentManifest` (new/revised) | D07 for scaffolding, kernel for registration | A complete, validating manifest per [`D00-department-template.md`](D00-department-template.md) §3 |
 | `ReviewReport` (daily/weekly/monthly/quarterly) | founder digest, Boardroom | The cycle's metric read + actions |
@@ -126,6 +128,36 @@ export const ChangeRecord = z.object({
     executed: z.boolean().default(false),
     reason: z.string().optional(),
   }),
+});
+
+export const DailyBriefing = z.object({
+  cadence: z.literal('daily_0700'),
+  meeting_date: z.string(),
+  timezone: z.string(),
+  band_room: z.literal('executive-briefing'),
+  executive_attendees: z.array(z.object({
+    department_id: DepartmentId,
+    head_agent_id: z.string(),
+    role: z.string(),
+    status: z.enum(['present','async_update','missing']),
+  })).min(13),
+  company_goals: z.array(z.object({
+    id: z.string(),
+    goal: z.string(),
+    owner_department_id: DepartmentId,
+    metric: z.string(),
+    target: z.string(),
+    priority: z.enum(['p0','p1','p2']),
+    due_at: z.string(),
+  })).min(1),
+  department_briefs: z.array(z.object({
+    department_id: DepartmentId,
+    headline: z.string(),
+    goals: z.array(z.string()).min(1),
+    blockers: z.array(z.string()),
+    asks_of_other_departments: z.array(z.object({ to: DepartmentId, ask: z.string(), needed_by: z.string() })),
+  })).min(13),
+  broadcasts: z.array(z.object({ room: z.string(), message: z.string(), tool_call_ref: z.string().optional() })),
 });
 ```
 

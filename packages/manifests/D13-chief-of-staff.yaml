@@ -133,12 +133,25 @@ workers:
       - pioneer.classify
       - metrics.record_signal
     max_tokens_per_run: 60000
+  - agent_id: chief.daily-briefing-facilitator
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D13/daily-briefing-facilitator.md
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - band.publish
+      - pioneer.classify
+      - metrics.record_signal
+    max_tokens_per_run: 60000
 concurrency: 8
 budget:
   default_envelope_usd: 2
   hard_cap_usd: 5
 io:
   input:
+    - DailyBriefing
     - CapabilityGap
   output: CapabilityGap
   min_outputs: 1

@@ -7,6 +7,8 @@ describe('renderPrompt', () => {
     expect(rendered).toContain('ZeroHumanCompany runs autonomous departments');
     expect(rendered).toContain('Every numeric claim');
     expect(rendered).toContain('Execution playbook');
+    expect(rendered).toContain('Daily operating cadence');
+    expect(rendered).toContain('DailyBriefing');
     expect(rendered).toContain('Department execution matrix');
     expect(rendered).toContain('Output contract');
     expect(rendered).toContain('Intake head');
@@ -68,5 +70,13 @@ describe('renderPrompt', () => {
     expect(renderPrompt('prompts/D07/qa.md')).toContain('Block GitHub push or Render deploy');
     expect(renderPrompt('prompts/D07/security-reviewer.md')).toContain('Block Render deploy');
     expect(renderPrompt('prompts/D07/critic-rubric.md')).toContain('D07 blockers');
+  });
+
+  it('makes D13 own the 7am executive briefing', () => {
+    const head = renderPrompt('prompts/D13/head.md');
+    expect(head).toContain('run_daily_executive_briefing');
+    expect(head).toContain('executive-briefing');
+    expect(head).toContain('produce a signed DailyBriefing');
+    expect(renderPrompt('prompts/D13/daily-briefing-facilitator.md')).toContain('Represent every department head D01-D13');
   });
 });

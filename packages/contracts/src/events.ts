@@ -35,6 +35,8 @@ export const EventType = z.enum([
 
   'support.ticket_opened', 'support.ticket_resolved', 'support.signal_filed',
 
+  'ops.daily_briefing_started', 'ops.daily_briefing_published',
+
   'cos.gap_detected', 'cos.department_designed', 'cos.shadow_test_run', 'cos.department_deployed',
 
   'bus.degraded', 'bus.recovered',
@@ -117,6 +119,17 @@ export const EVENT_PAYLOADS = {
   'sales.deal_won': z.object({ deal_id: Uuid, amount_usd: Usd }),
   'sales.deal_lost': z.object({ deal_id: Uuid, reason: z.string() }),
   'support.signal_filed': z.object({ theme: z.string(), severity: z.string() }),
+  'ops.daily_briefing_started': z.object({
+    meeting_date: z.string(),
+    timezone: z.string().default('America/Los_Angeles'),
+    band_room: z.string().default('executive-briefing'),
+    lookback_hours: z.number().int().positive().default(24),
+  }),
+  'ops.daily_briefing_published': z.object({
+    artifact: ArtifactRef,
+    band_room: z.string(),
+    message_id: z.string().optional(),
+  }),
   'cos.gap_detected': z.object({ taxonomy: z.string(), summary: z.string() }),
 } as const;
 

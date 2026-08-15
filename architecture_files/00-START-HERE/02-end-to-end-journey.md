@@ -19,6 +19,30 @@ captured (phone for Linq, email, optional LinkedIn/Gmail OAuth via Composio).
 
 ---
 
+## Scene 0.5 — Daily executive briefing
+
+At about **7:00 AM in the venture timezone**, D13 Chief of Staff convenes the heads of D01-D13 in the
+Band room `executive-briefing`. This is the backend version of the "meeting room" visualization:
+department heads bring yesterday's artifacts, week-to-date metrics, open gates, budget pressure,
+sales/support/build signals, and capability gaps.
+
+The meeting produces a signed **`DailyBriefing`** artifact with:
+
+- all department-head attendance/status,
+- company-level P0/P1/P2 goals,
+- per-department assignments and budgets for the day,
+- explicit asks between departments,
+- decisions, risks, and mitigations,
+- the Band broadcast message the whole organization should see.
+
+The frontend should render the latest signed `DailyBriefing` as the morning room and then show each
+department's assigned goals on its own panel. Backend trigger: `ops.daily_briefing_started` routes a
+`run_daily_executive_briefing` work order to D13.
+
+→ **D13 Chief of Staff** ([`../02-departments/D13-chief-of-staff.md`](../02-departments/D13-chief-of-staff.md))
+
+---
+
 ## Scene 1 — Origination (Mode B only)
 
 A swarm reads the live internet for pain: Reddit complaint clusters, G2 1-star reviews, job

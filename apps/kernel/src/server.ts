@@ -128,6 +128,30 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
     return { events, latest_seq: await kernel.events.latestSeq(id) };
   });
 
+  app.post('/v1/ventures/:id/daily-briefing', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const v = await kernel.venture(id);
+    if (!v) throw new KernelError('venture_not_found', `no venture ${id}`, false, 404);
+    const b = (req.body ?? {}) as any;
+    const event = await kernel.events.append({
+      venture_id: id,
+      type: 'ops.daily_briefing_started',
+      actor_kind: b.actor_kind ?? 'system',
+      actor_id: b.actor_id ?? 'system.daily-briefing',
+      department_id: 'D13',
+      payload: {
+        meeting_date: b.meeting_date ?? new Date().toISOString().slice(0, 10),
+        timezone: b.timezone ?? 'America/Los_Angeles',
+        band_room: b.band_room ?? 'executive-briefing',
+        lookback_hours: b.lookback_hours ?? 24,
+      },
+      trace_id: await kernel.traceFor(id),
+      idempotency_key: b.idempotency_key,
+    });
+    reply.code(201);
+    return { event };
+  });
+
   app.get('/v1/ventures/:id/artifacts', async (req) => {
     const { id } = req.params as { id: string };
     const q = req.query as { type?: string; quality?: string };

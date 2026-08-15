@@ -8,6 +8,7 @@ const sharedRefs = [
   '_shared/evidence-rules.md',
   '_shared/safety.md',
   '_shared/execution-playbook.md',
+  '_shared/daily-cadence.md',
   '_shared/output-contract.md',
 ];
 

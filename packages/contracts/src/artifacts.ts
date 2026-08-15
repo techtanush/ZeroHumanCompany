@@ -12,7 +12,7 @@ export const ArtifactType = z.enum([
   'Interview', 'Claim', 'ClaimLedger', 'SyntheticPanelResult', 'IdeaDiff', 'ProductSpec',
   'Deployment', 'BuildFailure', 'GTMPlan', 'LeadBatch', 'Deal', 'Order',
   'Ticket', 'ProductSignal', 'BudgetAllocation', 'HumanWorkRequisition',
-  'CapabilityGap', 'DepartmentManifestArtifact',
+  'DailyBriefing', 'CapabilityGap', 'DepartmentManifestArtifact',
 ]);
 export type ArtifactType = z.infer<typeof ArtifactType>;
 
@@ -471,6 +471,67 @@ export const HumanWorkRequisition = z.object({
   status: z.enum(['drafted', 'posted', 'matched', 'delivered', 'accepted', 'paid', 'cancelled']),
 });
 
+export const DailyBriefing = z.object({
+  cadence: z.literal('daily_0700'),
+  meeting_date: z.string(),
+  timezone: z.string().default('America/Los_Angeles'),
+  band_room: z.string().default('executive-briefing'),
+  lookback: z.object({
+    since: z.string(),
+    until: z.string(),
+    sources: z.array(z.string()).min(1),
+  }),
+  executive_attendees: z.array(z.object({
+    department_id: DepartmentId,
+    head_agent_id: z.string(),
+    role: z.string(),
+    status: z.enum(['present', 'async_update', 'missing']).default('present'),
+  })).min(13),
+  company_goals: z.array(z.object({
+    id: z.string(),
+    goal: z.string(),
+    owner_department_id: DepartmentId,
+    metric: z.string(),
+    target: z.string(),
+    priority: z.enum(['p0', 'p1', 'p2']),
+    due_at: z.string(),
+  })).min(1),
+  department_briefs: z.array(z.object({
+    department_id: DepartmentId,
+    headline: z.string(),
+    goals: z.array(z.string()).min(1),
+    blockers: z.array(z.string()).default([]),
+    asks_of_other_departments: z.array(z.object({
+      to: DepartmentId,
+      ask: z.string(),
+      needed_by: z.string(),
+    })).default([]),
+    work_orders: z.array(z.object({
+      intent: z.string(),
+      budget_usd: Usd,
+      params: z.record(z.unknown()).default({}),
+    })).default([]),
+  })).min(13),
+  decisions: z.array(z.object({
+    decision: z.string(),
+    rationale: z.string(),
+    owner_department_id: DepartmentId,
+    reversible: z.boolean(),
+  })).default([]),
+  risks: z.array(z.object({
+    risk: z.string(),
+    severity: z.enum(['low', 'medium', 'high', 'critical']),
+    mitigation: z.string(),
+    owner_department_id: DepartmentId,
+  })).default([]),
+  broadcasts: z.array(z.object({
+    room: z.string(),
+    message: z.string(),
+    tool_call_ref: z.string().optional(),
+  })).default([]),
+});
+export type DailyBriefing = z.infer<typeof DailyBriefing>;
+
 export const CapabilityGap = z.object({
   taxonomy: z.enum([
     'missing_department', 'missing_tool', 'weak_prompt', 'bad_routing',
@@ -519,6 +580,7 @@ export const ARTIFACT_SCHEMAS = {
   ProductSignal,
   BudgetAllocation,
   HumanWorkRequisition,
+  DailyBriefing,
   CapabilityGap,
   DepartmentManifestArtifact,
 } as const satisfies Record<ArtifactType, z.ZodTypeAny>;
@@ -549,6 +611,7 @@ export const ARTIFACT_OWNER: Record<ArtifactType, DepartmentId> = {
   ProductSignal: 'D12',
   BudgetAllocation: 'D11',
   HumanWorkRequisition: 'D11',
+  DailyBriefing: 'D13',
   CapabilityGap: 'D13',
   DepartmentManifestArtifact: 'D13',
 };

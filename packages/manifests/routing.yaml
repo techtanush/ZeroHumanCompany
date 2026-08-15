@@ -1,3 +1,11 @@
+- id: daily_0700_to_executive_briefing
+  when:
+    event: ops.daily_briefing_started
+    min_count: 1
+    all_signed: []
+    once: false
+  emit:
+    - work_order: { to: D13, intent: run_daily_executive_briefing, budget_usd: 2.00, params: { cadence: daily_0700, band_room: executive-briefing } }
 - id: sharpened_idea_signed_to_parallel_validation
   when:
     event: artifact.signed

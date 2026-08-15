@@ -24,7 +24,7 @@ export interface HeadOptions {
   manifest: DepartmentManifest;
   ctx: Omit<RunContext, 'tools' | 'vars'> & { vars: Record<string, unknown> };
   /** Builds the tool array for one agent from its manifest allowlist. */
-  buildTools: (names: string[]) => RunContext['tools'];
+  buildTools: (names: string[], agent_id: string) => RunContext['tools'];
   /** Validate an output body before signing; returns violations. */
   preflight?: (type: ArtifactType, body: Record<string, unknown>, sources: SourceRef[]) => Promise<string[]>;
 }
@@ -53,7 +53,7 @@ export async function runHead(opts: HeadOptions): Promise<HeadOutcome> {
       slice.map((job) =>
         runAgent(job.spec, {
           ...ctx,
-          tools: opts.buildTools(job.spec.tools),
+          tools: opts.buildTools(job.spec.tools, job.spec.agent_id),
           vars: { ...ctx.vars, replica_index: job.replica },
         }),
       ),
@@ -86,7 +86,7 @@ export async function runHead(opts: HeadOptions): Promise<HeadOutcome> {
 
   const head = await runAgent(manifest.head, {
     ...ctx,
-    tools: opts.buildTools(manifest.head.tools),
+    tools: opts.buildTools(manifest.head.tools, manifest.head.agent_id),
     vars: mergeVars,
   });
   tokens_in += head.tokens_in;
@@ -137,7 +137,7 @@ export async function runHead(opts: HeadOptions): Promise<HeadOutcome> {
   if (defects.length > 0) {
     const revised = await runAgent(manifest.head, {
       ...ctx,
-      tools: opts.buildTools(manifest.head.tools),
+      tools: opts.buildTools(manifest.head.tools, manifest.head.agent_id),
       vars: {
         ...mergeVars,
         task: `Revise the artifacts to fix these defects, changing nothing else:\n- ${defects.join('\n- ')}`,

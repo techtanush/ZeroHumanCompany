@@ -126,7 +126,7 @@ export class Orchestrator {
 
       const outcome = await runHead({
         manifest,
-        buildTools: (names: string[]): Tool[] => this.tools.build(names, toolCtx),
+        buildTools: (names: string[], agent_id: string): Tool[] => this.tools.build(names, { ...toolCtx, agent_id }),
         preflight: async (type, body, sources) => {
           const v = await kernel.artifacts.checkEvidence(type, body, sources, wo.venture_id);
           return v.map((x) => `${x.json_pointer}: ${x.reason}`);

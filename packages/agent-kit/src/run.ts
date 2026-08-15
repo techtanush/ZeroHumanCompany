@@ -117,7 +117,7 @@ export async function runAgent(spec: AgentSpec, ctx: RunContext): Promise<AgentR
         continue;
       }
       try {
-        const out = await tool.run(use.input, ctx.toolCtx);
+        const out = await tool.run(use.input, { ...ctx.toolCtx, agent_id: spec.agent_id });
         tool_calls.push({ name: use.name, ok: true });
         results.push(`${use.name}: ${JSON.stringify(out).slice(0, 4000)}`);
       } catch (e) {

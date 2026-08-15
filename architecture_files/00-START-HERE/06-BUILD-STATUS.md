@@ -1,11 +1,12 @@
 # Build Status
 
-Snapshot after the architecture completion pass. The repository now contains **78 architecture files** under `architecture_files/`.
+Snapshot after the architecture completion pass. The repository now contains **79 architecture files** under `architecture_files/`.
 
 ## Complete coverage
 
 | Area | Files |
 |---|---|
+| Build tutorial | Top-level [`../BUILD-TUTORIAL.md`](../BUILD-TUTORIAL.md), the exact read/build order for the coding agent |
 | Start here | Index, north star, end-to-end journey, org chart, demo/judging, glossary, this status file |
 | Platform | System architecture, agent runtime, event bus, data model, memory, HITL, identity, money/metering, Boardroom UI, observability, evidence/truth, safety/compliance, permissions, secrets, fallbacks, evaluation, API contracts, state machines |
 | Departments | D00 template plus D01-D13, including D10 Sales and D13 continuous improvement |

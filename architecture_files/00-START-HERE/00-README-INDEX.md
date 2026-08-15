@@ -20,6 +20,9 @@ writes new agents for itself.**
 Read in this order. Each file is self-contained and written so a *fresh* Claude Code session can
 one-shot its slice without asking questions.
 
+**If you are the coding agent that will build the product, start with
+[`../BUILD-TUTORIAL.md`](../BUILD-TUTORIAL.md).** It gives the full read/build order.
+
 | # | Path | What it gives you |
 |---|------|-------------------|
 | 1 | [`01-north-star.md`](01-north-star.md) | Why this exists, the thesis, non-negotiables |

@@ -1,0 +1,4 @@
+export interface RealSpec { env: string; base_url: string; path: string; auth: (key: string) => Record<string, string> }
+export function hasEnv(env: string): boolean { return Boolean(process.env[env]); }
+export async function postJson(vendor: string, spec: RealSpec, args: unknown): Promise<unknown> { const key = process.env[spec.env]; if (!key) throw new Error(`Missing ${spec.env}`); const res = await fetch(`${spec.base_url}${spec.path}`, { method:'POST', headers:{ 'content-type':'application/json', ...spec.auth(key) }, body: JSON.stringify(args) }); const text = await res.text(); const body = text ? JSON.parse(text) as unknown : null; if (!res.ok) throw new Error(`${vendor} ${res.status}: ${text.slice(0,300)}`); return body; }
+export const bearer = (key: string): Record<string,string> => ({ authorization: `Bearer ${key}` });

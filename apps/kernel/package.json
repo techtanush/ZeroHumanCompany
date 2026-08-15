@@ -1,0 +1,22 @@
+{
+  "name": "@zeroth/kernel",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "start": "tsx src/main.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@zeroth/contracts": "workspace:^",
+    "@zeroth/db": "workspace:^",
+    "@zeroth/manifests": "workspace:^",
+    "@zeroth/prompts": "workspace:^",
+    "@zeroth/tool-plane": "workspace:^",
+    "fastify": "^5.12.0",
+    "zod": "^3.24.1"
+  }
+}

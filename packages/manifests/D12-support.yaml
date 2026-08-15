@@ -1,0 +1,97 @@
+{
+  id: "D12",
+  name: "Support",
+  cluster: "ops",
+  head: {
+    agent_id: "support.head",
+    model: "opus",
+    system_prompt_ref: "prompts/D12/head.md",
+    tools: [
+      "memory_read",
+      "memory_write",
+      "linq.send_card"
+    ],
+    max_tokens_per_run: 90000
+  },
+  critic: {
+    agent_id: "support.critic",
+    model: "sonnet",
+    rubric_ref: "prompts/D12/critic-rubric.md",
+    max_tokens_per_run: 30000
+  },
+  workers: [
+    {
+      agent_id: "support.triage",
+      model: "haiku",
+      replicas: 1,
+      system_prompt_ref: "prompts/D12/triage.md",
+      tools: [
+        "composio.gmail_send",
+        "memory_read",
+        "memory_write",
+        "github.push",
+        "linq.send_card"
+      ],
+      max_tokens_per_run: 60000
+    },
+    {
+      agent_id: "support.customer-success",
+      model: "sonnet",
+      replicas: 1,
+      system_prompt_ref: "prompts/D12/customer-success.md",
+      tools: [
+        "composio.gmail_send",
+        "memory_read",
+        "memory_write",
+        "github.push",
+        "linq.send_card"
+      ],
+      max_tokens_per_run: 60000
+    },
+    {
+      agent_id: "support.signal-miner",
+      model: "sonnet",
+      replicas: 1,
+      system_prompt_ref: "prompts/D12/signal-miner.md",
+      tools: [
+        "composio.gmail_send",
+        "memory_read",
+        "memory_write",
+        "github.push",
+        "linq.send_card"
+      ],
+      max_tokens_per_run: 60000
+    }
+  ],
+  concurrency: 4,
+  budget: {
+    default_envelope_usd: 0.5,
+    hard_cap_usd: 2
+  },
+  io: {
+    input: [
+      "Deal",
+      "Deployment"
+    ],
+    output: "Ticket",
+    min_outputs: 1
+  },
+  gates: [
+    "outbound_to_real_person",
+    "refund"
+  ],
+  sandbox: {
+    image: "zeroth/dept-base:latest",
+    cpu: 2,
+    mem_mb: 2048,
+    pause_between_cycles: true,
+    egress_allowlist: [
+      "api.anthropic.com",
+      "*.zeroth.local"
+    ]
+  },
+  sla: {
+    soft_deadline_s: 300,
+    on_timeout: "return_partial"
+  }
+}

@@ -1,0 +1,121 @@
+{
+  id: "D03",
+  name: "Market Research",
+  cluster: "discovery",
+  head: {
+    agent_id: "market.head",
+    model: "opus",
+    system_prompt_ref: "prompts/D03/head.md",
+    tools: [
+      "web_search",
+      "web_fetch",
+      "apify.run_actor",
+      "solari.browse",
+      "calc",
+      "memory_read",
+      "memory_write"
+    ],
+    max_tokens_per_run: 90000
+  },
+  critic: {
+    agent_id: "market.critic",
+    model: "sonnet",
+    rubric_ref: "prompts/D03/critic-rubric.md",
+    max_tokens_per_run: 30000
+  },
+  workers: [
+    {
+      agent_id: "market.demand",
+      model: "sonnet",
+      replicas: 2,
+      system_prompt_ref: "prompts/D03/demand.md",
+      tools: [
+        "web_search",
+        "web_fetch",
+        "apify.run_actor",
+        "solari.browse",
+        "calc",
+        "memory_read",
+        "memory_write"
+      ],
+      max_tokens_per_run: 60000
+    },
+    {
+      agent_id: "market.supply",
+      model: "sonnet",
+      replicas: 1,
+      system_prompt_ref: "prompts/D03/supply.md",
+      tools: [
+        "web_search",
+        "web_fetch",
+        "apify.run_actor",
+        "solari.browse",
+        "calc",
+        "memory_read",
+        "memory_write"
+      ],
+      max_tokens_per_run: 60000
+    },
+    {
+      agent_id: "market.money",
+      model: "sonnet",
+      replicas: 1,
+      system_prompt_ref: "prompts/D03/money.md",
+      tools: [
+        "web_search",
+        "web_fetch",
+        "apify.run_actor",
+        "solari.browse",
+        "calc",
+        "memory_read",
+        "memory_write"
+      ],
+      max_tokens_per_run: 60000
+    },
+    {
+      agent_id: "market.niche",
+      model: "sonnet",
+      replicas: 1,
+      system_prompt_ref: "prompts/D03/niche.md",
+      tools: [
+        "web_search",
+        "web_fetch",
+        "apify.run_actor",
+        "solari.browse",
+        "calc",
+        "memory_read",
+        "memory_write"
+      ],
+      max_tokens_per_run: 60000
+    }
+  ],
+  concurrency: 8,
+  budget: {
+    default_envelope_usd: 4,
+    hard_cap_usd: 8
+  },
+  io: {
+    input: [
+      "SharpenedIdea"
+    ],
+    output: "NicheDossier",
+    min_outputs: 3
+  },
+  gates: [
+    "niche_selection"
+  ],
+  sandbox: {
+    image: "zeroth/dept-base:latest",
+    cpu: 2,
+    mem_mb: 2048,
+    pause_between_cycles: true,
+    egress_allowlist: [
+      "api.anthropic.com",
+      "*.zeroth.local"
+    ]
+  },
+  sla: {
+    soft_deadline_s: 300,
+    on_timeout: "return_partial"
+  }
+}

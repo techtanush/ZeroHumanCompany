@@ -1,0 +1,103 @@
+{
+  id: "D10",
+  name: "Sales",
+  cluster: "gtm",
+  head: {
+    agent_id: "sales.head",
+    model: "opus",
+    system_prompt_ref: "prompts/D10/head.md",
+    tools: [
+      "linq.send_card",
+      "memory_read",
+      "memory_write"
+    ],
+    max_tokens_per_run: 90000
+  },
+  critic: {
+    agent_id: "sales.critic",
+    model: "sonnet",
+    rubric_ref: "prompts/D10/critic-rubric.md",
+    max_tokens_per_run: 30000
+  },
+  workers: [
+    {
+      agent_id: "sales.copywriter",
+      model: "sonnet",
+      replicas: 1,
+      system_prompt_ref: "prompts/D10/copywriter.md",
+      tools: [
+        "composio.gmail_send",
+        "linq.send_card",
+        "stripe.create_payment_link",
+        "whop.create_checkout",
+        "dodo.create_checkout",
+        "memory_read",
+        "memory_write"
+      ],
+      max_tokens_per_run: 60000
+    },
+    {
+      agent_id: "sales.closer",
+      model: "sonnet",
+      replicas: 1,
+      system_prompt_ref: "prompts/D10/closer.md",
+      tools: [
+        "composio.gmail_send",
+        "linq.send_card",
+        "stripe.create_payment_link",
+        "whop.create_checkout",
+        "dodo.create_checkout",
+        "memory_read",
+        "memory_write"
+      ],
+      max_tokens_per_run: 60000
+    },
+    {
+      agent_id: "sales.ops",
+      model: "sonnet",
+      replicas: 1,
+      system_prompt_ref: "prompts/D10/ops.md",
+      tools: [
+        "composio.gmail_send",
+        "linq.send_card",
+        "stripe.create_payment_link",
+        "whop.create_checkout",
+        "dodo.create_checkout",
+        "memory_read",
+        "memory_write"
+      ],
+      max_tokens_per_run: 60000
+    }
+  ],
+  concurrency: 4,
+  budget: {
+    default_envelope_usd: 3,
+    hard_cap_usd: 8
+  },
+  io: {
+    input: [
+      "LeadBatch",
+      "GTMPlan"
+    ],
+    output: "Deal",
+    min_outputs: 1
+  },
+  gates: [
+    "outbound_to_real_person",
+    "money_out"
+  ],
+  sandbox: {
+    image: "zeroth/dept-base:latest",
+    cpu: 2,
+    mem_mb: 2048,
+    pause_between_cycles: true,
+    egress_allowlist: [
+      "api.anthropic.com",
+      "*.zeroth.local"
+    ]
+  },
+  sla: {
+    soft_deadline_s: 300,
+    on_timeout: "return_partial"
+  }
+}

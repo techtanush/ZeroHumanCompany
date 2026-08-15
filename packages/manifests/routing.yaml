@@ -1,0 +1,72 @@
+- id: sharpened_idea_signed_to_parallel_validation
+  when:
+    event: artifact.signed
+    artifact_type: SharpenedIdea
+    min_count: 1
+    all_signed: []
+    once: true
+  emit:
+    - work_order: { to: D03, intent: research_niches, budget_usd: 4.00, params: {} }
+    - work_order: { to: D04, intent: mine_network, budget_usd: 3.00, params: {} }
+    - work_order: { to: D05, intent: build_panel, budget_usd: 1.50, params: {} }
+- id: niche_dossiers_open_selection_gate
+  when:
+    event: artifact.signed
+    artifact_type: NicheDossier
+    min_count: 3
+    all_signed: []
+    once: true
+  emit:
+    - gate: { gate_type: niche_selection, department_id: D03, summary: Select the niche to validate with discovery interviews. }
+- id: niche_selection_approved_to_interviews
+  when:
+    event: gate.approved
+    gate_type: niche_selection
+    min_count: 1
+    all_signed: []
+    once: true
+  emit:
+    - work_order: { to: D04, intent: run_discovery_interviews, budget_usd: 6.00, params: {} }
+- id: validation_evidence_to_pivot
+  when:
+    event: artifact.signed
+    min_count: 1
+    all_signed: [ClaimLedger, SyntheticPanelResult]
+    once: true
+  emit:
+    - work_order: { to: D06, intent: propose_pivots, budget_usd: 3.00, params: {} }
+- id: product_spec_to_build_and_gtm
+  when:
+    event: artifact.signed
+    artifact_type: ProductSpec
+    min_count: 1
+    all_signed: []
+    once: true
+  emit:
+    - work_order: { to: D07, intent: build_product, budget_usd: 12.00, params: {} }
+    - work_order: { to: D08, intent: draft_gtm, budget_usd: 3.00, params: {} }
+- id: deployment_to_leads
+  when:
+    event: build.deployed
+    min_count: 1
+    all_signed: []
+    once: true
+  emit:
+    - work_order: { to: D09, intent: build_lead_lists, budget_usd: 4.00, params: {} }
+- id: deal_won_to_finance_and_support
+  when:
+    event: sales.deal_won
+    min_count: 1
+    all_signed: []
+    once: false
+  emit:
+    - work_order: { to: D11, intent: collect_and_reconcile, budget_usd: 0.50, params: {} }
+    - work_order: { to: D12, intent: onboard_customer, budget_usd: 0.50, params: {} }
+- id: capability_gap_to_chief_of_staff
+  when:
+    event: cos.gap_detected
+    min_count: 1
+    all_signed: []
+    once: false
+  emit:
+    - work_order: { to: D13, intent: review_company, budget_usd: 2.00, params: {} }

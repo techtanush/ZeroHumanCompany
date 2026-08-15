@@ -1,0 +1,100 @@
+{
+  id: "D13",
+  name: "Chief of Staff",
+  cluster: "ops",
+  head: {
+    agent_id: "chief.head",
+    model: "opus",
+    system_prompt_ref: "prompts/D13/head.md",
+    tools: [
+      "memory_read",
+      "memory_write",
+      "replay.run_suite",
+      "band.publish",
+      "pioneer.classify"
+    ],
+    max_tokens_per_run: 90000
+  },
+  critic: {
+    agent_id: "chief.critic",
+    model: "sonnet",
+    rubric_ref: "prompts/D13/critic-rubric.md",
+    max_tokens_per_run: 30000
+  },
+  workers: [
+    {
+      agent_id: "chief.observer",
+      model: "sonnet",
+      replicas: 1,
+      system_prompt_ref: "prompts/D13/observer.md",
+      tools: [
+        "memory_read",
+        "memory_write",
+        "github.push",
+        "replay.run_suite",
+        "band.publish",
+        "pioneer.classify"
+      ],
+      max_tokens_per_run: 60000
+    },
+    {
+      agent_id: "chief.designer",
+      model: "sonnet",
+      replicas: 1,
+      system_prompt_ref: "prompts/D13/designer.md",
+      tools: [
+        "memory_read",
+        "memory_write",
+        "github.push",
+        "replay.run_suite",
+        "band.publish",
+        "pioneer.classify"
+      ],
+      max_tokens_per_run: 60000
+    },
+    {
+      agent_id: "chief.shadow-tester",
+      model: "sonnet",
+      replicas: 1,
+      system_prompt_ref: "prompts/D13/shadow-tester.md",
+      tools: [
+        "memory_read",
+        "memory_write",
+        "github.push",
+        "replay.run_suite",
+        "band.publish",
+        "pioneer.classify"
+      ],
+      max_tokens_per_run: 60000
+    }
+  ],
+  concurrency: 4,
+  budget: {
+    default_envelope_usd: 2,
+    hard_cap_usd: 5
+  },
+  io: {
+    input: [
+      "CapabilityGap"
+    ],
+    output: "CapabilityGap",
+    min_outputs: 1
+  },
+  gates: [
+    "new_department"
+  ],
+  sandbox: {
+    image: "zeroth/dept-base:latest",
+    cpu: 2,
+    mem_mb: 2048,
+    pause_between_cycles: true,
+    egress_allowlist: [
+      "api.anthropic.com",
+      "*.zeroth.local"
+    ]
+  },
+  sla: {
+    soft_deadline_s: 300,
+    on_timeout: "return_partial"
+  }
+}

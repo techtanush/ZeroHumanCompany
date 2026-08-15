@@ -1,0 +1,95 @@
+{
+  id: "D02",
+  name: "Office Hours",
+  cluster: "discovery",
+  head: {
+    agent_id: "office.head",
+    model: "opus",
+    system_prompt_ref: "prompts/D02/head.md",
+    tools: [
+      "linq.send_card",
+      "web_search",
+      "web_fetch",
+      "memory_read",
+      "memory_write"
+    ],
+    max_tokens_per_run: 90000
+  },
+  critic: {
+    agent_id: "office.critic",
+    model: "sonnet",
+    rubric_ref: "prompts/D02/critic-rubric.md",
+    max_tokens_per_run: 30000
+  },
+  workers: [
+    {
+      agent_id: "office.devils-advocate",
+      model: "sonnet",
+      replicas: 1,
+      system_prompt_ref: "prompts/D02/devils-advocate.md",
+      tools: [
+        "linq.send_card",
+        "web_search",
+        "web_fetch",
+        "memory_read",
+        "memory_write"
+      ],
+      max_tokens_per_run: 60000
+    },
+    {
+      agent_id: "office.scribe",
+      model: "haiku",
+      replicas: 1,
+      system_prompt_ref: "prompts/D02/scribe.md",
+      tools: [
+        "linq.send_card",
+        "web_search",
+        "web_fetch",
+        "memory_read",
+        "memory_write"
+      ],
+      max_tokens_per_run: 60000
+    },
+    {
+      agent_id: "office.proxy",
+      model: "sonnet",
+      replicas: 1,
+      system_prompt_ref: "prompts/D02/proxy.md",
+      tools: [
+        "linq.send_card",
+        "web_search",
+        "web_fetch",
+        "memory_read",
+        "memory_write"
+      ],
+      max_tokens_per_run: 60000
+    }
+  ],
+  concurrency: 4,
+  budget: {
+    default_envelope_usd: 2,
+    hard_cap_usd: 4
+  },
+  io: {
+    input: [
+      "IdeaSeed"
+    ],
+    output: "SharpenedIdea",
+    min_outputs: 1
+  },
+  gates: [],
+  sandbox: {
+    image: "zeroth/dept-base:latest",
+    cpu: 2,
+    mem_mb: 2048,
+    pause_between_cycles: true,
+    egress_allowlist: [
+      "api.anthropic.com",
+      "*.zeroth.local"
+    ]
+  },
+  sla: {
+    soft_deadline_s: 300,
+    on_timeout: "return_partial"
+  }
+}

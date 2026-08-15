@@ -1,0 +1,105 @@
+{
+  id: "D01",
+  name: "Intake",
+  cluster: "discovery",
+  head: {
+    agent_id: "intake.head",
+    model: "opus",
+    system_prompt_ref: "prompts/D01/head.md",
+    tools: [
+      "linq.send_card",
+      "web_fetch",
+      "web_search",
+      "apify.run_actor",
+      "solari.browse",
+      "calc",
+      "memory_read",
+      "memory_write"
+    ],
+    max_tokens_per_run: 90000
+  },
+  critic: {
+    agent_id: "intake.critic",
+    model: "sonnet",
+    rubric_ref: "prompts/D01/critic-rubric.md",
+    max_tokens_per_run: 30000
+  },
+  workers: [
+    {
+      agent_id: "intake.parser",
+      model: "sonnet",
+      replicas: 1,
+      system_prompt_ref: "prompts/D01/parser.md",
+      tools: [
+        "linq.send_card",
+        "web_fetch",
+        "web_search",
+        "apify.run_actor",
+        "solari.browse",
+        "calc",
+        "memory_read",
+        "memory_write"
+      ],
+      max_tokens_per_run: 60000
+    },
+    {
+      agent_id: "intake.trend-scout",
+      model: "sonnet",
+      replicas: 1,
+      system_prompt_ref: "prompts/D01/trend-scout.md",
+      tools: [
+        "linq.send_card",
+        "web_fetch",
+        "web_search",
+        "apify.run_actor",
+        "solari.browse",
+        "calc",
+        "memory_read",
+        "memory_write"
+      ],
+      max_tokens_per_run: 60000
+    },
+    {
+      agent_id: "intake.scorer",
+      model: "sonnet",
+      replicas: 1,
+      system_prompt_ref: "prompts/D01/scorer.md",
+      tools: [
+        "linq.send_card",
+        "web_fetch",
+        "web_search",
+        "apify.run_actor",
+        "solari.browse",
+        "calc",
+        "memory_read",
+        "memory_write"
+      ],
+      max_tokens_per_run: 60000
+    }
+  ],
+  concurrency: 4,
+  budget: {
+    default_envelope_usd: 2,
+    hard_cap_usd: 4
+  },
+  io: {
+    input: [],
+    output: "IdeaSeed",
+    min_outputs: 1
+  },
+  gates: [],
+  sandbox: {
+    image: "zeroth/dept-base:latest",
+    cpu: 2,
+    mem_mb: 2048,
+    pause_between_cycles: true,
+    egress_allowlist: [
+      "api.anthropic.com",
+      "*.zeroth.local"
+    ]
+  },
+  sla: {
+    soft_deadline_s: 300,
+    on_timeout: "return_partial"
+  }
+}

@@ -1,0 +1,104 @@
+{
+  id: "D09",
+  name: "Leads",
+  cluster: "gtm",
+  head: {
+    agent_id: "leads.head",
+    model: "opus",
+    system_prompt_ref: "prompts/D09/head.md",
+    tools: [
+      "web_search",
+      "web_fetch",
+      "apify.run_actor",
+      "solari.browse",
+      "memory_read",
+      "memory_write",
+      "pioneer.classify"
+    ],
+    max_tokens_per_run: 90000
+  },
+  critic: {
+    agent_id: "leads.critic",
+    model: "sonnet",
+    rubric_ref: "prompts/D09/critic-rubric.md",
+    max_tokens_per_run: 30000
+  },
+  workers: [
+    {
+      agent_id: "leads.list-builder",
+      model: "sonnet",
+      replicas: 2,
+      system_prompt_ref: "prompts/D09/list-builder.md",
+      tools: [
+        "web_search",
+        "web_fetch",
+        "apify.run_actor",
+        "solari.browse",
+        "memory_read",
+        "memory_write",
+        "pioneer.classify"
+      ],
+      max_tokens_per_run: 60000
+    },
+    {
+      agent_id: "leads.enricher",
+      model: "sonnet",
+      replicas: 1,
+      system_prompt_ref: "prompts/D09/enricher.md",
+      tools: [
+        "web_search",
+        "web_fetch",
+        "apify.run_actor",
+        "solari.browse",
+        "memory_read",
+        "memory_write",
+        "pioneer.classify"
+      ],
+      max_tokens_per_run: 60000
+    },
+    {
+      agent_id: "leads.scorer",
+      model: "sonnet",
+      replicas: 1,
+      system_prompt_ref: "prompts/D09/scorer.md",
+      tools: [
+        "web_search",
+        "web_fetch",
+        "apify.run_actor",
+        "solari.browse",
+        "memory_read",
+        "memory_write",
+        "pioneer.classify"
+      ],
+      max_tokens_per_run: 60000
+    }
+  ],
+  concurrency: 8,
+  budget: {
+    default_envelope_usd: 4,
+    hard_cap_usd: 8
+  },
+  io: {
+    input: [
+      "Deployment",
+      "GTMPlan"
+    ],
+    output: "LeadBatch",
+    min_outputs: 1
+  },
+  gates: [],
+  sandbox: {
+    image: "zeroth/dept-base:latest",
+    cpu: 2,
+    mem_mb: 2048,
+    pause_between_cycles: true,
+    egress_allowlist: [
+      "api.anthropic.com",
+      "*.zeroth.local"
+    ]
+  },
+  sla: {
+    soft_deadline_s: 300,
+    on_timeout: "return_partial"
+  }
+}

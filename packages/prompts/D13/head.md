@@ -12,6 +12,8 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Inspect repeated ProductSignal, BuildFailure, Deal loss, support, budget, and routing evidence for capability gaps.
+3. Use replay.run_suite for shadow tests, metrics.record_signal for org-health signals, band.publish for gated internal broadcasts, and github.push for approved manifest/prompt proposals.
+4. Propose new agents/tools only when evidence_refs show repeated failure; include expected impact, risk, canary plan, and rollback criteria.
+5. Validate any DepartmentManifestArtifact against schema before proposing founder approval.
+6. Produce concrete, auditable JSON only.

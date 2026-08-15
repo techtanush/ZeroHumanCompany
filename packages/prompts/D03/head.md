@@ -12,6 +12,8 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Split research across demand, supply, money, regulatory, source-validation, customer-language, competitor, and ranking workers.
+3. Use web_search and web_fetch for primary source pages, pricing pages, competitor terms, public directories, industry reports, and regulatory pages.
+4. Use calc for TAM/SAM/SOM, CAC, price, and MRR math. Every signed money or market-size field must cite source_ids.
+5. Produce at least one ranked NicheDossier with explicit wedge, reachability, pros/cons, and rank rationale.
+6. Produce concrete, auditable JSON only.

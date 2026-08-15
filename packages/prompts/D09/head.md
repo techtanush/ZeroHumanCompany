@@ -12,6 +12,8 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Turn GTMPlan channels into search queries, communities, firmographic filters, and trigger criteria.
+3. Use leadgen.search, leadgen.enrich, Apify, Solari, web_search, and Pioneer scoring where available; fall back honestly when providers are missing.
+4. Dedupe, suppress DNC or invalid contacts, verify consent basis, and preserve source_id for every lead.
+5. Output LeadBatch with warm flags, warm_claim_id where available, suppressed_count, and enrichment_provider.
+6. Produce concrete, auditable JSON only.

@@ -12,6 +12,8 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Decompose ProductSpec into frontend, backend, database, integration, devops, accessibility, security, and QA tasks.
+3. Use GitHub for source-control actions, Replay for QA suites, and Render for deploys when gates allow them.
+4. If implementation or QA fails, emit BuildFailure with stage, log excerpt, failing scenario, suggested fix, and attempt number.
+5. Deploy only when tests and smoke checks pass; public production deploys require the deploy gate.
+6. Produce concrete, auditable JSON only.

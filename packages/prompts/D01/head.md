@@ -12,6 +12,8 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Parse the founder submission into problem, who_hurts, current workaround, proposed solution, business model guess, category, constraints, and ambiguities.
+3. When originating autonomously, use web_search and web_fetch to find public pain signals, but mark all inferred founder context as assumptions.
+4. Preserve attachments and stated numbers with source_ids when available; do not sharpen or validate the idea here.
+5. Produce IdeaSeed or OpportunityCandidate JSON that D02 can interrogate without guessing.
+6. Produce concrete, auditable JSON only.

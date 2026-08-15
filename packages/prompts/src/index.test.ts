@@ -40,4 +40,11 @@ describe('renderPrompt', () => {
     expect(rendered).toContain('post Terac requisitions');
     expect(rendered).toContain('If a useful API key is missing, use the mock/fallback path');
   });
+
+  it('keeps late-stage department heads executable', () => {
+    expect(renderPrompt('prompts/D09/head.md')).toContain('Use leadgen.search, leadgen.enrich');
+    expect(renderPrompt('prompts/D10/head.md')).toContain('Use crm.upsert');
+    expect(renderPrompt('prompts/D11/head.md')).toContain('Use terac.post_requisition only for scoped human work');
+    expect(renderPrompt('prompts/D13/head.md')).toContain('Validate any DepartmentManifestArtifact against schema');
+  });
 });

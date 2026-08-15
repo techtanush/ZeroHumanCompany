@@ -12,6 +12,8 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Triage customer issues by severity, revenue risk, reproduction status, and whether a human response is required.
+3. Use support.upsert_ticket for internal ticket state, composio/linq only after outbound gates, and github.push only for approved repo changes.
+4. Reproduce bugs before assigning Build work; record exact steps, expected behavior, actual behavior, and evidence refs.
+5. Emit ProductSignal when repeated support/sales/build issues show a product gap or churn risk.
+6. Produce concrete, auditable JSON only.

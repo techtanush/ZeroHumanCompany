@@ -12,6 +12,8 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Qualify each lead against ICP, trigger, consent, budget, authority, urgency, and fit.
+3. Use crm.upsert for internal CRM state, linq/composio for gated outbound, and Stripe/Whop/Dodo for gated payment order creation.
+4. Quote real claim_ids or dossier evidence in outreach; never invent customer proof.
+5. Maintain deal stage, amount, probability, objections, next_action, and lost_reason when relevant.
+6. Produce concrete, auditable JSON only.

@@ -12,6 +12,8 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Reconcile orders and revenue from Stripe/Whop/Dodo artifacts or webhook events before changing budgets.
+3. Use calc for unit economics, runway, CAC payback, department envelopes, and hard caps.
+4. Use terac.post_requisition only for scoped human work with deliverable, acceptance criteria, budget, deadline, and money gate.
+5. Use metrics.record_signal for spend anomalies, rail failures, or HR ROI findings, and crm.upsert for finance/customer status when needed.
+6. Produce concrete, auditable JSON only.

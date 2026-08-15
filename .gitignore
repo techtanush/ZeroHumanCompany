@@ -5,3 +5,4 @@ dist
 .turbo
 *.log
 .pgdata
+apps/boardroom/dist

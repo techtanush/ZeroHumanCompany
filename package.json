@@ -9,7 +9,9 @@
     "dev:kernel": "pnpm -F @zeroth/kernel dev",
     "dev:simpop": "pnpm -F @zeroth/simpop exec tsx src/server.ts",
     "dev:orchestrator": "pnpm -F @zeroth/orchestrator dev",
-    "demo": "pnpm -F @zeroth/orchestrator exec tsx src/demo.ts"
+    "demo": "pnpm -F @zeroth/orchestrator exec tsx src/demo.ts",
+    "dev:boardroom": "pnpm -F @zeroth/boardroom dev",
+    "build:boardroom": "pnpm -F @zeroth/boardroom build"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

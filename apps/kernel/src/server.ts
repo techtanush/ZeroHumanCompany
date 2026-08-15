@@ -2,6 +2,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { Kernel } from './kernel.js';
 import { KernelError, type StoredEvent } from './event-store.js';
+import { sendFounderText } from './founder-channel.js';
 import { nowIso, uuid } from './util.js';
 import { integrationStatus, probe, sendLinqText, setIntegrationVar, INTEGRATIONS } from './integrations.js';
 import { VOICE_CONSENT_TEXT_V1 } from './voice.js';
@@ -173,6 +174,36 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
     });
     reply.code(201);
     return { event };
+  });
+
+  app.post('/v1/ventures/:id/transfer-onboarding-to-phone', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const v = await kernel.venture(id);
+    if (!v) throw new KernelError('venture_not_found', `no venture ${id}`, false, 404);
+    const b = unwrapBody(req.body);
+    const text = String(b.text ?? "Let's continue the onboarding process here. Reply with your next answer, or type STOP to pause.");
+    const result = await sendFounderText({
+      text,
+      to: typeof b.phone_e164 === 'string' ? b.phone_e164 : undefined,
+      metadata: { venture_id: id, kind: 'onboarding_transfer', step: b.step ?? 'current' },
+    });
+    const event = await kernel.events.append({
+      venture_id: id,
+      type: 'human.notified',
+      actor_kind: 'system',
+      actor_id: 'kernel.founder-channel',
+      payload: {
+        channel: 'linq',
+        purpose: 'onboarding_transfer',
+        delivered: result.delivered,
+        message_id: result.message_id,
+        degraded: result.degraded,
+      },
+      trace_id: await kernel.traceFor(id),
+      idempotency_key: b.idempotency_key ?? `onboarding_transfer:${id}:${b.step ?? 'current'}`,
+    });
+    reply.code(202);
+    return { event, delivery: result };
   });
 
   app.get('/v1/ventures/:id/artifacts', async (req) => {

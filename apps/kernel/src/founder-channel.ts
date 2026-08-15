@@ -19,8 +19,19 @@ function gateText(gate: GateRecord): string {
 }
 
 export async function notifyFounderByLinq(gate: GateRecord): Promise<FounderNoticeResult> {
+  return sendFounderText({
+    text: gateText(gate),
+    metadata: { gate_id: gate.id, venture_id: gate.venture_id },
+  });
+}
+
+export async function sendFounderText(input: {
+  text: string;
+  to?: string;
+  metadata?: Record<string, unknown>;
+}): Promise<FounderNoticeResult> {
   const apiKey = process.env.LINQ_API_KEY;
-  const founderPhone = process.env.FOUNDER_PHONE;
+  const founderPhone = input.to ?? process.env.FOUNDER_PHONE;
   if (!apiKey || !founderPhone) {
     return { delivered: false, degraded: 'missing LINQ_API_KEY or FOUNDER_PHONE' };
   }
@@ -30,8 +41,8 @@ export async function notifyFounderByLinq(gate: GateRecord): Promise<FounderNoti
     from: process.env.LINQ_FROM_NUMBER || undefined,
     to: [founderPhone],
     message: {
-      parts: [{ text: gateText(gate) }],
-      metadata: { gate_id: gate.id, venture_id: gate.venture_id },
+      parts: [{ text: input.text }],
+      metadata: input.metadata ?? {},
     },
   };
 

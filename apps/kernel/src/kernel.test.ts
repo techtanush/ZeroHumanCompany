@@ -473,6 +473,15 @@ describe('http surface', () => {
     expect(briefing.statusCode).toBe(201);
     expect(briefing.json().event.type).toBe('ops.daily_briefing_started');
 
+    const phoneTransfer = await app.inject({
+      method: 'POST',
+      url: `/v1/ventures/${venture_id}/transfer-onboarding-to-phone`,
+      headers: { authorization: 'Bearer tok' },
+      payload: { step: 'office-hours', phone_e164: '+15555555555', idempotency_key: 'phone-transfer-1' },
+    });
+    expect(phoneTransfer.statusCode).toBe(202);
+    expect(phoneTransfer.json().delivery.delivered).toBe(false);
+
     const budgets = await app.inject({ method: 'GET', url: `/v1/budgets/${venture_id}`, headers: { authorization: 'Bearer tok' } });
     expect(budgets.json().budgets.length).toBe(13);
 

@@ -29,6 +29,7 @@ export const ApiError = z.object({
 | `GET` | `/v1/ventures/:id` | Read venture projection |
 | `GET` | `/v1/ventures/:id/timeline` | Paged event timeline |
 | `POST` | `/v1/ventures/:id/daily-briefing` | Start the 7:00 AM executive briefing flow |
+| `POST` | `/v1/ventures/:id/transfer-onboarding-to-phone` | Send a Linq/SMS handoff so onboarding can continue on the founder phone |
 | `GET` | `/v1/ventures/:id/artifacts` | Filter artifacts by type/quality |
 | `GET` | `/v1/artifacts/:id` | Fetch artifact body and source map |
 | `POST` | `/v1/work-orders` | Create a typed work order |
@@ -61,6 +62,24 @@ export const StartDailyBriefing = z.object({
 Routing issues a D13 `run_daily_executive_briefing` work order. The frontend reads the latest signed
 `DailyBriefing` from `GET /v1/ventures/:id/artifacts?type=DailyBriefing&quality=signed` and displays
 its `company_goals`, `department_briefs`, `decisions`, `risks`, and `broadcasts`.
+
+## Transfer onboarding to phone
+
+The frontend may let the founder move the onboarding conversation from browser to phone after phone
+setup:
+
+```ts
+export const TransferOnboardingToPhone = z.object({
+  phone_e164: z.string().optional(),      // defaults to FOUNDER_PHONE when omitted
+  step: z.string().default('current'),
+  text: z.string().optional(),            // defaults to "Let's continue the onboarding process here..."
+  idempotency_key: z.string().optional(),
+});
+```
+
+`POST /v1/ventures/:id/transfer-onboarding-to-phone` sends a Linq message when configured and always
+records a `human.notified` event with `purpose:"onboarding_transfer"` so the UI can show delivered
+or degraded state.
 
 ## Create venture
 

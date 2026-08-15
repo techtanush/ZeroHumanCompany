@@ -9,6 +9,11 @@ head:
     - calc
     - memory_read
     - memory_write
+    - stripe.create_payment_link
+    - whop.create_checkout
+    - dodo.create_checkout
+    - terac.post_requisition
+    - crm.upsert
     - metrics.record_signal
   max_tokens_per_run: 90000
 critic:
@@ -23,6 +28,8 @@ workers:
     system_prompt_ref: prompts/D11/treasury.md
     tools:
       - stripe.create_payment_link
+      - whop.create_checkout
+      - dodo.create_checkout
       - terac.post_requisition
       - calc
       - crm.upsert
@@ -36,6 +43,8 @@ workers:
     system_prompt_ref: prompts/D11/hr-buyer.md
     tools:
       - stripe.create_payment_link
+      - whop.create_checkout
+      - dodo.create_checkout
       - terac.post_requisition
       - calc
       - crm.upsert
@@ -49,6 +58,8 @@ workers:
     system_prompt_ref: prompts/D11/reconciler.md
     tools:
       - stripe.create_payment_link
+      - whop.create_checkout
+      - dodo.create_checkout
       - terac.post_requisition
       - calc
       - crm.upsert
@@ -63,6 +74,9 @@ workers:
     tools: &a1
       - calc
       - memory_read
+      - memory_write
+      - stripe.create_payment_link
+      - crm.upsert
       - pioneer.classify
       - metrics.record_signal
     max_tokens_per_run: 60000
@@ -70,31 +84,65 @@ workers:
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D11/rail-selector.md
-    tools: *a1
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - stripe.create_payment_link
+      - whop.create_checkout
+      - dodo.create_checkout
+      - crm.upsert
+      - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: finance.unit-economist
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D11/unit-economist.md
-    tools: *a1
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - crm.upsert
+      - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: finance.spend-anomaly-detector
     model: haiku
     replicas: 1
     system_prompt_ref: prompts/D11/spend-anomaly-detector.md
-    tools: *a1
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - crm.upsert
+      - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: finance.terac-roi-analyst
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D11/terac-roi-analyst.md
-    tools: *a1
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - terac.post_requisition
+      - crm.upsert
+      - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: finance.payout-auditor
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D11/payout-auditor.md
-    tools: *a1
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - crm.upsert
+      - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
 concurrency: 8
 budget:
@@ -109,6 +157,7 @@ io:
 gates:
   - money_out
   - account_creation
+  - refund
 sandbox:
   image: zeroth/dept-base:latest
   cpu: 2

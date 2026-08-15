@@ -9,7 +9,11 @@ head:
     - memory_read
     - memory_write
     - linq.send_card
+    - composio.gmail_send
     - support.upsert_ticket
+    - crm.upsert
+    - replay.run_suite
+    - band.publish
     - metrics.record_signal
   max_tokens_per_run: 90000
 critic:
@@ -29,6 +33,7 @@ workers:
       - github.push
       - linq.send_card
       - support.upsert_ticket
+      - crm.upsert
       - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: support.customer-success
@@ -42,6 +47,7 @@ workers:
       - github.push
       - linq.send_card
       - support.upsert_ticket
+      - crm.upsert
       - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: support.signal-miner
@@ -55,6 +61,7 @@ workers:
       - github.push
       - linq.send_card
       - support.upsert_ticket
+      - crm.upsert
       - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: support.ticket-triager
@@ -64,39 +71,81 @@ workers:
     tools: &a1
       - calc
       - memory_read
+      - memory_write
       - pioneer.classify
       - support.upsert_ticket
+      - crm.upsert
       - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: support.resolver
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D12/resolver.md
-    tools: *a1
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - composio.gmail_send
+      - linq.send_card
+      - support.upsert_ticket
+      - crm.upsert
+      - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: support.bug-reproducer
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D12/bug-reproducer.md
-    tools: *a1
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - replay.run_suite
+      - github.push
+      - support.upsert_ticket
+      - crm.upsert
+      - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: support.billing-support
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D12/billing-support.md
-    tools: *a1
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - support.upsert_ticket
+      - crm.upsert
+      - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: support.churn-risk-analyst
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D12/churn-risk-analyst.md
-    tools: *a1
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - support.upsert_ticket
+      - crm.upsert
+      - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: support.knowledge-base-writer
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D12/knowledge-base-writer.md
-    tools: *a1
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - band.publish
+      - support.upsert_ticket
+      - crm.upsert
+      - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
 concurrency: 8
 budget:
@@ -111,6 +160,8 @@ io:
 gates:
   - outbound_to_real_person
   - refund
+  - public_content
+  - deploy
 sandbox:
   image: zeroth/dept-base:latest
   cpu: 2

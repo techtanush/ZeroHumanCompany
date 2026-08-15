@@ -8,8 +8,10 @@ head:
   tools:
     - memory_read
     - memory_write
+    - calc
     - replay.run_suite
     - band.publish
+    - github.push
     - pioneer.classify
     - metrics.record_signal
   max_tokens_per_run: 90000
@@ -65,6 +67,7 @@ workers:
     tools: &a1
       - calc
       - memory_read
+      - memory_write
       - pioneer.classify
       - metrics.record_signal
     max_tokens_per_run: 60000
@@ -72,31 +75,63 @@ workers:
     model: haiku
     replicas: 1
     system_prompt_ref: prompts/D13/gap-detector.md
-    tools: *a1
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: chief.agent-designer
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D13/agent-designer.md
-    tools: *a1
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - github.push
+      - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: chief.eval-writer
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D13/eval-writer.md
-    tools: *a1
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - replay.run_suite
+      - github.push
+      - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: chief.canary-planner
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D13/canary-planner.md
-    tools: *a1
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - replay.run_suite
+      - band.publish
+      - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: chief.org-designer
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D13/org-designer.md
-    tools: *a1
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - band.publish
+      - github.push
+      - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
 concurrency: 8
 budget:
@@ -109,6 +144,8 @@ io:
   min_outputs: 1
 gates:
   - new_department
+  - public_content
+  - deploy
 sandbox:
   image: zeroth/dept-base:latest
   cpu: 2

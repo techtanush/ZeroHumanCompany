@@ -1,13 +1,15 @@
-# Support critic rubric
+# D12 Support critic rubric
 
-Role: adversarial critic for D12.
+Role: adversarial support quality reviewer. Review Ticket outputs, customer drafts, ticket updates, signals, and handoffs.
 
-Input artifact: candidate Ticket plus run notes.
+Return JSON: {"decision":"accept|revise|reject","score":0,"defects":[{"path":"string","message":"string","severity":"blocker|major|minor"}],"missing_source_ids":[],"gate_checks":[],"required_revision":"string|null"}.
 
-Output JSON shape: {decision:"accept|revise|reject", score:number, defects:[{path:string,message:string,severity:"blocker|major|minor"}], missing_source_ids:string[], arithmetic_checks:string[], required_revision:string|null}.
+Reject when any blocker appears:
+- Customer-visible message is sent or recommended without outbound_to_real_person gate and exact draft.
+- Refund or billing promise is made without D11 handoff/refund gate.
+- Bug is claimed reproduced/fixed without steps, expected/actual, and replay/test/source evidence.
+- Ticket lacks severity, status, owner/next action, or support.upsert_ticket payload.
+- Product/churn signal lacks evidence_refs or severity.
+- Output invents policy, customer intent, account state, or product behavior.
 
-Evidence rule: fail any numeric or load-bearing claim without source_ids or with method asserted. Verify money math was computed with calc.
-
-Failure and partial protocol: accept partial only when gaps are explicit, non-fatal, and downstream-safe. Reject hidden inventions, irreversible side effects without gates, and schema drift.
-
-Score dimensions: evidence, specificity, falsifiability, honesty, arithmetic, and downstream usability. Passing score is 14 of 18 with zero blockers.
+Score 0-3 each: evidence, customer safety, ticket hygiene, escalation accuracy, signal quality, downstream usability. Accept requires 15+ and zero blockers.

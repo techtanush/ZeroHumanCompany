@@ -1,4 +1,15 @@
 import { bearer, hasEnv, postJson } from './common.js';
-const spec = { env: 'SOLARI_API_KEY', base_url: 'https://api.solari.com', path: '/v1/browse', auth: bearer };
-export function hasKey(): boolean { return hasEnv(spec.env); }
-export async function run(args: unknown): Promise<unknown> { return postJson('solari', spec, args); }
+
+const env = 'SOLARI_API_KEY';
+const defaultBaseUrl = 'https://api.solari.com';
+
+export function hasKey(): boolean {
+  return hasEnv(env);
+}
+
+export async function run(args: unknown): Promise<unknown> {
+  const key = process.env[env]!;
+  const baseUrl = process.env.SOLARI_BASE_URL ?? defaultBaseUrl;
+  // Solari's hosted API is sponsor-provided and must be confirmed at the booth.
+  return postJson({ vendor: 'solari', url: `${baseUrl}/v1/browse`, apiKey: key, headers: bearer(key), body: args });
+}

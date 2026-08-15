@@ -56,6 +56,7 @@ workers:
       - web_fetch
       - calc
       - memory_read
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: pivot.diff-modeler
     model: sonnet
@@ -85,7 +86,12 @@ workers:
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D06/strategy-propagator.md
-    tools: *a1
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - metrics.record_signal
+      - linq.send_card
     max_tokens_per_run: 60000
 concurrency: 8
 budget:

@@ -12,6 +12,7 @@ head:
     - solari.browse
     - leadgen.search
     - leadgen.enrich
+    - crm.upsert
     - memory_read
     - memory_write
     - pioneer.classify
@@ -33,6 +34,7 @@ workers:
       - solari.browse
       - leadgen.search
       - leadgen.enrich
+      - crm.upsert
       - memory_read
       - memory_write
       - pioneer.classify
@@ -48,6 +50,7 @@ workers:
       - solari.browse
       - leadgen.search
       - leadgen.enrich
+      - crm.upsert
       - memory_read
       - memory_write
       - pioneer.classify
@@ -63,6 +66,7 @@ workers:
       - solari.browse
       - leadgen.search
       - leadgen.enrich
+      - crm.upsert
       - memory_read
       - memory_write
       - pioneer.classify
@@ -78,6 +82,7 @@ workers:
       - memory_read
       - leadgen.search
       - leadgen.enrich
+      - crm.upsert
       - pioneer.classify
     max_tokens_per_run: 60000
   - agent_id: leads.community-miner

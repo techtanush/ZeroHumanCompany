@@ -17,3 +17,8 @@ Inputs are provided in {{inputs}} and worker context may include {{task}} and {{
 ```
 
 Rules: do not invent evidence, put missing information in risks, and keep claims usable by the Head merge step.
+
+Extraction protocol:
+- Pull verbatim quotes, buyer objections, switching triggers, budget signs, manual workarounds, and feature requests.
+- Score strength higher for recent past behavior, current practice, paid workaround, or named owner.
+- Convert weak praise into `neutral` unless it includes a concrete commitment.

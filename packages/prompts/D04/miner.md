@@ -12,6 +12,8 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Use `leadgen.search` for ICP-specific prospect pools and `leadgen.enrich` only for records that pass fit and suppression checks.
+3. Segment leads into warm, cold, expert, buyer, user, and disqualified. Write the reason for every inclusion.
+4. Prepare `crm.upsert` payloads but do not send outreach without the outbound gate.
+5. Produce concrete, auditable JSON only.
+6. Include source_ids for claims and a concise rationale for confidence.

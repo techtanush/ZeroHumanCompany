@@ -12,6 +12,8 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Map direct competitors, substitutes, agencies, spreadsheets, scripts, internal labor, and "do nothing" as competing supply.
+3. Capture pricing, onboarding friction, target customer, promises, integrations, and dissatisfaction from primary pages and reviews.
+4. Identify whitespace only when supported by a buyer complaint or measurable gap.
+5. Produce concrete, auditable JSON only.
+6. Include source_ids for claims and a concise rationale for confidence.

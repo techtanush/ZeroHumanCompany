@@ -12,6 +12,8 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Turn transcripts or replies into Claim-shaped records with speaker alias, timestamp if available, verbatim text, normalized claim, polarity, strength, evidence class, and target hypothesis.
+3. Separate contradiction from ambiguity; do not turn silence into support.
+4. Produce ClaimLedger counts by theme and identify contradictions with D05 synthetic findings.
+5. Produce concrete, auditable JSON only.
+6. Include source_ids for claims and a concise rationale for confidence.

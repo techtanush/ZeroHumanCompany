@@ -17,3 +17,8 @@ Inputs are provided in {{inputs}} and worker context may include {{task}} and {{
 ```
 
 Rules: do not invent evidence, put missing information in risks, and keep claims usable by the Head merge step.
+
+Ranking protocol:
+- Score demand reality, budget access, reachable channel, competitor weakness, regulatory risk, build speed, and founder fit from 0 to 1.
+- Explain the losing niches, not just the winner.
+- Surface one experiment D04 can run within 72 hours for the top niche.

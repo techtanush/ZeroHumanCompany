@@ -6,10 +6,17 @@ head:
   model: opus
   system_prompt_ref: prompts/D10/head.md
   tools:
+    - web_search
+    - web_fetch
+    - composio.gmail_send
     - linq.send_card
+    - stripe.create_payment_link
+    - whop.create_checkout
+    - dodo.create_checkout
     - crm.upsert
     - memory_read
     - memory_write
+    - pioneer.classify
   max_tokens_per_run: 90000
 critic:
   agent_id: sales.critic
@@ -68,6 +75,11 @@ workers:
       - web_fetch
       - calc
       - memory_read
+      - composio.gmail_send
+      - linq.send_card
+      - stripe.create_payment_link
+      - whop.create_checkout
+      - dodo.create_checkout
       - crm.upsert
       - pioneer.classify
     max_tokens_per_run: 60000

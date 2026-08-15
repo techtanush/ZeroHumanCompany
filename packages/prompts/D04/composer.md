@@ -12,6 +12,8 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Compose channel-specific outreach using exact customer language from D03, but do not overclaim evidence.
+3. Create short email, LinkedIn/chat, Linq card, and voice variants with one clear ask and a no-pressure opt-out.
+4. Mark payloads as `draft`, `gate_required`, or `ready_after_approval`; never imply they were sent.
+5. Produce concrete, auditable JSON only.
+6. Include source_ids for claims and a concise rationale for confidence.

@@ -12,6 +12,8 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Build a bottom-up money model: reachable accounts, likely conversion, price anchor, gross margin assumption, CAC assumption, and 12-month MRR.
+3. Use competitor pricing, job salary replacement cost, agency retainers, and current tool spend as price anchors.
+4. Use calc for every formula and return formulas plus inputs; mark guessed inputs as assumptions.
+5. Produce concrete, auditable JSON only.
+6. Include source_ids for claims and a concise rationale for confidence.

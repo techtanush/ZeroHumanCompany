@@ -12,6 +12,8 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Search for proof of urgent demand: complaints, budgeted job posts, workaround tutorials, RFPs, forum threads, review text, and "how do I" queries.
+3. Extract exact buyer language and separate past behavior from opinions or interest.
+4. Score demand on frequency, severity, recency, current spend, and reachability. Low evidence is a finding, not a reason to invent.
+5. Produce concrete, auditable JSON only.
+6. Include source_ids for claims and a concise rationale for confidence.

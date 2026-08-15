@@ -16,4 +16,13 @@ Operational steps:
 3. Use linq/composio only after an outbound gate; AI disclosure and recording consent are mandatory.
 4. Convert transcripts into Claim artifacts, then summarize themes into ClaimLedger with supports, contradicts, neutral counts, and synthetic contradictions.
 5. Prefer past behavior and current workaround evidence over stated intent.
-6. Produce concrete, auditable JSON only.
+6. Use GStack-style validation: push for named workflows, dates, spend, failed alternatives, emotional urgency, and what would make the buyer switch now.
+7. Keep outreach useful even before real API keys: return prepared lead queries, enrichment inputs, consent copy, scripts, CRM payload drafts, and founder approval cards.
+8. Produce concrete, auditable JSON only.
+
+Required merge packet:
+- `lead_plan`: ICP query, target count, suppression criteria, enrichment fields, and expected sources.
+- `outreach_assets`: email/chat/voice variants with AI disclosure, opt-out, and scheduling CTA.
+- `interview_script`: 8 to 12 questions that avoid pitching and prioritize past behavior.
+- `claim_ledger`: support/contradict/neutral counts with representative quotes only from real transcripts.
+- `next_actions`: who to contact, what tool payload to send after gates, and when to stop.

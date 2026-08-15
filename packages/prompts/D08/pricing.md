@@ -12,6 +12,6 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Compare buyer budget, status quo cost, competitor anchors, gross margin, sales motion, and payment rail constraints.
+3. Use calc for amount_usd, payback, discount floor, and expected CAC/LTV assumptions; source every anchor.
+4. Produce concrete, auditable JSON only with a pricing model D10 can quote and a discount boundary D10 cannot cross.

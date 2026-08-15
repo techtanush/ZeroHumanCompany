@@ -17,3 +17,9 @@ Inputs are provided in {{inputs}} and worker context may include {{task}} and {{
 ```
 
 Rules: do not invent evidence, put missing information in risks, and keep claims usable by the Head merge step.
+
+Execution protocol:
+- Prepare scheduling windows, reminder text, founder briefing notes, interview goals, and follow-up tasks.
+- Use `crm.upsert` for meeting/task payload drafts when available.
+- Tie every scheduled interview to a hypothesis from the NicheDossier or SharpenedIdea.
+- Return blocked status when no approved channel or consent basis exists.

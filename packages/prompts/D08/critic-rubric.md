@@ -10,4 +10,6 @@ Evidence rule: fail any numeric or load-bearing claim without source_ids or with
 
 Failure and partial protocol: accept partial only when gaps are explicit, non-fatal, and downstream-safe. Reject hidden inventions, irreversible side effects without gates, and schema drift.
 
+GTM blockers: reject plans that lack a beachhead ICP, executable D09 search surfaces, executable D10 sales motion, pricing math, channel success thresholds, or public_content gate awareness.
+
 Score dimensions: evidence, specificity, falsifiability, honesty, arithmetic, and downstream usability. Passing score is 14 of 18 with zero blockers.

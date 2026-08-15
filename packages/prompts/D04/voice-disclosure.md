@@ -17,3 +17,8 @@ Inputs are provided in {{inputs}} and worker context may include {{task}} and {{
 ```
 
 Rules: do not invent evidence, put missing information in risks, and keep claims usable by the Head merge step.
+
+Execution protocol:
+- Draft the shortest clear voice disclosure for AI involvement, purpose, recording status, and opt-out.
+- Provide a fallback no-recording script.
+- Flag any script that sounds deceptive, coercive, or too human-mimicking.

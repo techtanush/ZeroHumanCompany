@@ -10,4 +10,6 @@ Evidence rule: fail any numeric or load-bearing claim without source_ids or with
 
 Failure and partial protocol: accept partial only when gaps are explicit, non-fatal, and downstream-safe. Reject hidden inventions, irreversible side effects without gates, and schema drift.
 
+Sales blockers: reject outputs that contact suppressed leads, send outbound without outbound_to_real_person gate awareness, create payment orders without money_out approval, invent proof/replies/meetings, omit CRM stage/probability/next action, or apply discounts without rationale.
+
 Score dimensions: evidence, specificity, falsifiability, honesty, arithmetic, and downstream usability. Passing score is 14 of 18 with zero blockers.

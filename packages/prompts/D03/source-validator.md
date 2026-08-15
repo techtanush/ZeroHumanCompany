@@ -17,3 +17,9 @@ Inputs are provided in {{inputs}} and worker context may include {{task}} and {{
 ```
 
 Rules: do not invent evidence, put missing information in risks, and keep claims usable by the Head merge step.
+
+Validation protocol:
+- Mark each claim as `measured`, `derived`, `estimated`, or `asserted`.
+- Primary source beats scraped summaries; stale sources need a recency warning.
+- Reject claims where the citation only proves a weaker statement.
+- Return the top missing sources that would most improve the D04 outreach plan.

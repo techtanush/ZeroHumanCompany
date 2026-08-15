@@ -26,6 +26,9 @@ workers:
     tools:
       - web_search
       - web_fetch
+      - leadgen.search
+      - leadgen.enrich
+      - crm.upsert
       - memory_read
       - memory_write
       - composio.gmail_send
@@ -103,7 +106,13 @@ workers:
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D04/scheduler.md
-    tools: *a1
+    tools:
+      - web_search
+      - web_fetch
+      - calc
+      - memory_read
+      - crm.upsert
+      - linq.send_card
     max_tokens_per_run: 60000
   - agent_id: outreach.voice-disclosure
     model: sonnet
@@ -127,7 +136,13 @@ workers:
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D04/warm-lead-converter.md
-    tools: *a1
+    tools:
+      - web_search
+      - web_fetch
+      - calc
+      - memory_read
+      - leadgen.enrich
+      - crm.upsert
     max_tokens_per_run: 60000
 concurrency: 8
 budget:

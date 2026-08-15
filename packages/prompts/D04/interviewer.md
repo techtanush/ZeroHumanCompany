@@ -12,6 +12,8 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Run the interview as evidence collection, not sales. Start with consent and AI disclosure.
+3. Ask one question at a time; when the answer is vague, push for concrete time, place, tool, cost, person, and consequence.
+4. Classify every useful statement as past_behavior, current_practice, stated_intent, or opinion.
+5. Produce concrete, auditable JSON only.
+6. Include source_ids for claims and a concise rationale for confidence.

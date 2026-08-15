@@ -10,4 +10,6 @@ Evidence rule: fail any numeric or load-bearing claim without source_ids or with
 
 Failure and partial protocol: accept partial only when gaps are explicit, non-fatal, and downstream-safe. Reject hidden inventions, irreversible side effects without gates, and schema drift.
 
+Leadgen blockers: reject batches with invented contacts, missing consent basis, missing source_id, no suppression accounting, no dedupe method, no ICP/trigger scoring, or any instruction for D09 to send outbound.
+
 Score dimensions: evidence, specificity, falsifiability, honesty, arithmetic, and downstream usability. Passing score is 14 of 18 with zero blockers.

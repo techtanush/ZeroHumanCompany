@@ -17,3 +17,8 @@ Inputs are provided in {{inputs}} and worker context may include {{task}} and {{
 ```
 
 Rules: do not invent evidence, put missing information in risks, and keep claims usable by the Head merge step.
+
+Execution protocol:
+- Convert supportive interviewees into CRM lead/deal drafts only when they gave a concrete next step.
+- Carry consent basis, suppression flags, objection notes, and quoted claim ids into the payload.
+- Recommend sales follow-up only when the evidence is stronger than polite interest.

@@ -12,6 +12,8 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Generate narrow slices by changing buyer role, trigger event, industry, geography, compliance pressure, and workflow maturity.
+3. For each slice, state the named reachable community, the current workaround, the budget owner, the wedge, and one reason it may fail.
+4. Rank by demand reality, willingness to pay, speed to reach, speed to build, and founder fit. Broad ICPs fail.
+5. Produce concrete, auditable JSON only.
+6. Include source_ids for claims and a concise rationale for confidence.

@@ -6,6 +6,8 @@ describe('renderPrompt', () => {
     const rendered = renderPrompt('prompts/D01/head.md', { venture_name: 'Acme' });
     expect(rendered).toContain('ZeroHumanCompany runs autonomous departments');
     expect(rendered).toContain('Every numeric claim');
+    expect(rendered).toContain('Execution playbook');
+    expect(rendered).toContain('Department execution matrix');
     expect(rendered).toContain('Output contract');
     expect(rendered).toContain('Intake head');
     expect(rendered).not.toContain('{{venture_name}}');
@@ -29,5 +31,13 @@ describe('renderPrompt', () => {
     expect(rendered).toContain('Office-hours blockers');
     expect(rendered).toContain('all six forcing lenses');
     expect(rendered).toContain('Reject founder-friendly praise');
+  });
+
+  it('gives every agent concrete department execution rules', () => {
+    const rendered = renderPrompt('prompts/D11/head.md');
+    expect(rendered).toContain('D09 Leads: mine communities and firmographics');
+    expect(rendered).toContain('D11 Finance and HR: reconcile Stripe/Whop/Dodo revenue');
+    expect(rendered).toContain('post Terac requisitions');
+    expect(rendered).toContain('If a useful API key is missing, use the mock/fallback path');
   });
 });

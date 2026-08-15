@@ -7,6 +7,7 @@ const sharedRefs = [
   '_shared/company-context.md',
   '_shared/evidence-rules.md',
   '_shared/safety.md',
+  '_shared/execution-playbook.md',
   '_shared/output-contract.md',
 ];
 

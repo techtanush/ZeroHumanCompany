@@ -1,6 +1,7 @@
 import type { RoutingRule, RoutingTable } from '@zeroth/contracts';
 import type { Db } from '@zeroth/db';
 import { EventStore, StoredEvent } from './event-store.js';
+import type { GateEngine } from './gates.js';
 import { nowIso, uuid } from './util.js';
 
 export interface EnqueuedWorkOrder {
@@ -24,7 +25,13 @@ export class Router {
     private db: Db,
     private events: EventStore,
     private rules: RoutingTable,
+    /** Set by the Kernel so routing rules can open real approval gates. */
+    private gates?: GateEngine,
   ) {}
+
+  setGateEngine(gates: GateEngine): void {
+    this.gates = gates;
+  }
 
   onWorkOrder(fn: WorkOrderSink): void {
     this.sinks.push(fn);
@@ -51,16 +58,31 @@ export class Router {
           out.push(wo);
         }
         if (emit.gate) {
-          await this.events.append({
+          // Open a REAL gate row: a gate.opened event with no gate behind it is
+          // a card the founder can never decide, which would silently stall the
+          // company at exactly the moment it needs a human.
+          if (!this.gates) {
+            throw new Error('routing rule emits a gate but no GateEngine is wired');
+          }
+          await this.gates.open({
             venture_id: e.venture_id,
-            type: 'gate.opened',
-            actor_kind: 'system',
-            actor_id: 'kernel.router',
+            gate_type: emit.gate.gate_type,
+            requested_by: 'kernel.router',
             department_id: emit.gate.department_id,
-            payload: { gate_id: uuid(), gate_type: emit.gate.gate_type },
+            action: { tool: 'noop', args: { rule_id: rule.id } },
+            preview: {
+              summary: emit.gate.summary || `${emit.gate.gate_type} needs a decision`,
+              candidates: await this.gateCandidates(e, emit.gate.gate_type),
+            },
+            options: await this.gateOptions(e, emit.gate.gate_type),
+            risk: 'medium',
+            reversible: true,
+            channel: 'boardroom',
+            timeout_s: 900,
+            on_timeout: 'hold',
+            idempotency_key: `route:${rule.id}:${e.venture_id}`,
             trace_id: e.trace_id,
-            causation_id: e.id,
-          });
+          } as any);
         }
       }
     }
@@ -126,6 +148,48 @@ export class Router {
       correlation_id: id,
     });
     return { id, venture_id: e.venture_id, to_dept: spec.to, intent: spec.intent, budget_usd: spec.budget_usd };
+  }
+
+  /**
+   * For a selection gate, the options ARE the candidate artifacts, so the
+   * founder taps a niche rather than answering an open question.
+   */
+  private async gateOptions(e: StoredEvent, gate_type: string) {
+    if (gate_type === 'niche_selection') {
+      const r = await this.db.query<any>(
+        `SELECT id, body FROM artifacts
+          WHERE venture_id = $1 AND type = 'NicheDossier' AND quality = 'signed'
+          ORDER BY created_at ASC`,
+        [e.venture_id],
+      );
+      const opts = r.rows.map((row: any) => {
+        const body = typeof row.body === 'string' ? JSON.parse(row.body) : row.body;
+        return {
+          id: row.id,
+          label: String(body?.label ?? 'niche'),
+          consequence: `Run discovery interviews against ${body?.label ?? 'this niche'}`,
+        };
+      });
+      if (opts.length > 0) return opts;
+    }
+    return [
+      { id: 'approve', label: 'Approve', consequence: 'work continues' },
+      { id: 'reject', label: 'Reject', consequence: 'work stops here' },
+    ];
+  }
+
+  private async gateCandidates(e: StoredEvent, gate_type: string) {
+    if (gate_type !== 'niche_selection') return [];
+    const r = await this.db.query<any>(
+      `SELECT id, body FROM artifacts
+        WHERE venture_id = $1 AND type = 'NicheDossier' AND quality = 'signed'
+        ORDER BY created_at ASC`,
+      [e.venture_id],
+    );
+    return r.rows.map((row: any) => {
+      const body = typeof row.body === 'string' ? JSON.parse(row.body) : row.body;
+      return { artifact_id: row.id, label: body?.label, confidence: body?.confidence };
+    });
   }
 
   private async isHalted(venture_id: string): Promise<boolean> {

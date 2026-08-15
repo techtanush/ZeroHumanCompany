@@ -39,6 +39,7 @@ export class Kernel {
     this.meter = new Meter(db, this.events);
     this.router = new Router(db, this.events, opts.routing ?? []);
     this.vault = new Vault(db);
+    this.router.setGateEngine(this.gates);
 
     // Projections run inside the append transaction; routing runs after commit.
     this.events.addReducer(async (e, tx) => {

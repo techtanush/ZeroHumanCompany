@@ -20,6 +20,15 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   const token = opts.token ?? process.env.KERNEL_SHARED_TOKEN ?? 'dev-only-token';
   const app = Fastify({ logger: opts.logger ?? false });
 
+  app.addContentTypeParser('application/json', { parseAs: 'string' }, (_req, body, done) => {
+    try {
+      const raw = String(body || '{}');
+      done(null, { __rawBody: raw, __parsedBody: JSON.parse(raw) });
+    } catch (error) {
+      done(error as Error);
+    }
+  });
+
   app.setErrorHandler((err: unknown, req, reply) => {
     const ke = err instanceof KernelError ? err : null;
     const status = ke?.status ?? (err as any)?.statusCode ?? 500;
@@ -53,7 +62,7 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   /* ── Ventures ─────────────────────────────────────────────────────────── */
 
   app.post('/v1/ventures', async (req) => {
-    const b = req.body as any;
+    const b = unwrapBody(req.body);
     const created = await kernel.createVenture({
       mode: b.mode,
       name: b.name ?? b.idea_seed?.normalized?.problem?.slice(0, 40),
@@ -132,7 +141,7 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
     const { id } = req.params as { id: string };
     const v = await kernel.venture(id);
     if (!v) throw new KernelError('venture_not_found', `no venture ${id}`, false, 404);
-    const b = (req.body ?? {}) as any;
+    const b = unwrapBody(req.body);
     const event = await kernel.events.append({
       venture_id: id,
       type: 'ops.daily_briefing_started',
@@ -166,7 +175,7 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   });
 
   app.post('/v1/artifacts', async (req, reply) => {
-    const b = req.body as any;
+    const b = unwrapBody(req.body);
     const a = await kernel.artifacts.create(b);
     await kernel.events.append({
       venture_id: b.venture_id,
@@ -188,7 +197,7 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   /* ── Work orders & events ─────────────────────────────────────────────── */
 
   app.post('/v1/work-orders', async (req, reply) => {
-    const b = req.body as any;
+    const b = unwrapBody(req.body);
     const id = await kernel.issueWorkOrder(b);
     reply.code(201);
     return { work_order_id: id };
@@ -201,7 +210,7 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   });
 
   app.post('/v1/events', async (req, reply) => {
-    const b = req.body as any;
+    const b = unwrapBody(req.body);
     if (await kernel.isHalted(b.venture_id)) {
       throw new KernelError('kill_switch_engaged', 'venture is halted; no side effects permitted', false, 423);
     }
@@ -229,14 +238,14 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   });
 
   app.post('/v1/gates', async (req, reply) => {
-    const gate = await kernel.gates.open(req.body as any);
+    const gate = await kernel.gates.open(unwrapBody(req.body));
     reply.code(201);
     return gate;
   });
 
   app.post('/v1/gates/:id/decision', async (req) => {
     const { id } = req.params as { id: string };
-    return kernel.gates.decide(id, req.body as any);
+    return kernel.gates.decide(id, unwrapBody(req.body));
   });
 
   /* ── Money ────────────────────────────────────────────────────────────── */
@@ -247,7 +256,7 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   });
 
   app.post('/v1/kill-switch', async (req) => {
-    const b = req.body as { venture_id: string; on: boolean; actor?: string };
+    const b = unwrapBody(req.body) as { venture_id: string; on: boolean; actor?: string };
     await kernel.killSwitch(b.venture_id, b.on, b.actor);
     return { venture_id: b.venture_id, kill_switch: b.on };
   });
@@ -296,21 +305,18 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   const vendors = ['stripe', 'composio', 'linq', 'terac', 'replay', 'render', 'whop', 'dodo'] as const;
   for (const vendor of vendors) {
     app.post(`/v1/webhooks/${vendor}`, async (req, reply) => {
-      const raw = JSON.stringify(req.body ?? {});
+      const raw = rawBody(req.body);
       const secretEnv = `${vendor.toUpperCase()}_WEBHOOK_SECRET`;
       const secret = process.env[secretEnv];
       if (secret) {
         const sig = String(req.headers['x-signature'] ?? req.headers['stripe-signature'] ?? '');
-        const expected = createHmac('sha256', secret).update(raw).digest('hex');
-        const ok =
-          sig.length === expected.length &&
-          timingSafeEqual(Buffer.from(sig), Buffer.from(expected));
+        const ok = vendor === 'stripe' ? verifyStripeSignature(raw, sig, secret) : verifyGenericSignature(raw, sig, secret);
         if (!ok) {
           reply.code(401);
           return { error: { code: 'bad_signature', message: 'signature mismatch', trace_id: 'none', retryable: false } };
         }
       }
-      const body = (req.body ?? {}) as any;
+      const body = unwrapBody(req.body);
       const venture_id = body.venture_id ?? body.metadata?.venture_id;
       if (!venture_id) {
         reply.code(202);
@@ -342,6 +348,33 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   }
 
   return app;
+}
+
+function unwrapBody(body: unknown): any {
+  if (body && typeof body === 'object' && '__parsedBody' in body) return (body as any).__parsedBody;
+  return (body ?? {}) as any;
+}
+
+function rawBody(body: unknown): string {
+  if (body && typeof body === 'object' && '__rawBody' in body) return String((body as any).__rawBody);
+  return JSON.stringify(body ?? {});
+}
+
+function verifyGenericSignature(raw: string, sig: string, secret: string): boolean {
+  const expected = createHmac('sha256', secret).update(raw).digest('hex');
+  return sig.length === expected.length && timingSafeEqual(Buffer.from(sig), Buffer.from(expected));
+}
+
+function verifyStripeSignature(raw: string, sig: string, secret: string): boolean {
+  const parts = Object.fromEntries(sig.split(',').map((part) => {
+    const [key, ...rest] = part.split('=');
+    return [key, rest.join('=')];
+  }));
+  const timestamp = parts.t;
+  const v1 = parts.v1;
+  if (!timestamp || !v1) return false;
+  const expected = createHmac('sha256', secret).update(`${timestamp}.${raw}`).digest('hex');
+  return v1.length === expected.length && timingSafeEqual(Buffer.from(v1), Buffer.from(expected));
 }
 
 /** Vendor payload -> internal event. Kept in one place so drivers stay dumb. */

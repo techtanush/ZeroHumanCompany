@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { createHmac } from 'node:crypto';
 import { openDb, type Db } from '@zeroth/db';
 import { Kernel } from './kernel.js';
 import { buildServer } from './server.js';
@@ -500,6 +501,36 @@ describe('http surface', () => {
     expect(evs[0].payload.amount_usd).toBe(49);
     const proj = await k.venture(v.venture_id);
     expect(proj.liveness.revenue_real).toBe(true);
+  });
+
+  it('accepts Stripe CLI webhook signatures using the endpoint secret', async () => {
+    const old = process.env.STRIPE_WEBHOOK_SECRET;
+    const secret = 'whsec_test_endpoint_secret';
+    process.env.STRIPE_WEBHOOK_SECRET = secret;
+    const k = await freshKernel();
+    const app = buildServer({ kernel: k, token: 'tok' });
+    const v = await venture(k);
+    const raw = JSON.stringify({
+      id: 'evt_signed_1',
+      type: 'checkout.session.completed',
+      venture_id: v.venture_id,
+      data: { object: { id: 'cs_signed_1', amount_total: 2500 } },
+    });
+    const timestamp = '1786812000';
+    const signature = createHmac('sha256', secret).update(`${timestamp}.${raw}`).digest('hex');
+
+    const res = await app.inject({
+      method: 'POST',
+      url: '/v1/webhooks/stripe',
+      headers: { 'content-type': 'application/json', 'stripe-signature': `t=${timestamp},v1=${signature}` },
+      payload: raw,
+    });
+
+    expect(res.statusCode).toBe(202);
+    const evs = await k.events.readStream(v.venture_id, { types: ['money.revenue_received'] });
+    expect(evs[0].payload).toMatchObject({ amount_usd: 25, rail: 'stripe', external_id: 'cs_signed_1' });
+    if (old === undefined) delete process.env.STRIPE_WEBHOOK_SECRET;
+    else process.env.STRIPE_WEBHOOK_SECRET = old;
   });
 
   it('maps a Linq founder reply into a gate decision', async () => {

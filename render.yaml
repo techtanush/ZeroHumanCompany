@@ -44,57 +44,23 @@ services:
         value: https://terac.com/api/external/v2
       - key: BAND_API_KEY
         sync: false
-      - key: BAND_BASE_URL
-        sync: false
-      - key: BAND_WORKSPACE_ID
-        sync: false
       - key: STRIPE_SECRET_KEY
         sync: false
       - key: STRIPE_PUBLISHABLE_KEY
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
         sync: false
-      - key: SOLARI_API_KEY
-        sync: false
-      - key: SOLARI_BASE_URL
-        sync: false
-      - key: SUPERSERVE_API_KEY
-        sync: false
       - key: SUPERSERVE_POOL_SIZE
         value: "4"
       - key: LINQ_API_KEY
-        sync: false
-      - key: LINQ_BASE_URL
-        sync: false
-      - key: LINQ_WEBHOOK_SECRET
         sync: false
       - key: LINQ_FROM_NUMBER
         sync: false
       - key: FOUNDER_PHONE
         sync: false
-      - key: REPLAY_API_KEY
-        sync: false
-      - key: RENDER_API_KEY
-        sync: false
-      - key: RENDER_OWNER_ID
-        sync: false
       - key: COMPOSIO_API_KEY
         sync: false
-      - key: COMPOSIO_ENTITY_ID
-        sync: false
       - key: ELEVENLABS_API_KEY
-        sync: false
-      - key: ELEVENLABS_VOICE_ID
-        sync: false
-      - key: APIFY_TOKEN
-        sync: false
-      - key: GITHUB_TOKEN
-        sync: false
-      - key: GITHUB_ORG
-        sync: false
-      - key: COMPANY_EMAIL
-        sync: false
-      - key: SIMPOP_URL
         sync: false
       - key: SIMPOP_SEED
         value: "42"

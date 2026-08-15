@@ -45,8 +45,16 @@ describe('renderPrompt', () => {
     expect(renderPrompt('prompts/D09/head.md')).toContain('Use leadgen.search for account/person discovery');
     expect(renderPrompt('prompts/D09/head.md')).toContain('leadgen.enrich for contact data');
     expect(renderPrompt('prompts/D10/head.md')).toContain('Use crm.upsert');
-    expect(renderPrompt('prompts/D11/head.md')).toContain('Use terac.post_requisition only when a scoped human task has acceptance criteria');
-    expect(renderPrompt('prompts/D13/head.md')).toContain('Validate any DepartmentManifestArtifact against schema');
+    expect(renderPrompt('prompts/D11/head.md')).toContain('Use terac.post_requisition only for scoped human work with acceptance criteria');
+    expect(renderPrompt('prompts/D13/head.md')).toContain('Use github.push only for approved manifest/prompt/eval changes');
+  });
+
+  it('keeps GTM, leadgen, and sales prompts operator-grade', () => {
+    expect(renderPrompt('prompts/D08/head.md')).toContain('leadgen.search only to sample reachable account density');
+    expect(renderPrompt('prompts/D09/head.md')).toContain('crm.upsert with object_type "lead" only for non-suppressed records');
+    expect(renderPrompt('prompts/D09/suppression-checker.md')).toContain('no-consent-basis');
+    expect(renderPrompt('prompts/D10/head.md')).toContain('money_out approval');
+    expect(renderPrompt('prompts/D10/copywriter.md')).toContain('Do not send via composio.gmail_send or linq.send_card unless outbound_to_real_person approval is present');
   });
 
   it('keeps D07 build execution concrete and gated', () => {

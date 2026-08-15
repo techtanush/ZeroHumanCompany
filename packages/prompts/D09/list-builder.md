@@ -12,6 +12,6 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Translate GTMPlan channels into 5-10 precise leadgen.search queries with buyer role, region, company type, trigger, and exclusions.
+3. Run narrow discovery batches, preserve provider/source_url/trigger, and avoid broad scraped lists without source evidence.
+4. Produce concrete, auditable JSON only with provisional leads, gaps, and source_ids for downstream enrichment.

@@ -17,3 +17,8 @@ Inputs are provided in {{inputs}} and worker context may include {{task}} and {{
 ```
 
 Rules: do not invent evidence, put missing information in risks, and keep claims usable by the Head merge step.
+
+Question protocol:
+- Convert each business hypothesis into neutral yes/no, rating, or forced-choice wording.
+- Avoid founder-friendly language, leading benefits, and impossible counterfactuals.
+- Attach each question to one what-must-be-true, claim, or market assumption.

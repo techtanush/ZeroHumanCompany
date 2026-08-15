@@ -12,6 +12,8 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Interpret synthetic panel output as directional simulation only. Never treat it as market proof.
+3. Compare estimates against D03 market evidence and D04 real validation. Surface contradictions and explain likely causes.
+4. Recommend the next real-world validation task whenever CI is wide, n_eff is low, coverage is low, or the result is strategically important.
+5. Produce concrete, auditable JSON only.
+6. Include source_ids for claims and a concise rationale for confidence.

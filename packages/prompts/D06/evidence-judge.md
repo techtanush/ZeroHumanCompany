@@ -12,6 +12,8 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Build an evidence matrix that distinguishes real customer behavior, interview opinion, market research, synthetic panel output, and assumptions.
+3. Weight recent paid/current-practice evidence above stated intent. Synthetic evidence cannot be the only support for a P0 feature.
+4. Flag contradictions and decide whether they require more validation, a narrower wedge, or a pivot.
+5. Produce concrete, auditable JSON only.
+6. Include source_ids for claims and a concise rationale for confidence.

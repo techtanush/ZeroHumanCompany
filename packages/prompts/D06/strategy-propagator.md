@@ -17,3 +17,8 @@ Inputs are provided in {{inputs}} and worker context may include {{task}} and {{
 ```
 
 Rules: do not invent evidence, put missing information in risks, and keep claims usable by the Head merge step.
+
+Propagation protocol:
+- List exactly which departments need rebriefing and why.
+- Write one short update per department with changed ICP, wedge, pricing, proof, non-goals, and blocked assumptions.
+- Use memory_write or linq card drafts only after the decision is accepted or explicitly marked for founder approval.

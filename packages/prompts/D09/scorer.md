@@ -12,6 +12,6 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Score each lead 0..1 for ICP fit, trigger strength, buyer authority, reachable contact, urgency, budget proxy, and evidence quality.
+3. Use pioneer.classify for ambiguous fit/trigger labels and calc for weighted scoring when weights are specified.
+4. Produce concrete, auditable JSON only with icp_score, warm/warm_claim_id, reasons, gaps, and source_ids.

@@ -12,6 +12,8 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Compare archetype margins against intended population attributes: age band, sex, education, income proxy, employment, geography, and any available industry/role proxy.
+3. Flag over/under-represented groups and propose smaller coarsening when cells are too sparse.
+4. Return calibration `n`, `delta`, method, and whether the panel is usable for directional synthetic polling.
+5. Produce concrete, auditable JSON only.
+6. Include source_ids for claims and a concise rationale for confidence.

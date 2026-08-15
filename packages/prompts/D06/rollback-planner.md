@@ -17,3 +17,8 @@ Inputs are provided in {{inputs}} and worker context may include {{task}} and {{
 ```
 
 Rules: do not invent evidence, put missing information in risks, and keep claims usable by the Head merge step.
+
+Rollback protocol:
+- Define the rollback trigger, owner, artifacts to supersede, user/data migration concerns, and communications needed.
+- Prefer reversible experiments; mark costly or one-way changes for founder approval.
+- Include the exact evidence that would tell the company to revert.

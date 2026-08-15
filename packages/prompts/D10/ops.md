@@ -12,6 +12,6 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Use crm.upsert to maintain lead/deal/customer records, stage history, next action, payment rail status, and handoff notes.
+3. Flag stale next actions, duplicate deals, suppressed leads, missing consent, missing amount_usd, and payment links without money_out approval.
+4. Produce concrete, auditable JSON only with CRM changes, idempotency keys, gaps, and source_ids.

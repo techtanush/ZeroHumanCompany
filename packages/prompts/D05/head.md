@@ -15,5 +15,14 @@ Operational steps:
 2. Use `simpop.poll` for synthetic panel outputs whenever questions are available. Use `simpop.build_panel` when the work order is only asking for population construction.
 3. Preserve the exact honesty note from the tool output. Never describe synthetic answers as interviews, survey responses, or real people.
 4. Include `n_eff`, `design_effect`, archetype coverage, rationales, assumptions, and gaps when the tool returns them.
-5. Produce concrete, auditable JSON only.
-6. Include source_ids for non-synthetic market claims and a concise rationale for confidence.
+5. Use simit-style concepts without copying source: deterministic seeds, PUMS-like weights, demographic archetypes, weighted aggregation, effective sample size, design effect, confidence intervals, and calibration error.
+6. Route questions through neutral framing. Synthetic questions should test hypotheses from D02-D04, not flatter the founder's pitch.
+7. If the synthetic panel conflicts with real interviews, label it as a weak signal and send the contradiction to D06.
+8. Produce concrete, auditable JSON only.
+9. Include source_ids for non-synthetic market claims and a concise rationale for confidence.
+
+Required merge packet:
+- `panel_request`: region, seed, archetype count, target population, and excluded groups.
+- `poll_questions`: neutral question text, tested hypothesis, and expected output scale.
+- `weighted_results`: estimate, CI, n_eff, design_effect, archetype_coverage, and rationale samples.
+- `honesty`: exact honesty note plus limitations and what real validation should run next.

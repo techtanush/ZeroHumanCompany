@@ -12,6 +12,6 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Draft personalized email/Linq copy from the lead trigger, role, GTM messaging, and cited proof only.
+3. Do not send via composio.gmail_send or linq.send_card unless outbound_to_real_person approval is present; otherwise return drafts.
+4. Produce concrete, auditable JSON only with subject, body, personalization source_ids, CTA, and forbidden claims.

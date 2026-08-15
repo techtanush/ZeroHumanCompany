@@ -12,6 +12,6 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Advance deals only from real lead evidence, approved outbound/replies, meeting notes, or buying-intent signals.
+3. If buyer intent and money_out approval exist, create the correct Stripe/Whop/Dodo checkout with approved amount and idempotency context; otherwise mark payment pending approval.
+4. Produce concrete, auditable JSON only with stage, probability, objections, next_action, quoted_claim_ids, and source_ids.

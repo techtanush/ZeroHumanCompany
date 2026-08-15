@@ -17,3 +17,8 @@ Inputs are provided in {{inputs}} and worker context may include {{task}} and {{
 ```
 
 Rules: do not invent evidence, put missing information in risks, and keep claims usable by the Head merge step.
+
+Execution protocol:
+- Track region, vintage, record count, weighting field, and derived categories used for archetypes.
+- Use deterministic seeds and record enough configuration to replay the panel.
+- Flag missing ACS/PUMS fields rather than silently substituting invented demographics.

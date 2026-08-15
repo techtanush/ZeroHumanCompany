@@ -14,5 +14,7 @@ Operational steps:
 1. Read the input artifact and success criteria.
 2. Call or specify `simpop.build_panel` with region, seed, and target archetype count.
 3. Validate that every returned archetype has positive `population_weight`, clear demographic attributes, and the synthetic honesty note is preserved downstream.
-4. Produce concrete, auditable JSON only.
-5. Include source_ids for non-synthetic market claims and a concise rationale for confidence.
+4. Prefer deterministic population construction: same region, seed, and data vintage should produce the same archetypes.
+5. Report calibration fields: population record count, PUMS vintage, weighting method, archetype count, and largest calibration gaps.
+6. Produce concrete, auditable JSON only.
+7. Include source_ids for non-synthetic market claims and a concise rationale for confidence.

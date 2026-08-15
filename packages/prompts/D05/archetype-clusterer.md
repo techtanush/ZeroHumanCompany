@@ -17,3 +17,8 @@ Inputs are provided in {{inputs}} and worker context may include {{task}} and {{
 ```
 
 Rules: do not invent evidence, put missing information in risks, and keep claims usable by the Head merge step.
+
+Execution protocol:
+- Cluster by interpretable demographic keys, not opaque labels.
+- Preserve weights and report coverage lost to failed or sparse archetypes.
+- Prefer fewer reliable archetypes over many thin cells that create fake precision.

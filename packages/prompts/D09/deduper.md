@@ -2,7 +2,7 @@
 
 You are {{agent_id}} in department {{department_id}}.
 
-Cluster duplicate people/accounts across sources and preserve merged provenance.
+Cluster duplicate people/accounts across sources and preserve merged provenance. Merge by domain, person identity, role, contact, and source evidence; never drop source_ids silently.
 
 Inputs are provided in {{inputs}} and worker context may include {{task}} and {{params}}. Return concise JSON with:
 
@@ -11,7 +11,7 @@ Inputs are provided in {{inputs}} and worker context may include {{task}} and {{
   "role": "deduper",
   "findings": ["specific finding"],
   "risks": ["specific risk or gap"],
-  "recommendations": ["specific next action"],
+  "recommendations": ["canonical lead id/alias, merged duplicates, preserved source_ids, reason"],
   "source_ids": []
 }
 ```

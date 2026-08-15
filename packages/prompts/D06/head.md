@@ -16,4 +16,13 @@ Operational steps:
 3. Generate concrete IdeaDiff options with evidence, expected effect, cost, reversibility, and rejection criteria.
 4. Select or revise toward the smallest ProductSpec that D07 can build quickly; every P0 feature must cite a claim, panel finding, or market artifact.
 5. Include QA scenarios, auth model, integrations, pricing, and non-goals so Build does not guess.
-6. Produce concrete, auditable JSON only.
+6. Use a founder approval card through `linq.send_card` for irreversible, costly, or strategy-changing pivots. Draft the card if the gate is not open.
+7. Write a propagation plan for D07-D13 so downstream departments know exactly what changed.
+8. Produce concrete, auditable JSON only.
+
+Required merge packet:
+- `evidence_matrix`: market, interview, synthetic, support, and sales signals with weights and contradictions.
+- `idea_diffs`: at least stay-course, narrow, and pivot options with cost, reversibility, and rejection criteria.
+- `decision`: chosen path, confidence, what would reverse it, founder approval status.
+- `product_spec`: D07-ready scope with P0/P1/P2 features, non-goals, integrations, auth, data model, QA scenarios, and pricing.
+- `rebriefs`: departments to notify and the exact brief each one needs.

@@ -1,6 +1,6 @@
 # Build status — what exists and what is still missing
 
-Snapshot taken when authoring was stopped. 59 files, ~24k lines.
+Snapshot taken when authoring was stopped. 63 files, ~25k lines.
 
 ## Complete
 - `00-START-HERE/` — index, north star, end-to-end journey, org chart, demo/judging, glossary
@@ -26,19 +26,15 @@ Snapshot taken when authoring was stopped. 59 files, ~24k lines.
 | `02-departments/D10-sales.md` | sequences, objections, deal state machine, CRM schema, forecasting, Linq deal cards |
 | `02-departments/D13-chief-of-staff.md` | review cycles, CapabilityGap taxonomy, shadow-test → eval → canary → rollback pipeline |
 | `03-integrations/12-pioneer-fastino.md` | fine-tuned small models for high-volume classification |
-| `03-integrations/13-composio.md` | managed OAuth connectors |
 | `03-integrations/14-elevenlabs-voice.md` | voice interviewer, cloning consent, disclosure |
 | `03-integrations/15-anthropic-claude.md` | Agent SDK, model routing, prompt caching, Claude Code in D07 |
-| `01-platform/16-evaluation-framework.md` | golden sets, rubrics, LLM-as-judge, promotion gates |
 | `01-platform/17-api-contracts.md` | kernel REST + SSE surface, webhook receivers |
 | `01-platform/18-state-machines.md` | every state machine in one place (mermaid) |
 | `04-execution/08-cicd-and-testing.md` | CI, test pyramid, Replay gating, release/rollback |
-| `04-execution/09-deployment-architecture.md` | environments, Render services, sandbox fleet |
 | `04-execution/10-roadmap-and-milestones.md` | hour-by-hour, then W1/M1/Q1 |
 | `04-execution/11-dependency-graph.md` | build DAG + critical path |
 | `04-execution/12-risk-register.md` | risk table with mitigations and owners |
 | `05-journeys/05-account-ceremony.md` | blocked-credential workflow (CAPTCHA, 2FA, ID, payment) |
-| `06-reference/05-external-research-notes.md` | simit digest, office-hours method, OSS tool survey |
 | `06-reference/06-decision-log.md` | ADRs for the decisions already baked in |
 
 ## Known cleanup

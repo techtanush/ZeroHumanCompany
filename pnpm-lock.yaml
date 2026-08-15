@@ -45,9 +45,44 @@ importers:
         specifier: ^3.24.1
         version: 3.25.76
 
-  apps/orchestrator: {}
+  apps/orchestrator:
+    dependencies:
+      '@zeroth/agent-kit':
+        specifier: workspace:^
+        version: link:../../packages/agent-kit
+      '@zeroth/contracts':
+        specifier: workspace:^
+        version: link:../../packages/contracts
+      '@zeroth/db':
+        specifier: workspace:^
+        version: link:../../packages/db
+      '@zeroth/kernel':
+        specifier: workspace:^
+        version: link:../kernel
+      '@zeroth/manifests':
+        specifier: workspace:^
+        version: link:../../packages/manifests
+      '@zeroth/tool-plane':
+        specifier: workspace:^
+        version: link:../../packages/tool-plane
 
-  packages/agent-kit: {}
+  packages/agent-kit:
+    dependencies:
+      '@zeroth/contracts':
+        specifier: workspace:^
+        version: link:../contracts
+      '@zeroth/manifests':
+        specifier: workspace:^
+        version: link:../manifests
+      '@zeroth/prompts':
+        specifier: workspace:^
+        version: link:../prompts
+      '@zeroth/tool-plane':
+        specifier: workspace:^
+        version: link:../tool-plane
+      zod:
+        specifier: ^3.24.1
+        version: 3.25.76
 
   packages/contracts:
     dependencies:

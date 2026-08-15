@@ -31,7 +31,11 @@ async function createPglite(dataDir: string): Promise<Db> {
     driver: 'pglite',
     async query<R>(sql: string, params: unknown[] = []) {
       const r = await pg.query<R>(sql, params as any[]);
-      return { rows: r.rows as R[], rowCount: r.rows.length };
+      // PGlite reports affected rows in `affectedRows` for INSERT/UPDATE/DELETE;
+      // `rows` is empty unless the statement had a RETURNING clause. Using
+      // rows.length alone silently breaks optimistic-claim UPDATE ... WHERE.
+      const affected = (r as { affectedRows?: number }).affectedRows;
+      return { rows: r.rows as R[], rowCount: affected ?? r.rows.length };
     },
     async tx<T>(fn: (db: Db) => Promise<T>): Promise<T> {
       if (inTx) return fn(base); // reuse outer transaction

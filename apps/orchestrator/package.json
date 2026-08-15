@@ -1,21 +1,21 @@
 {
-  "name": "@zeroth/agent-kit",
+  "name": "@zeroth/orchestrator",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "main": "./src/index.ts",
-  "exports": {
-    ".": "./src/index.ts"
-  },
   "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "start": "tsx src/main.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
+    "@zeroth/agent-kit": "workspace:^",
     "@zeroth/contracts": "workspace:^",
+    "@zeroth/db": "workspace:^",
+    "@zeroth/kernel": "workspace:^",
     "@zeroth/manifests": "workspace:^",
-    "@zeroth/prompts": "workspace:^",
-    "@zeroth/tool-plane": "workspace:^",
-    "zod": "^3.24.1"
+    "@zeroth/tool-plane": "workspace:^"
   }
 }

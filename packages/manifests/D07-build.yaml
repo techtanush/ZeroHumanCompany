@@ -1,95 +1,127 @@
-{
-  id: "D07",
-  name: "Build",
-  cluster: "build",
-  head: {
-    agent_id: "build.head",
-    model: "opus",
-    system_prompt_ref: "prompts/D07/head.md",
-    tools: [
-      "replay.run_suite",
-      "memory_read",
-      "memory_write"
-    ],
-    max_tokens_per_run: 140000
-  },
-  critic: {
-    agent_id: "build.critic",
-    model: "sonnet",
-    rubric_ref: "prompts/D07/critic-rubric.md",
-    max_tokens_per_run: 30000
-  },
-  workers: [
-    {
-      agent_id: "build.architect",
-      model: "sonnet",
-      replicas: 1,
-      system_prompt_ref: "prompts/D07/architect.md",
-      tools: [
-        "github.push",
-        "render.deploy",
-        "replay.run_suite",
-        "memory_read",
-        "memory_write"
-      ],
-      max_tokens_per_run: 60000
-    },
-    {
-      agent_id: "build.implementer",
-      model: "sonnet",
-      replicas: 1,
-      system_prompt_ref: "prompts/D07/implementer.md",
-      tools: [
-        "github.push",
-        "render.deploy",
-        "replay.run_suite",
-        "memory_read",
-        "memory_write"
-      ],
-      max_tokens_per_run: 60000
-    },
-    {
-      agent_id: "build.qa",
-      model: "sonnet",
-      replicas: 1,
-      system_prompt_ref: "prompts/D07/qa.md",
-      tools: [
-        "github.push",
-        "render.deploy",
-        "replay.run_suite",
-        "memory_read",
-        "memory_write"
-      ],
-      max_tokens_per_run: 60000
-    }
-  ],
-  concurrency: 4,
-  budget: {
-    default_envelope_usd: 12,
-    hard_cap_usd: 24
-  },
-  io: {
-    input: [
-      "ProductSpec"
-    ],
-    output: "Deployment",
-    min_outputs: 1
-  },
-  gates: [
-    "deploy"
-  ],
-  sandbox: {
-    image: "zeroth/dept-base:latest",
-    cpu: 4,
-    mem_mb: 4096,
-    pause_between_cycles: true,
-    egress_allowlist: [
-      "api.anthropic.com",
-      "*.zeroth.local"
-    ]
-  },
-  sla: {
-    soft_deadline_s: 900,
-    on_timeout: "return_partial"
-  }
-}
+id: D07
+name: Build
+cluster: build
+head:
+  agent_id: build.head
+  model: opus
+  system_prompt_ref: prompts/D07/head.md
+  tools:
+    - replay.run_suite
+    - memory_read
+    - memory_write
+  max_tokens_per_run: 140000
+critic:
+  agent_id: build.critic
+  model: sonnet
+  rubric_ref: prompts/D07/critic-rubric.md
+  max_tokens_per_run: 30000
+workers:
+  - agent_id: build.architect
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D07/architect.md
+    tools:
+      - github.push
+      - render.deploy
+      - replay.run_suite
+      - memory_read
+      - memory_write
+    max_tokens_per_run: 60000
+  - agent_id: build.implementer
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D07/implementer.md
+    tools:
+      - github.push
+      - render.deploy
+      - replay.run_suite
+      - memory_read
+      - memory_write
+    max_tokens_per_run: 60000
+  - agent_id: build.qa
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D07/qa.md
+    tools:
+      - github.push
+      - render.deploy
+      - replay.run_suite
+      - memory_read
+      - memory_write
+    max_tokens_per_run: 60000
+  - agent_id: build.technical-pm
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D07/technical-pm.md
+    tools: &a1
+      - web_search
+      - web_fetch
+      - calc
+      - memory_read
+      - github.push
+      - replay.run_suite
+    max_tokens_per_run: 60000
+  - agent_id: build.frontend-engineer
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D07/frontend-engineer.md
+    tools: *a1
+    max_tokens_per_run: 60000
+  - agent_id: build.backend-engineer
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D07/backend-engineer.md
+    tools: *a1
+    max_tokens_per_run: 60000
+  - agent_id: build.database-engineer
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D07/database-engineer.md
+    tools: *a1
+    max_tokens_per_run: 60000
+  - agent_id: build.integration-engineer
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D07/integration-engineer.md
+    tools: *a1
+    max_tokens_per_run: 60000
+  - agent_id: build.security-reviewer
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D07/security-reviewer.md
+    tools: *a1
+    max_tokens_per_run: 60000
+  - agent_id: build.devops-engineer
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D07/devops-engineer.md
+    tools: *a1
+    max_tokens_per_run: 60000
+  - agent_id: build.accessibility-reviewer
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D07/accessibility-reviewer.md
+    tools: *a1
+    max_tokens_per_run: 60000
+concurrency: 8
+budget:
+  default_envelope_usd: 12
+  hard_cap_usd: 24
+io:
+  input:
+    - ProductSpec
+  output: Deployment
+  min_outputs: 1
+gates:
+  - deploy
+sandbox:
+  image: zeroth/dept-base:latest
+  cpu: 4
+  mem_mb: 4096
+  pause_between_cycles: true
+  egress_allowlist:
+    - api.anthropic.com
+    - "*.zeroth.local"
+sla:
+  soft_deadline_s: 900
+  on_timeout: return_partial

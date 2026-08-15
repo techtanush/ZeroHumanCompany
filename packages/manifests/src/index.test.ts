@@ -34,6 +34,15 @@ describe('department manifests', () => {
       }
     }
   });
+
+  it('keeps every department staffed with at least 10 agents', () => {
+    const manifests = loadManifests();
+    for (const manifest of manifests) {
+      const workerCount = manifest.workers.reduce((count, worker) => count + worker.replicas, 0);
+      const totalAgents = 1 + (manifest.critic ? 1 : 0) + workerCount;
+      expect(totalAgents, manifest.id).toBeGreaterThanOrEqual(10);
+    }
+  });
 });
 
 describe('routing table', () => {

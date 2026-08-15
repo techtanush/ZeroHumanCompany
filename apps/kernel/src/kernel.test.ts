@@ -1,12 +1,20 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { openDb, type Db } from '@zeroth/db';
 import { Kernel } from './kernel.js';
 import { buildServer } from './server.js';
 
 async function freshKernel(routing: any[] = []) {
   const db: Db = await openDb({ dataDir: 'memory' });
-  return Kernel.create({ db, routing, signingKey: 'test-key' });
+  const kernel = await Kernel.create({ db, routing, signingKey: 'test-key' });
+  openKernels.push(kernel);
+  return kernel;
 }
+
+const openKernels: Kernel[] = [];
+
+afterEach(async () => {
+  await Promise.all(openKernels.splice(0).map((kernel) => kernel.close()));
+});
 
 async function venture(k: Kernel, autonomy: 'copilot' | 'supervised' | 'autonomous' = 'supervised') {
   return k.createVenture({

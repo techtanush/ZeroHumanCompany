@@ -1,97 +1,114 @@
-{
-  id: "D11",
-  name: "Finance & HR",
-  cluster: "ops",
-  head: {
-    agent_id: "finance.head",
-    model: "opus",
-    system_prompt_ref: "prompts/D11/head.md",
-    tools: [
-      "calc",
-      "memory_read",
-      "memory_write"
-    ],
-    max_tokens_per_run: 90000
-  },
-  critic: {
-    agent_id: "finance.critic",
-    model: "sonnet",
-    rubric_ref: "prompts/D11/critic-rubric.md",
-    max_tokens_per_run: 30000
-  },
-  workers: [
-    {
-      agent_id: "finance.treasury",
-      model: "sonnet",
-      replicas: 1,
-      system_prompt_ref: "prompts/D11/treasury.md",
-      tools: [
-        "stripe.create_payment_link",
-        "terac.post_requisition",
-        "calc",
-        "memory_read",
-        "memory_write"
-      ],
-      max_tokens_per_run: 60000
-    },
-    {
-      agent_id: "finance.hr-buyer",
-      model: "sonnet",
-      replicas: 1,
-      system_prompt_ref: "prompts/D11/hr-buyer.md",
-      tools: [
-        "stripe.create_payment_link",
-        "terac.post_requisition",
-        "calc",
-        "memory_read",
-        "memory_write"
-      ],
-      max_tokens_per_run: 60000
-    },
-    {
-      agent_id: "finance.reconciler",
-      model: "sonnet",
-      replicas: 1,
-      system_prompt_ref: "prompts/D11/reconciler.md",
-      tools: [
-        "stripe.create_payment_link",
-        "terac.post_requisition",
-        "calc",
-        "memory_read",
-        "memory_write"
-      ],
-      max_tokens_per_run: 60000
-    }
-  ],
-  concurrency: 4,
-  budget: {
-    default_envelope_usd: 0.5,
-    hard_cap_usd: 2
-  },
-  io: {
-    input: [
-      "Deal",
-      "Order"
-    ],
-    output: "BudgetAllocation",
-    min_outputs: 1
-  },
-  gates: [
-    "money_out",
-    "account_creation"
-  ],
-  sandbox: {
-    image: "zeroth/dept-base:latest",
-    cpu: 2,
-    mem_mb: 2048,
-    pause_between_cycles: true,
-    egress_allowlist: [
-      "api.anthropic.com",
-      "*.zeroth.local"
-    ]
-  },
-  sla: {
-    soft_deadline_s: 300,
-    on_timeout: "return_partial"
-  }
-}
+id: D11
+name: Finance & HR
+cluster: ops
+head:
+  agent_id: finance.head
+  model: opus
+  system_prompt_ref: prompts/D11/head.md
+  tools:
+    - calc
+    - memory_read
+    - memory_write
+  max_tokens_per_run: 90000
+critic:
+  agent_id: finance.critic
+  model: sonnet
+  rubric_ref: prompts/D11/critic-rubric.md
+  max_tokens_per_run: 30000
+workers:
+  - agent_id: finance.treasury
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D11/treasury.md
+    tools:
+      - stripe.create_payment_link
+      - terac.post_requisition
+      - calc
+      - memory_read
+      - memory_write
+    max_tokens_per_run: 60000
+  - agent_id: finance.hr-buyer
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D11/hr-buyer.md
+    tools:
+      - stripe.create_payment_link
+      - terac.post_requisition
+      - calc
+      - memory_read
+      - memory_write
+    max_tokens_per_run: 60000
+  - agent_id: finance.reconciler
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D11/reconciler.md
+    tools:
+      - stripe.create_payment_link
+      - terac.post_requisition
+      - calc
+      - memory_read
+      - memory_write
+    max_tokens_per_run: 60000
+  - agent_id: finance.stripe-reconciler
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D11/stripe-reconciler.md
+    tools: &a1
+      - calc
+      - memory_read
+      - pioneer.classify
+    max_tokens_per_run: 60000
+  - agent_id: finance.rail-selector
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D11/rail-selector.md
+    tools: *a1
+    max_tokens_per_run: 60000
+  - agent_id: finance.unit-economist
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D11/unit-economist.md
+    tools: *a1
+    max_tokens_per_run: 60000
+  - agent_id: finance.spend-anomaly-detector
+    model: haiku
+    replicas: 1
+    system_prompt_ref: prompts/D11/spend-anomaly-detector.md
+    tools: *a1
+    max_tokens_per_run: 60000
+  - agent_id: finance.terac-roi-analyst
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D11/terac-roi-analyst.md
+    tools: *a1
+    max_tokens_per_run: 60000
+  - agent_id: finance.payout-auditor
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D11/payout-auditor.md
+    tools: *a1
+    max_tokens_per_run: 60000
+concurrency: 8
+budget:
+  default_envelope_usd: 0.5
+  hard_cap_usd: 2
+io:
+  input:
+    - Deal
+    - Order
+  output: BudgetAllocation
+  min_outputs: 1
+gates:
+  - money_out
+  - account_creation
+sandbox:
+  image: zeroth/dept-base:latest
+  cpu: 2
+  mem_mb: 2048
+  pause_between_cycles: true
+  egress_allowlist:
+    - api.anthropic.com
+    - "*.zeroth.local"
+sla:
+  soft_deadline_s: 300
+  on_timeout: return_partial

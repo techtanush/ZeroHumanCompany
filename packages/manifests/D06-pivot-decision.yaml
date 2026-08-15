@@ -1,94 +1,112 @@
-{
-  id: "D06",
-  name: "Pivot & Decision",
-  cluster: "validation",
-  head: {
-    agent_id: "pivot.head",
-    model: "opus",
-    system_prompt_ref: "prompts/D06/head.md",
-    tools: [
-      "calc",
-      "memory_read",
-      "memory_write",
-      "linq.send_card"
-    ],
-    max_tokens_per_run: 90000
-  },
-  critic: {
-    agent_id: "pivot.critic",
-    model: "sonnet",
-    rubric_ref: "prompts/D06/critic-rubric.md",
-    max_tokens_per_run: 30000
-  },
-  workers: [
-    {
-      agent_id: "pivot.evidence-judge",
-      model: "sonnet",
-      replicas: 1,
-      system_prompt_ref: "prompts/D06/evidence-judge.md",
-      tools: [
-        "calc",
-        "memory_read",
-        "memory_write",
-        "linq.send_card"
-      ],
-      max_tokens_per_run: 60000
-    },
-    {
-      agent_id: "pivot.pivot-writer",
-      model: "sonnet",
-      replicas: 1,
-      system_prompt_ref: "prompts/D06/pivot-writer.md",
-      tools: [
-        "calc",
-        "memory_read",
-        "memory_write",
-        "linq.send_card"
-      ],
-      max_tokens_per_run: 60000
-    },
-    {
-      agent_id: "pivot.spec-writer",
-      model: "sonnet",
-      replicas: 1,
-      system_prompt_ref: "prompts/D06/spec-writer.md",
-      tools: [
-        "calc",
-        "memory_read",
-        "memory_write",
-        "linq.send_card"
-      ],
-      max_tokens_per_run: 60000
-    }
-  ],
-  concurrency: 4,
-  budget: {
-    default_envelope_usd: 3,
-    hard_cap_usd: 6
-  },
-  io: {
-    input: [
-      "ClaimLedger",
-      "SyntheticPanelResult"
-    ],
-    output: "ProductSpec",
-    min_outputs: 1
-  },
-  gates: [
-    "pivot_approval"
-  ],
-  sandbox: {
-    image: "zeroth/dept-base:latest",
-    cpu: 2,
-    mem_mb: 2048,
-    pause_between_cycles: true,
-    egress_allowlist: [
-      "api.anthropic.com",
-      "*.zeroth.local"
-    ]
-  },
-  sla: {
-    soft_deadline_s: 300,
-    on_timeout: "return_partial"
-  }
-}
+id: D06
+name: Pivot & Decision
+cluster: validation
+head:
+  agent_id: pivot.head
+  model: opus
+  system_prompt_ref: prompts/D06/head.md
+  tools:
+    - calc
+    - memory_read
+    - memory_write
+    - linq.send_card
+  max_tokens_per_run: 90000
+critic:
+  agent_id: pivot.critic
+  model: sonnet
+  rubric_ref: prompts/D06/critic-rubric.md
+  max_tokens_per_run: 30000
+workers:
+  - agent_id: pivot.evidence-judge
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D06/evidence-judge.md
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - linq.send_card
+    max_tokens_per_run: 60000
+  - agent_id: pivot.pivot-writer
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D06/pivot-writer.md
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - linq.send_card
+    max_tokens_per_run: 60000
+  - agent_id: pivot.spec-writer
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D06/spec-writer.md
+    tools:
+      - calc
+      - memory_read
+      - memory_write
+      - linq.send_card
+    max_tokens_per_run: 60000
+  - agent_id: pivot.signal-collector
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D06/signal-collector.md
+    tools: &a1
+      - web_search
+      - web_fetch
+      - calc
+      - memory_read
+    max_tokens_per_run: 60000
+  - agent_id: pivot.diff-modeler
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D06/diff-modeler.md
+    tools: *a1
+    max_tokens_per_run: 60000
+  - agent_id: pivot.rollback-planner
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D06/rollback-planner.md
+    tools: *a1
+    max_tokens_per_run: 60000
+  - agent_id: pivot.founder-brief-writer
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D06/founder-brief-writer.md
+    tools: *a1
+    max_tokens_per_run: 60000
+  - agent_id: pivot.counterfactual-runner
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D06/counterfactual-runner.md
+    tools: *a1
+    max_tokens_per_run: 60000
+  - agent_id: pivot.strategy-propagator
+    model: sonnet
+    replicas: 1
+    system_prompt_ref: prompts/D06/strategy-propagator.md
+    tools: *a1
+    max_tokens_per_run: 60000
+concurrency: 8
+budget:
+  default_envelope_usd: 3
+  hard_cap_usd: 6
+io:
+  input:
+    - ClaimLedger
+    - SyntheticPanelResult
+  output: ProductSpec
+  min_outputs: 1
+gates:
+  - pivot_approval
+sandbox:
+  image: zeroth/dept-base:latest
+  cpu: 2
+  mem_mb: 2048
+  pause_between_cycles: true
+  egress_allowlist:
+    - api.anthropic.com
+    - "*.zeroth.local"
+sla:
+  soft_deadline_s: 300
+  on_timeout: return_partial

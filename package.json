@@ -1,0 +1,20 @@
+{
+  "name": "zeroth",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "typecheck": "pnpm -r --parallel typecheck",
+    "test": "pnpm -r test",
+    "dev:kernel": "pnpm -F @zeroth/kernel dev",
+    "dev:orchestrator": "pnpm -F @zeroth/orchestrator dev",
+    "seed": "tsx scripts/seed-events.ts",
+    "e2e": "tsx scripts/e2e.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

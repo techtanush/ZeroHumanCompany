@@ -542,6 +542,55 @@ describe('http surface', () => {
     else process.env.STRIPE_WEBHOOK_SECRET = old;
   });
 
+  it('routes Stripe wallet top-ups from nested Checkout metadata and credits once', async () => {
+    const k = await freshKernel();
+    const app = buildServer({ kernel: k, token: 'tok' });
+    const v = await venture(k);
+    const payload = {
+      id: 'evt_topup_1',
+      type: 'checkout.session.completed',
+      data: { object: { id: 'cs_topup_1', amount_total: 1300, metadata: { venture_id: v.venture_id, kind: 'wallet_topup' } } },
+    };
+
+    const res = await app.inject({ method: 'POST', url: '/v1/webhooks/stripe', payload });
+    const replay = await app.inject({ method: 'POST', url: '/v1/webhooks/stripe', payload });
+
+    expect(res.statusCode).toBe(202);
+    expect(replay.statusCode).toBe(202);
+    const evs = await k.events.readStream(v.venture_id, { types: ['money.wallet_funded'] });
+    expect(evs).toHaveLength(1);
+    expect(evs[0].payload).toMatchObject({ amount_usd: 13, rail: 'stripe', external_id: 'cs_topup_1' });
+    const wallets = await k.wallets.list(v.venture_id);
+    expect(wallets.funded_usd).toBe(13);
+  });
+
+  it('does not auto-approve sensitive gates on timeout', async () => {
+    const k = await freshKernel();
+    const v = await venture(k);
+    const gate = await k.gates.open({
+      venture_id: v.venture_id,
+      gate_type: 'money_out',
+      requested_by: 'finance.head',
+      department_id: 'D11',
+      action: { tool: 'stripe.create_payment_link', args: { amount: 100 } },
+      preview: { summary: 'Spend $100' },
+      options: [{ id: 'approve', label: 'Approve', consequence: 'money leaves' }],
+      amount_usd: 100,
+      risk: 'high',
+      reversible: false,
+      timeout_s: 1,
+      on_timeout: 'auto_approve',
+      idempotency_key: 'timeout-sensitive-money',
+      trace_id: v.trace_id,
+    } as any);
+    await k.db.query(`UPDATE gates SET expires_at = now() - interval '1 second' WHERE id = $1`, [gate.id]);
+
+    await k.gates.sweepTimeouts();
+
+    const updated = await k.gates.get(gate.id);
+    expect(updated?.status).toBe('timed_out');
+  });
+
   it('maps a Linq founder reply into a gate decision', async () => {
     const k = await freshKernel();
     const app = buildServer({ kernel: k, token: 'tok' });

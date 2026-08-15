@@ -19,7 +19,7 @@ type PanelId = 'gates' | 'timeline' | 'dept' | 'briefing' | 'goals' | 'wallets' 
 
 export function Hq({ onReonboard }: { onReonboard: () => void }) {
   const store = useStore();
-  const { ventureId, venture, events, sse, gates, settings, meeting, workday } = store;
+  const { ventureId, venture, events, sse, gates, settings, meeting, workday, setVentureId } = store;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<HqScene | null>(null);
   const [ui, setUi] = useState<UiState | null>(null);
@@ -65,8 +65,20 @@ export function Hq({ onReonboard }: { onReonboard: () => void }) {
   }, [ui?.view, activeRoom]);
 
   const pendingGates = gates.filter((g) => g.status === 'pending');
+  const deptStatus = useMemo(() => {
+    const byDept = new Map<string, AgentReport[]>();
+    for (const agent of agents) {
+      const list = byDept.get(agent.department_id) ?? [];
+      list.push(agent);
+      byDept.set(agent.department_id, list);
+    }
+    const active = Array.from(byDept.entries()).filter(([, list]) => list.some((a) => a.status === 'working'));
+    const idle = Array.from(byDept.entries()).filter(([, list]) => list.length && list.every((a) => a.status !== 'working'));
+    return { active, idle };
+  }, [agents]);
   const scene = sceneRef.current;
   const toggle = (id: PanelId) => setPanel((p) => (p === id ? null : id));
+  const newProject = () => { setVentureId(null); onReonboard(); };
 
   return (
     <div className="stage">
@@ -84,8 +96,19 @@ export function Hq({ onReonboard }: { onReonboard: () => void }) {
           {venture?.kill_switch && <span className="chip err">KILL SWITCH ON</span>}
           <span className="chip">{workday === 'night' ? '🌙 after hours' : workday === 'day' ? '☀ workday' : '· clock'}</span>
           <span className="spec" style={{ color: 'var(--bone)', opacity: .6 }}>// ZEROTH_HQ · {ui?.view.toUpperCase()}</span>
+          <button className="btn sm" onClick={() => scene?.goBack()}>Exit HQ</button>
+          <button className="btn sm" onClick={newProject}>New project</button>
         </div>
       </div>
+
+      {ui?.view !== 'exterior' && (
+        <div className="dept-status-strip">
+          <span className="chip ok">{deptStatus.active.length} departments active</span>
+          <span className="chip">{deptStatus.idle.length} idle</span>
+          {deptStatus.active.slice(0, 5).map(([dept, list]) => <span key={dept} className="chip info">{dept} {list.filter((a) => a.status === 'working').length} working</span>)}
+          {deptStatus.active.length === 0 && <span className="muted tiny">No department is currently executing. Start the daily briefing or open Goals to dispatch work.</span>}
+        </div>
+      )}
 
       {meeting && (
         <div className="meeting-banner">

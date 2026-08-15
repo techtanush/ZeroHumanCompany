@@ -503,23 +503,24 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
         }
       }
       const body = unwrapBody(req.body);
-      const venture_id = body.venture_id ?? body.metadata?.venture_id;
+      const venture_id = webhookVentureId(vendor, body);
       if (!venture_id) {
         reply.code(202);
         return { accepted: false, reason: 'no venture_id in payload' };
       }
       const mapped = mapWebhook(vendor, body);
-      await kernel.events.append({
-        venture_id,
-        type: mapped.type,
-        actor_kind: 'webhook',
-        actor_id: vendor,
-        payload: mapped.payload,
-        trace_id: await kernel.traceFor(venture_id),
-        idempotency_key: `wh:${vendor}:${body.id ?? uuid()}`,
-      });
       if (mapped.type === 'money.wallet_funded') {
-        await kernel.wallets.fund(venture_id, Number((mapped.payload as any).amount_usd ?? 0), 'stripe', `${String((mapped.payload as any).external_id ?? '')}:apply`).catch(() => undefined);
+        await kernel.wallets.fund(venture_id, Number((mapped.payload as any).amount_usd ?? 0), 'stripe', String((mapped.payload as any).external_id ?? body.id ?? '')).catch(() => undefined);
+      } else {
+        await kernel.events.append({
+          venture_id,
+          type: mapped.type,
+          actor_kind: 'webhook',
+          actor_id: vendor,
+          payload: mapped.payload,
+          trace_id: await kernel.traceFor(venture_id),
+          idempotency_key: `wh:${vendor}:${body.id ?? uuid()}`,
+        });
       }
       if (vendor === 'linq') {
         const decision = await parseLinqGateDecision(kernel, body);
@@ -547,6 +548,16 @@ function unwrapBody(body: unknown): any {
 function rawBody(body: unknown): string {
   if (body && typeof body === 'object' && '__rawBody' in body) return String((body as any).__rawBody);
   return JSON.stringify(body ?? {});
+}
+
+function webhookVentureId(vendor: string, body: any): string | undefined {
+  if (vendor === 'stripe') {
+    return body.venture_id
+      ?? body.metadata?.venture_id
+      ?? body.data?.object?.metadata?.venture_id
+      ?? body.data?.object?.client_reference_id;
+  }
+  return body.venture_id ?? body.metadata?.venture_id;
 }
 
 function verifyGenericSignature(raw: string, sig: string, secret: string): boolean {

@@ -41,12 +41,12 @@ export async function sendFounderText(input: {
     from: process.env.LINQ_FROM_NUMBER || undefined,
     to: [founderPhone],
     message: {
-      parts: [{ text: input.text }],
+      parts: [{ type: 'text', value: input.text }],
       metadata: input.metadata ?? {},
     },
   };
 
-  const response = await fetch(`${baseUrl}/messages`, {
+  const response = await fetch(`${baseUrl}/chats`, {
     method: 'POST',
     headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
     body: JSON.stringify(body),
@@ -56,8 +56,8 @@ export async function sendFounderText(input: {
     return { delivered: false, degraded: `linq ${response.status}: ${text.slice(0, 160)}` };
   }
   try {
-    const json = JSON.parse(text) as { message_id?: string; id?: string };
-    return { delivered: true, message_id: json.message_id ?? json.id };
+    const json = JSON.parse(text) as { message_id?: string; id?: string; data?: { id?: string }; chat_id?: string };
+    return { delivered: true, message_id: json.message_id ?? json.chat_id ?? json.id ?? json.data?.id };
   } catch {
     return { delivered: true };
   }

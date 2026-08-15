@@ -51,7 +51,7 @@ export const INTEGRATIONS: IntegrationSpec[] = [
       { env: 'STRIPE_PUBLISHABLE_KEY', label: 'Publishable key', required: false, secret: false },
       { env: 'STRIPE_WEBHOOK_SECRET', label: 'Webhook secret', required: false, hint: 'stripe listen --forward-to localhost:4000/v1/webhooks/stripe' },
     ] },
-  { id: 'composio', name: 'Composio', tier: 'sponsor', purpose: 'Gmail / Calendar / other SaaS on behalf of the company. Outbound email stays behind the outbound_to_real_person gate.', powers: 'composio.gmail_send, calendar',
+  { id: 'composio', name: 'Composio', tier: 'sponsor', purpose: 'Gmail / Calendar / GitHub / Vercel / other SaaS on behalf of the company. Outbound email, repo pushes and deploys stay behind gates.', powers: 'gmail, calendar, github, vercel through Composio connected accounts',
     vars: [
       { env: 'COMPOSIO_API_KEY', label: 'API key', required: true, hint: 'app.composio.dev' },
       { env: 'COMPOSIO_ENTITY_ID', label: 'Entity ID (per founder)', required: false, secret: false, hint: 'created when you connect Gmail' },
@@ -76,6 +76,12 @@ export const INTEGRATIONS: IntegrationSpec[] = [
     ] },
   { id: 'render', name: 'Render', tier: 'sponsor', purpose: 'Deploy the built product (deploy gate).', powers: 'render.deploy',
     vars: [{ env: 'RENDER_API_KEY', label: 'API key', required: true }, { env: 'RENDER_OWNER_ID', label: 'Owner ID', required: false, secret: false }] },
+  { id: 'vercel', name: 'Vercel', tier: 'sponsor', purpose: 'Frontend hosting for the venture. Prefer Composio-connected Vercel; direct token is supported for deployment status/config.', powers: 'vercel.deploy, production frontend URLs',
+    vars: [
+      { env: 'VERCEL_TOKEN', label: 'Vercel token', required: false },
+      { env: 'VERCEL_TEAM_ID', label: 'Team ID', required: false, secret: false },
+      { env: 'VERCEL_PROJECT_ID', label: 'Project ID', required: false, secret: false },
+    ] },
   { id: 'replay', name: 'Replay', tier: 'sponsor', purpose: 'Autonomous QA with time-travel recordings; runs before every deploy so buggy code never ships.', powers: 'replay.run_suite',
     vars: [{ env: 'REPLAY_API_KEY', label: 'API key', required: true }] },
   { id: 'github', name: 'GitHub', tier: 'core', purpose: 'Repo work for the venture the company builds.', powers: 'github.push',
@@ -148,13 +154,13 @@ export async function sendLinqText(to: string, text: string, meta: Record<string
   if (!apiKey) return { ok: false, detail: 'not sent', degraded: 'missing LINQ_API_KEY' };
   if (!/^\+[1-9]\d{6,14}$/.test(to)) return { ok: false, detail: 'not sent', degraded: `bad E.164 phone ${to}` };
   const baseUrl = process.env.LINQ_BASE_URL ?? 'https://api.linqapp.com/api/partner/v3';
-  const body = { from: process.env.LINQ_FROM_NUMBER || undefined, to: [to], message: { parts: [{ text }], metadata: meta } };
+  const body = { from: process.env.LINQ_FROM_NUMBER || undefined, to: [to], message: { parts: [{ type: 'text', value: text }], metadata: meta } };
   try {
-    const res = await fetch(`${baseUrl}/messages`, { method: 'POST', headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' }, body: JSON.stringify(body) });
+    const res = await fetch(`${baseUrl}/chats`, { method: 'POST', headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' }, body: JSON.stringify(body) });
     const raw = await res.text();
     if (!res.ok) return { ok: false, detail: `linq ${res.status}`, degraded: raw.slice(0, 200) };
     let id: string | undefined;
-    try { const j = JSON.parse(raw); id = j.message_id ?? j.id ?? j.data?.id; } catch { /* non-json */ }
+    try { const j = JSON.parse(raw); id = j.message_id ?? j.chat_id ?? j.id ?? j.data?.id; } catch { /* non-json */ }
     return { ok: true, detail: 'sent', extra: { message_id: id } };
   } catch (e) {
     return { ok: false, detail: 'network error', degraded: e instanceof Error ? e.message : String(e) };
@@ -173,7 +179,7 @@ export async function probeComposio(): Promise<ProbeResult> {
     const j = (await res.json()) as any;
     const items: any[] = j.items ?? j.connectedAccounts ?? j.data ?? [];
     const apps = items.map((i) => String(i.appName ?? i.appUniqueId ?? i.integrationId ?? '').toLowerCase());
-    return { ok: true, detail: `${items.length} connected account(s)`, extra: { apps, gmail: apps.some((a) => a.includes('gmail')), calendar: apps.some((a) => a.includes('calendar')), entity_id: entity ?? null } };
+    return { ok: true, detail: `${items.length} connected account(s)`, extra: { apps, gmail: apps.some((a) => a.includes('gmail')), calendar: apps.some((a) => a.includes('calendar')), github: apps.some((a) => a.includes('github')), vercel: apps.some((a) => a.includes('vercel')), entity_id: entity ?? null } };
   } catch (e) {
     return { ok: false, detail: 'network error', degraded: e instanceof Error ? e.message : String(e) };
   }

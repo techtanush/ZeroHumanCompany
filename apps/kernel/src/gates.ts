@@ -137,11 +137,14 @@ export class GateEngine {
    * real person are NEVER auto-approved, at any autonomy level.
    */
   private shouldAutoApprove(req: GateRequest, autonomy: string): boolean {
-    const never = ['money_out', 'outbound_to_real_person', 'refund', 'account_creation', 'new_department'];
-    if (never.includes(req.gate_type)) return false;
+    if (this.neverAutoApprove(req.gate_type)) return false;
     if (autonomy === 'copilot') return false;
     if (autonomy === 'supervised') return req.risk === 'low' && req.reversible;
     return req.risk !== 'high' && req.reversible; // autonomous
+  }
+
+  private neverAutoApprove(gate_type: string): boolean {
+    return ['money_out', 'outbound_to_real_person', 'refund', 'account_creation', 'new_department'].includes(gate_type);
   }
 
   async decide(gate_id: string, decision: GateDecision): Promise<GateRecord> {
@@ -210,7 +213,7 @@ export class GateEngine {
     for (const row of r.rows) {
       const gate = this.rowToGate(row);
       const status: GateStatus =
-        gate.on_timeout === 'auto_approve' ? 'approved'
+        gate.on_timeout === 'auto_approve' && !this.neverAutoApprove(gate.gate_type) ? 'approved'
         : gate.on_timeout === 'auto_reject' ? 'rejected'
         : 'timed_out';
       await this.db.query(
@@ -222,7 +225,7 @@ export class GateEngine {
         type: 'gate.timed_out',
         actor_kind: 'system',
         actor_id: 'kernel.gates',
-        payload: { gate_id: gate.id, on_timeout: gate.on_timeout },
+        payload: { gate_id: gate.id, on_timeout: gate.on_timeout, blocked_auto_approve: gate.on_timeout === 'auto_approve' && this.neverAutoApprove(gate.gate_type) },
         trace_id: gate.trace_id,
       });
       if (status === 'approved') await this.execute({ ...gate, status });

@@ -57,6 +57,7 @@ export const api = {
   setVar: (env: string, value: string) => call<{ env: string; configured: boolean }>('PUT', `/v1/integrations/vars/${env}`, { value }),
   linqTest: (b: { to?: string; text?: string; venture_id?: string }) => call<{ ok: boolean; detail: string; degraded?: string; to: string }>('POST', '/v1/integrations/linq/test-message', b),
   linqConfirm: (venture_id: string, confirmed: boolean) => call<any>('POST', '/v1/integrations/linq/confirm', { venture_id, confirmed }),
+  transferOnboardingToPhone: (venture_id: string, b: { phone_e164?: string; step?: string; text?: string; idempotency_key?: string }) => call<{ event: KernelEvent; delivery: { delivered: boolean; message_id?: string; degraded?: string } }>('POST', `/v1/ventures/${venture_id}/transfer-onboarding-to-phone`, b),
   consentText: () => call<{ version: string; text: string }>('GET', '/v1/voice/consent-text'),
   voiceConsent: (id: string, b: { accepted: boolean; display_name?: string }) => call<{ consent_event_id: string }>('POST', `/v1/ventures/${id}/voice/consent`, b),
   voiceClone: (id: string, b: { audio_base64: string; mime_type: string; name?: string; duration_s?: number }) => call<{ voice_id: string; driver: string; degraded?: string }>('POST', `/v1/ventures/${id}/voice/clone`, b),

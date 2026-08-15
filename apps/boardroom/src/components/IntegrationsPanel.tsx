@@ -28,6 +28,7 @@ export function IntegrationsList({ compact, filter }: { compact?: boolean; filte
               {pr && <span className={`chip ${pr.ok ? 'ok' : 'err'}`} title={pr.degraded}>{pr.detail}</span>}
               {pr?.extra?.tools && <span className="tiny muted">{pr.extra.tools.length} MCP tools</span>}
               {pr?.extra && 'gmail' in pr.extra && <span className="tiny muted">gmail {pr.extra.gmail ? '✓' : '✗'} · calendar {pr.extra.calendar ? '✓' : '✗'}</span>}
+              {pr?.extra && 'github' in pr.extra && <span className="tiny muted">github {pr.extra.github ? '✓' : '✗'} · vercel {pr.extra.vercel ? '✓' : '✗'}</span>}
             </div>
             <div className="vars">
               {i.vars.map((v) => (
@@ -55,7 +56,7 @@ export function IntegrationsPanel({ onClose }: { onClose: () => void }) {
   const linq = async () => { setLinqBusy(true); try { const r = await api.linqTest({}); toast(r.ok ? `HELLO sent to ${r.to}` : `Linq: ${r.degraded ?? r.detail}`, r.ok ? 'ok' : 'error'); } finally { setLinqBusy(false); } };
   return (
     <Panel title="Integrations" size="wide" onClose={onClose} sub="Keys are written to .env on this machine and never shown again. Test = live probe."
-      foot={<><button className="btn" onClick={linq} disabled={linqBusy}>Send HELLO to my phone (Linq)</button><span className="muted small">Composio: connect Gmail/Calendar at app.composio.dev, then paste the entity id.</span></>}>
+      foot={<><button className="btn" onClick={linq} disabled={linqBusy}>Send HELLO to my phone (Linq)</button><span className="muted small">Composio: connect Gmail/Calendar/GitHub/Vercel at app.composio.dev, then paste the entity id.</span></>}>
       <IntegrationsList />
     </Panel>
   );

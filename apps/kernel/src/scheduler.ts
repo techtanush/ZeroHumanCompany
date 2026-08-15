@@ -31,8 +31,12 @@ function toMinutes(hhmm: string): number { const [h, m] = hhmm.split(':').map(Nu
 /** Which schedule points are due at this local minute (within a 2-minute window so a slow tick never misses). */
 export function dueKinds(schedule: MeetingSchedule, minutes: number, day: string): Kind[] {
   if (!schedule.days.includes(day as any)) return [];
-  // Exact-minute match; the once-a-minute tick plus per-day idempotency keys make this safe.
-  const within = (t: string) => minutes === toMinutes(t);
+  // The tick runs once a minute, but process pauses or deploy restarts can land a
+  // little late. Per-day idempotency keys prevent duplicate scheduled firings.
+  const within = (t: string) => {
+    const target = toMinutes(t);
+    return minutes >= target && minutes <= target + 2;
+  };
   const out: Kind[] = [];
   if (within(schedule.work_start)) out.push('workday_start');
   if (within(schedule.exec_meeting_time)) out.push('executive');

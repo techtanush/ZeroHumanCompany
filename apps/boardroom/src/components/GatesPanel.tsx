@@ -8,7 +8,7 @@ export function GatesPanel({ onClose }: { onClose: () => void }) {
   const { gates, refreshGates, toast } = useStore();
   const [showAll, setShowAll] = useState(false);
   const pending = gates.filter((g) => g.status === 'pending');
-  const list = showAll ? gates : pending;
+  const list = [...(showAll ? gates : pending)].sort((a, b) => Number(b.gate_type === 'money_out') - Number(a.gate_type === 'money_out'));
   return (
     <Panel title="Decisions" sub={`${pending.length} waiting · money, outreach, deploys and new capabilities never run without you`} onClose={onClose}
       foot={<><button className="btn sm" onClick={() => setShowAll((s) => !s)}>{showAll ? 'Pending only' : `History (${gates.length})`}</button><button className="btn sm" onClick={() => refreshGates()}>Refresh</button></>}>
@@ -38,7 +38,7 @@ function GateCard({ g, onDone, toast }: { g: Gate; onDone: () => void; toast: (m
   const isPending = g.status === 'pending';
   const secondsLeft = Math.max(0, Math.round((new Date(g.expires_at).getTime() - Date.now()) / 1000));
   return (
-    <div className={`card gate ${g.channel === 'linq' ? 'linq' : ''}`}>
+    <div className={`card gate ${g.channel === 'linq' ? 'linq' : ''} ${g.gate_type === 'money_out' ? 'money-out' : ''}`}>
       <div className="row" style={{ alignItems: 'flex-start' }}>
         <div className="grow">
           <div className="row wrap" style={{ gap: 6 }}>

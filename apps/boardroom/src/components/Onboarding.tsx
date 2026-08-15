@@ -23,10 +23,10 @@ const TZ_GUESS = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Lo
 /** Declared at module scope so typing never remounts the input (a component created inside render loses focus on every keystroke). */
 function Field({ label, children }: { label: string; children: React.ReactNode }) { return <label className="field"><span className="spec muted">{label}</span>{children}</label>; }
 
-export function Onboarding({ onDone }: { onDone: () => void }) {
+export function Onboarding({ onDone, initialProfile }: { onDone: () => void; initialProfile?: { display_name?: string; email?: string } }) {
   const { setVentureId, ventureId, toast, kernelOk } = useStore();
   const [step, setStep] = useState(0);
-  const [f, setF] = useState({ display_name: '', email: '', phone: '', timezone: TZ_GUESS, background: '' });
+  const [f, setF] = useState({ display_name: initialProfile?.display_name ?? '', email: initialProfile?.email ?? '', phone: '', timezone: TZ_GUESS, background: '' });
   const [mode, setMode] = useState<'founder_led' | 'autonomous_origination'>('founder_led');
   const [idea, setIdea] = useState('');
   const [caps, setCaps] = useState({ spend_cap_usd: 50, terac_cap_usd: 200, autonomy: 'supervised' as 'copilot' | 'supervised' | 'autonomous' });
@@ -38,12 +38,13 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<{ venture_id: string; first_work_order_id: string | null; trace_id: string } | null>(null);
   const [launchLog, setLaunchLog] = useState<string[]>([]);
+  const [transfer, setTransfer] = useState<{ busy: boolean; status: string }>({ busy: false, status: '' });
   const phoneE164 = useMemo(() => toE164(f.phone), [f.phone]);
   const phoneOk = /^\+[1-9]\d{6,14}$/.test(phoneE164);
   useEffect(() => { api.consentText().then((r) => setVoice((v) => ({ ...v, text: r.text }))).catch(() => undefined); }, []);
   useEffect(() => { setSched((s) => ({ ...s, timezone: f.timezone })); }, [f.timezone]);
 
-  const canNext = [f.display_name.trim().length > 1, phoneOk, mode === 'autonomous_origination' || idea.trim().length > 12, true, true, true, true, true, true][step];
+  const canNext = [f.display_name.trim().length > 1, true, mode === 'autonomous_origination' || idea.trim().length > 12, true, true, true, true, true, true][step];
 
   const sendHello = async () => {
     setLinqBusy(true);
@@ -60,7 +61,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
     setBusy(true); setLaunchLog([]);
     const log = (s: string) => setLaunchLog((l) => [...l, s]);
     try {
-      const founder_profile = { display_name: f.display_name.trim(), email: f.email.trim() || undefined, phone_e164: phoneE164, timezone: f.timezone, background: f.background };
+      const founder_profile = { display_name: f.display_name.trim(), email: f.email.trim() || undefined, phone_e164: phoneOk ? phoneE164 : undefined, timezone: f.timezone, background: f.background };
       const body: any = {
         mode, founder_profile, autonomy_level: caps.autonomy, spend_cap_usd: caps.spend_cap_usd, terac_cap_usd: caps.terac_cap_usd,
         name: mode === 'founder_led' ? idea.trim().slice(0, 40) : `${f.display_name.split(' ')[0]}'s autonomous venture`,
@@ -75,12 +76,32 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
       setResult(r); log(`Venture ${r.venture_id.slice(0, 8)} · first work order ${r.first_work_order_id?.slice(0, 8) ?? '—'} → ${mode === 'founder_led' ? 'D01 normalize_idea' : 'D01 originate_opportunities'}`);
       if (voice.agree) { log('Recording voice consent…'); await api.voiceConsent(r.venture_id, { accepted: true, display_name: f.display_name }); if (voice.sample) { log('Cloning voice…'); const c = await api.voiceClone(r.venture_id, { audio_base64: voice.sample.audio_base64, mime_type: voice.sample.mime_type, duration_s: voice.sample.duration_s, name: `${f.display_name} voice` }).catch((e) => ({ voice_id: '', driver: 'error', degraded: e.message })); log(`Voice: ${c.voice_id ? `cloned (${c.driver})` : c.degraded}`); } }
       if (linq.sent) await api.linqConfirm(r.venture_id, linq.confirmed).catch(() => undefined);
-      log('Opening the HQ. The SSE stream connects on entry.');
-      // App switches to the HQ the moment the venture id is set, so set it inside
-      // the delay — otherwise the launch log / "Venture created" card never shows.
-      setTimeout(() => { setVentureId(r.venture_id); onDone(); }, 1500);
+      log('Ready. Open the HQ when you want the SSE stream to connect.');
     } catch (e: any) { log(`Error: ${e.message}`); toast(e.message, 'error'); }
     finally { setBusy(false); }
+  };
+
+  const transferToPhone = async () => {
+    if (!result?.venture_id || !phoneOk) return;
+    setTransfer({ busy: true, status: 'sending...' });
+    try {
+      const r = await api.transferOnboardingToPhone(result.venture_id, {
+        phone_e164: phoneE164,
+        step: STEPS[step].toLowerCase(),
+        text: "Let's continue the onboarding process here. I'll ask the next question by text.",
+        idempotency_key: `onboarding-transfer-${result.venture_id}-${STEPS[step].toLowerCase()}`,
+      });
+      setTransfer({ busy: false, status: r.delivery.delivered ? 'sent to phone' : (r.delivery.degraded ?? 'not delivered') });
+      toast(r.delivery.delivered ? 'Onboarding transferred to phone' : `Phone transfer: ${r.delivery.degraded ?? 'not delivered'}`, r.delivery.delivered ? 'ok' : 'warn');
+    } catch (e: any) {
+      setTransfer({ busy: false, status: e.message });
+      toast(e.message, 'error');
+    }
+  };
+  const openHq = () => {
+    if (!result?.venture_id) return;
+    setVentureId(result.venture_id);
+    onDone();
   };
 
   const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
@@ -123,11 +144,12 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
               </div>
               {linq.sent && linq.ok && <label className="opt check on mt" style={{ cursor: 'pointer' }} onClick={() => setLinq({ ...linq, confirmed: !linq.confirmed })}><span className="rad" style={{ background: linq.confirmed ? 'var(--filament)' : 'transparent' }} /><span>I got the HELLO on my phone {linq.confirmed ? '✓' : ''}</span></label>}
               {linq.sent && !linq.ok && <div className="small muted mt">Linq isn't configured yet (LINQ_API_KEY) — you can add it in the Integrations step; approvals still work in the Boardroom meanwhile.</div>}
+              <div className="small muted mt">Optional: skip phone for now. Money, outreach and deploy gates will stay in the Boardroom until Linq is connected.</div>
             </div>
           </>)}
           {step === 2 && (<>
             <h1>Bring an idea — or none at all.</h1>
-            <p className="lede">Founder-led: you describe the idea and Intake (D01) normalizes it, then Office Hours interviews you. Autonomous: D01 originates opportunities from real signals and you pick.</p>
+            <p className="lede">Founder-led: you describe the idea and Intake (D01) normalizes it, then Office Hours asks one sharp GStack-style question at a time. Autonomous: D01 originates opportunities, D02 stress-tests the generated idea, and you approve before market research starts.</p>
             <div className="opt" onClick={() => setMode('founder_led')}><span className={`rad ${mode === 'founder_led' ? '' : ''}`} style={{ background: mode === 'founder_led' ? 'radial-gradient(var(--filament) 45%, transparent 50%)' : 'transparent', borderColor: mode === 'founder_led' ? 'var(--filament)' : undefined }} /><div><b>I have an idea</b><div className="small muted">Even a rough one. The company sharpens it against evidence.</div></div></div>
             <div className="opt" onClick={() => setMode('autonomous_origination')}><span className="rad" style={{ background: mode === 'autonomous_origination' ? 'radial-gradient(var(--filament) 45%, transparent 50%)' : 'transparent', borderColor: mode === 'autonomous_origination' ? 'var(--filament)' : undefined }} /><div><b>Find one for me (autonomous origination)</b><div className="small muted">D01 mines pain signals and proposes candidates; you approve the niche.</div></div></div>
             {mode === 'founder_led' && <textarea className="textarea" placeholder="Dental clinics with 2–5 chairs lose patients between visits; I want an automatic recall-reminder service they can turn on in 10 minutes…" value={idea} onChange={(e) => setIdea(e.target.value)} autoFocus />}
@@ -164,7 +186,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
           {step === 6 && (<>
             <h1>Connect the company's tools.</h1>
             <p className="lede">Keys are stored in <span className="kbd">.env</span> on this machine and never displayed again. Anything missing degrades to a mock — the company still runs. If a department later needs an integration you haven't connected, it texts you on Linq.</p>
-            <div className="card small"><b>Composio (Gmail / Calendar):</b> add the API key here, connect Gmail + Calendar at app.composio.dev, then paste the entity id. Outbound email always waits for your approval.</div>
+            <div className="card small"><b>Composio:</b> add the API key here, connect Gmail/Calendar plus GitHub and Vercel at app.composio.dev, then paste the entity id. If GitHub or Vercel is missing at build/deploy time, the dashboard and Linq will ask you to connect it before D07 continues.</div>
             <IntegrationsList compact />
           </>)}
           {step === 7 && (<>
@@ -187,10 +209,18 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
             {result && <div className="card" style={{ borderColor: 'var(--ok)' }}><b>Venture created.</b> <span className="mono small">venture_id {result.venture_id} · first_work_order_id {result.first_work_order_id ?? '—'} · trace {result.trace_id}</span></div>}
           </>)}
         </div>
+        {result && phoneOk && (
+          <div className="phone-transfer">
+            <div className="bubble them">You can also transfer the onboarding process to phone.</div>
+            <button className="btn primary" onClick={transferToPhone} disabled={transfer.busy}>{transfer.busy ? 'Sending...' : 'Transfer to phone'}</button>
+            {transfer.status && <span className="chip">{transfer.status}</span>}
+          </div>
+        )}
         <div className="onboard-foot">
           <button className="btn ghost" onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0 || busy}>&larr; Back</button>
           <div className="row">
-            {step < STEPS.length - 1 ? <button className="btn primary" onClick={() => setStep((s) => s + 1)} disabled={!canNext}>Next &rarr;</button> : <button className="btn primary pulse" onClick={launch} disabled={busy || !!result}>{busy ? 'Launching…' : result ? 'Opening HQ…' : '🚀 Launch the company'}</button>}
+            {step === 1 && <button className="btn ghost" onClick={() => setStep((s) => s + 1)}>Skip phone</button>}
+            {step < STEPS.length - 1 ? <button className="btn primary" onClick={() => setStep((s) => s + 1)} disabled={!canNext}>Next &rarr;</button> : result ? <button className="btn primary pulse" onClick={openHq}>Open HQ &rarr;</button> : <button className="btn primary pulse" onClick={launch} disabled={busy}>{busy ? 'Launching…' : 'Launch the company'}</button>}
           </div>
         </div>
       </main>

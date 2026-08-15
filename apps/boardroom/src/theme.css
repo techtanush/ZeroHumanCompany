@@ -213,3 +213,39 @@ a { color: var(--filament-2); }
 .tabs-dark { display: flex; gap: 2px; border-bottom: 1px solid var(--bone-on-void); }
 .tabs-dark button { background: none; border: none; border-bottom: 2px solid transparent; padding: 10px 12px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--paper-on-void-2); }
 .tabs-dark button.active { color: var(--filament-2); border-bottom-color: var(--filament); }
+
+/* ── landing ───────────────────────────────────────────────── */
+.landing { height: 100%; overflow-y: auto; background: var(--void); color: var(--paper-on-void); }
+.landing-hero { min-height: 74vh; display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 520px); gap: 42px; align-items: center; padding: 58px clamp(24px, 6vw, 82px) 34px; }
+.landing-copy { display: flex; flex-direction: column; gap: 18px; max-width: 720px; }
+.landing-copy h1 { margin: 0; font-family: var(--font-display); font-size: clamp(42px, 7vw, 78px); font-weight: 400; line-height: 0.98; letter-spacing: -0.02em; }
+.landing-copy p { margin: 0; max-width: 640px; color: var(--paper-on-void-2); font-size: 18px; }
+.brand-mark { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--filament-2); }
+.landing-auth { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 8px; max-width: 760px; align-items: stretch; }
+.landing-hq { position: relative; min-height: 440px; border: 1px solid var(--bone-on-void); border-radius: var(--r-3); background: linear-gradient(180deg, #182034, #0d1324); overflow: hidden; box-shadow: inset 0 0 0 1px rgba(245,242,236,0.04), 0 18px 50px rgba(0,0,0,.35); }
+.landing-hq::before { content: ""; position: absolute; inset: 34px 28px; border: 1px solid rgba(245,242,236,0.08); background: repeating-linear-gradient(90deg, transparent 0 72px, rgba(245,242,236,0.05) 72px 73px), repeating-linear-gradient(0deg, transparent 0 58px, rgba(245,242,236,0.04) 58px 59px); }
+.dept-tile { position: absolute; width: 140px; min-height: 84px; display: grid; place-items: center; gap: 3px; padding: 12px; border: 1px solid rgba(245,242,236,0.16); border-radius: var(--r-2); background: rgba(245,242,236,0.08); text-align: center; box-shadow: 0 10px 22px rgba(0,0,0,.18); }
+.dept-tile .face { font-family: var(--font-mono); font-size: 24px; color: var(--filament-2); }
+.dept-tile b { font-size: 12px; }
+.dept-tile.t0 { left: 36px; top: 54px; } .dept-tile.t1 { right: 54px; top: 66px; } .dept-tile.t2 { left: 74px; top: 190px; }
+.dept-tile.t3 { right: 44px; top: 202px; } .dept-tile.t4 { left: 44px; bottom: 54px; } .dept-tile.t5 { right: 82px; bottom: 58px; }
+.hq-core { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; width: 160px; height: 96px; border: 1px solid var(--filament); border-radius: var(--r-2); background: rgba(230,106,44,0.13); color: var(--filament-2); font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; }
+.landing-bands { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; border-top: 1px solid var(--bone-on-void); background: var(--bone-on-void); }
+.landing-bands > div { min-height: 116px; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 22px clamp(18px, 4vw, 56px); background: var(--void-2); }
+.landing-bands b { color: var(--paper-on-void); }
+.landing-bands span { color: var(--paper-on-void-2); font-size: 14px; }
+
+.phone-transfer { padding: 12px 56px; display: flex; gap: 10px; align-items: center; border-top: 1px solid var(--bone-on-void); background: rgba(20,26,43,0.96); }
+.dept-status-strip { position: absolute; top: 78px; left: 96px; right: 22px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; z-index: 5; pointer-events: none; }
+.dept-status-strip .chip, .dept-status-strip .muted { pointer-events: auto; }
+.gate.money-out { border-left-color: var(--err); box-shadow: 0 0 0 1px rgba(176,70,60,0.22); }
+.gate.money-out .amount { color: var(--err); }
+
+@media (max-width: 900px) {
+  .landing-hero { grid-template-columns: 1fr; padding-top: 34px; }
+  .landing-auth { grid-template-columns: 1fr; }
+  .landing-hq { min-height: 360px; }
+  .landing-bands { grid-template-columns: 1fr; }
+  .phone-transfer { padding: 12px 18px; flex-wrap: wrap; }
+  .dept-status-strip { left: 24px; top: 126px; right: 18px; }
+}

@@ -12,7 +12,7 @@
 
 Every other department produces documents. D07 is the only department whose output a customer can
 touch. It is therefore the only department allowed to push code and create infrastructure
-([`../00-vision/03-org-chart.md`](../00-vision/03-org-chart.md) — "who can talk to the outside world").
+([`../00-START-HERE/03-org-chart.md`](../00-START-HERE/03-org-chart.md) — "who can talk to the outside world").
 
 ---
 
@@ -669,7 +669,7 @@ A `Deployment` may be signed only when **all** are true:
 
 ## 14. Demo notes
 
-D07 owns **2:25 → 2:55** ([`../00-vision/04-demo-and-judging.md`](../00-vision/04-demo-and-judging.md)).
+D07 owns **2:25 → 2:55** ([`../00-START-HERE/04-demo-and-judging.md`](../00-START-HERE/04-demo-and-judging.md)).
 
 | t | On screen | Line |
 |---|---|---|

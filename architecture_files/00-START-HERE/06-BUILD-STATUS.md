@@ -1,43 +1,40 @@
-# Build status — what exists and what is still missing
+# Build Status
 
-Snapshot taken when authoring was stopped. 63 files, ~25k lines.
+Snapshot after the architecture completion pass. The repository now contains **78 architecture files** under `architecture_files/`.
 
-## Complete
-- `00-START-HERE/` — index, north star, end-to-end journey, org chart, demo/judging, glossary
-- `01-platform/` — 01 system architecture, 02 agent runtime, 03 event bus, 04 data model,
-  05 memory, 06 human-in-the-loop, 07 identity, 08 money/metering, 09 boardroom UI,
-  10 observability, 11 evidence & truth, 12 safety & compliance, 13 permissions,
-  14 secrets & vault, 15 error handling & fallbacks
-- `02-departments/` — D00 template, D01 intake, D02 office hours, D03 market research,
-  D04 outreach & validation, D06 pivot & decision, D07 build, D08 strategy, D09 leads,
-  D11 finance & HR, D12 support
-- `03-integrations/` — 00 sponsor strategy, 01 Terac, 02 Band, 03 Stripe, 04 Solari,
-  05 Superserve, 06 Linq, 07 Replay, 08 Render, 09 Lovable, 10 Whop, 11 Dodo
-- `04-execution/` — 01 build order, 02 speed playbook, 03 one-shot prompt,
-  04 demo seed & fallbacks, 05 MVP scope, 06 repo layout, 07 source control & GitHub
-- `05-journeys/` — 01 founder journey, 02 founder messaging flows, 03 customer journey
-- `06-reference/` — 00 worker brief, 01 product principles, 02 agent roles catalog,
-  03 artifact catalog, 04 KPI dictionary
+## Complete coverage
 
-## Still to write (next session — briefs are in `06-reference/00-WORKER-BRIEF.md`)
-| Path | Content |
+| Area | Files |
 |---|---|
-| `02-departments/D05-synthetic-population.md` | simit port: PUMS sampling, PWGTP weights, archetype clustering, post-stratified polling, rubric validation, axum API, synthetic-evidence labeling rule |
-| `02-departments/D10-sales.md` | sequences, objections, deal state machine, CRM schema, forecasting, Linq deal cards |
-| `02-departments/D13-chief-of-staff.md` | review cycles, CapabilityGap taxonomy, shadow-test → eval → canary → rollback pipeline |
-| `03-integrations/12-pioneer-fastino.md` | fine-tuned small models for high-volume classification |
-| `03-integrations/14-elevenlabs-voice.md` | voice interviewer, cloning consent, disclosure |
-| `03-integrations/15-anthropic-claude.md` | Agent SDK, model routing, prompt caching, Claude Code in D07 |
-| `01-platform/17-api-contracts.md` | kernel REST + SSE surface, webhook receivers |
-| `01-platform/18-state-machines.md` | every state machine in one place (mermaid) |
-| `04-execution/08-cicd-and-testing.md` | CI, test pyramid, Replay gating, release/rollback |
-| `04-execution/10-roadmap-and-milestones.md` | hour-by-hour, then W1/M1/Q1 |
-| `04-execution/11-dependency-graph.md` | build DAG + critical path |
-| `04-execution/12-risk-register.md` | risk table with mitigations and owners |
-| `05-journeys/05-account-ceremony.md` | blocked-credential workflow (CAPTCHA, 2FA, ID, payment) |
-| `06-reference/06-decision-log.md` | ADRs for the decisions already baked in |
+| Start here | Index, north star, end-to-end journey, org chart, demo/judging, glossary, this status file |
+| Platform | System architecture, agent runtime, event bus, data model, memory, HITL, identity, money/metering, Boardroom UI, observability, evidence/truth, safety/compliance, permissions, secrets, fallbacks, evaluation, API contracts, state machines |
+| Departments | D00 template plus D01-D13, including D10 Sales and D13 continuous improvement |
+| Integrations | Sponsor strategy plus Terac, Band, Stripe, Solari, Superserve/sandbox0, Linq, Replay, Render, Lovable, Whop, Dodo, Pioneer, Composio, ElevenLabs, Anthropic Claude |
+| Execution | Build order, speed playbook, one-shot prompt, demo seed/fallbacks, MVP scope, repo layout, GitHub workflow, CI/testing, deployment, roadmap, dependency graph, risk register |
+| Journeys | Founder journey, founder messaging, customer journey, account ceremony |
+| Reference | Worker brief, product principles, agent roles, artifacts, KPIs, external research notes, decision log |
+
+## What changed in this completion pass
+
+- Added [`../02-departments/D10-sales.md`](../02-departments/D10-sales.md), the missing Sales & Revenue department spec.
+- Added [`../03-integrations/15-anthropic-claude.md`](../03-integrations/15-anthropic-claude.md) for Claude API, Agent SDK, model routing, prompt caching, and Claude Code policy.
+- Added [`../01-platform/17-api-contracts.md`](../01-platform/17-api-contracts.md) and [`../01-platform/18-state-machines.md`](../01-platform/18-state-machines.md).
+- Added [`../04-execution/10-roadmap-and-milestones.md`](../04-execution/10-roadmap-and-milestones.md), [`../04-execution/11-dependency-graph.md`](../04-execution/11-dependency-graph.md), and [`../04-execution/12-risk-register.md`](../04-execution/12-risk-register.md).
+- Added [`../06-reference/06-decision-log.md`](../06-reference/06-decision-log.md).
+- Fixed stale cross-links from the old `00-vision/` directory name to `00-START-HERE/`.
+
+## Remaining implementation work
+
+These are not architecture gaps; they are build tasks for the next coding session.
+
+1. Scaffold the repo layout in [`../04-execution/06-repo-layout.md`](../04-execution/06-repo-layout.md).
+2. Implement shared schemas from [`../01-platform/04-data-model.md`](../01-platform/04-data-model.md), [`../01-platform/17-api-contracts.md`](../01-platform/17-api-contracts.md), and all department contract sections.
+3. Build the kernel event store, reducer projections, gate engine, and SSE stream.
+4. Build the Boardroom UI and seed trace from [`../04-execution/04-demo-seed-and-fallbacks.md`](../04-execution/04-demo-seed-and-fallbacks.md).
+5. Connect MVP integrations in this order: Stripe test mode, Linq approvals, Composio Gmail/Calendar, Replay, Render.
+6. Port the minimum simit service described in [`../02-departments/D05-synthetic-population.md`](../02-departments/D05-synthetic-population.md).
 
 ## Known cleanup
-- `02-departments/D06-pivot-and-decision.md` may exist as a duplicate of `D06-pivot-decision.md`;
-  keep the latter (it is the cross-linked name) and delete the former.
-- Run a link check across all files; several docs link to files in the "still to write" list.
+
+- Link check should be run whenever files move.
+- Sponsor APIs, prices, and model names should be re-verified at implementation time because they change.

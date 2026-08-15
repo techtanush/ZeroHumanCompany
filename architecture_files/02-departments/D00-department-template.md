@@ -9,11 +9,11 @@ This file is two things at once:
    department at runtime*.
 
 > If this file and a department spec disagree about structure, this file wins.
-> If this file and [`../README.md`](../README.md) disagree about an invariant, the README wins.
+> If this file and [`../00-START-HERE/00-README-INDEX.md`](../00-START-HERE/00-README-INDEX.md) disagree about an invariant, the start-here index wins.
 
 Related: [`../01-platform/02-agent-runtime.md`](../01-platform/02-agent-runtime.md) (how a manifest
 is executed), [`../01-platform/03-event-bus.md`](../01-platform/03-event-bus.md) (the three
-messages), [`../00-vision/03-org-chart.md`](../00-vision/03-org-chart.md) (Head/Workers/Critic).
+messages), [`../00-START-HERE/03-org-chart.md`](../00-START-HERE/03-org-chart.md) (Head/Workers/Critic).
 
 ---
 

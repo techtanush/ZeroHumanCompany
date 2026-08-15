@@ -94,7 +94,7 @@ The built product deploys to Render; so does Zeroth itself. Preview environments
   on Whop instead of building billing. A second revenue rail.
   → [`../03-integrations/10-whop.md`](../03-integrations/10-whop.md)
 - **Dodo Payments** — merchant-of-record fallback for international/no-entity founders. The
-  Treasury picks a rail based on the venture's geography. → [`../03-integrations/11-dodo.md`](../03-integrations/11-dodo.md)
+  Treasury picks a rail based on the venture's geography. → [`../03-integrations/11-dodo-payments.md`](../03-integrations/11-dodo-payments.md)
 - **Pioneer (Fastino)** — fine-tune a small model on our own accumulated labels (lead scoring,
   claim-strength classification, ticket triage) so the *high-volume, low-judgment* calls get cheap
   and fast, and improve as the company runs. Adaptive inference = the company's classifiers get

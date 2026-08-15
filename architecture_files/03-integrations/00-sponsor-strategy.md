@@ -1,6 +1,6 @@
 # 00 — Sponsor Strategy
 
-The master table. One rule, restated from [`../00-vision/04-demo-and-judging.md`](../00-vision/04-demo-and-judging.md):
+The master table. One rule, restated from [`../00-START-HERE/04-demo-and-judging.md`](../00-START-HERE/04-demo-and-judging.md):
 **every integration must be load-bearing in the demo narrative.** If we could delete a vendor and the
 story still works, we are not entering that track.
 
@@ -60,7 +60,7 @@ We would rather win four tracks convincingly than gesture at fifteen. Three spon
 
 ## Demo timeline, by vendor
 
-Cross-reference for the rehearsal. Read alongside the beat table in [`../00-vision/04-demo-and-judging.md`](../00-vision/04-demo-and-judging.md).
+Cross-reference for the rehearsal. Read alongside the beat table in [`../00-START-HERE/04-demo-and-judging.md`](../00-START-HERE/04-demo-and-judging.md).
 
 ```
 0:00 ──────────────────────────────────────────────────────────── 4:00

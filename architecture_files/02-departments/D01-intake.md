@@ -1,7 +1,7 @@
 # D01 — Intake & Origination
 
 Follows [`D00-department-template.md`](D00-department-template.md). Implements
-[Scene 0 and Scene 1](../00-vision/02-end-to-end-journey.md).
+[Scene 0 and Scene 1](../00-START-HERE/02-end-to-end-journey.md).
 
 ---
 
@@ -20,7 +20,7 @@ Two modes, one output contract:
 | **A — Founder-led** | Founder chose "I have an idea" | parse → normalize → extract → `IdeaSeed` |
 | **B — Autonomous origination** | Founder chose "Find me one" | trend swarm → score → select → `IdeaSeed` (with `OpportunityCandidate[]` attached) |
 
-Mode B is the flex, and it is what the demo cold-opens on ([`../00-vision/04-demo-and-judging.md`](../00-vision/04-demo-and-judging.md), t=0:00).
+Mode B is the flex, and it is what the demo cold-opens on ([`../00-START-HERE/04-demo-and-judging.md`](../00-START-HERE/04-demo-and-judging.md), t=0:00).
 
 ---
 

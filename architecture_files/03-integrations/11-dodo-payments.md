@@ -239,4 +239,4 @@ this folder does.
 [`03-stripe.md`](03-stripe.md) (the default rail; shared ledger + dunning machinery) ·
 [`10-whop.md`](10-whop.md) (the distribution rail; Whop/Stripe boundary) ·
 [`06-linq.md`](06-linq.md) (how the rail choice is explained to the founder) ·
-[`../00-vision/04-demo-and-judging.md`](../00-vision/04-demo-and-judging.md) (the 2:55 beat)
+[`../00-START-HERE/04-demo-and-judging.md`](../00-START-HERE/04-demo-and-judging.md) (the 2:55 beat)

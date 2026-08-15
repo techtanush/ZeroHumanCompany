@@ -365,7 +365,7 @@ DEMO_OFFLINE=false                  # true ⇒ every driver reads fixtures, zero
 | **Whenever** | `LOVABLE`, `WHOP`, `DODO`, `PIONEER` | All Tier 2. Mocked by default; never let these block a lane. |
 
 Anything not acquired stays on `ZEROTH_TOOLS=mock` for that vendor and gets logged in
-[`05-risks-and-open-questions.md`](05-risks-and-open-questions.md). The 30-minute rule from
+[`12-risk-register.md`](12-risk-register.md). The 30-minute rule from
 [`02-speed-playbook.md`](02-speed-playbook.md) §6.4 governs.
 
 ---

@@ -45,7 +45,7 @@ All three are contract disagreements. Freeze the contract and the class of bug s
 | **Escape hatch** | `z.record(z.unknown())` on any field you are not sure about yet. Loose beats wrong beats blocked. |
 
 ### What "complete" means for the first pass
-Every artifact type in [`../00-vision/05-glossary.md`](../00-vision/05-glossary.md), every event in
+Every artifact type in [`../00-START-HERE/05-glossary.md`](../00-START-HERE/05-glossary.md), every event in
 the taxonomy in [`../01-platform/03-event-bus.md`](../01-platform/03-event-bus.md), all three
 messages, and the full `DepartmentManifest` from
 [`../02-departments/D00-department-template.md`](../02-departments/D00-department-template.md).
@@ -336,7 +336,7 @@ public URL, use a single shared bearer token in an env var and move on.
 ### 6.3 Premature multi-tenancy — *cost: 3h, spread invisibly*
 Every table gets a `venture_id` column — that is the *entire* multi-tenancy story, and it is enough
 for `?replay=demo-1` to coexist with a live run. No orgs, no roles, no RLS policies, no tenant
-middleware. [`../00-vision/01-north-star.md`](../00-vision/01-north-star.md) declares this a
+middleware. [`../00-START-HERE/01-north-star.md`](../00-START-HERE/01-north-star.md) declares this a
 non-goal in writing. Believe it.
 
 ### 6.4 Chasing a flaky vendor API — *cost: 2–5h, and it is always the same 2 hours*
@@ -346,7 +346,7 @@ someone burns the afternoon on it because the track is worth winning.
 **The 30-minute rule.** Start a timer when you begin integrating any vendor. At 30 minutes, if you
 do not have one successful round-trip:
 1. Flip that tool to `mock` with realistic fixture output.
-2. Log the exact blocker in [`05-risks-and-open-questions.md`](05-risks-and-open-questions.md).
+2. Log the exact blocker in [`12-risk-register.md`](12-risk-register.md).
 3. Go find the sponsor's engineer at the venue and hand them the blocker. **They are in the room.**
 4. Move to the next task. Return only if they unblock you.
 
@@ -371,7 +371,7 @@ budget bar: no.
 | Real-time collaborative anything | One founder, one browser. |
 | Perfecting the Rust `simpop` port | It needs to return a correctly weighted `SyntheticPanelResult`. It does not need to be idiomatic Rust. |
 | Refactoring at `T+28` | Tag, freeze, harden. Refactoring during M7 is how demos break. |
-| Debating a name for 15 minutes | It is in [`../00-vision/05-glossary.md`](../00-vision/05-glossary.md). Look it up. |
+| Debating a name for 15 minutes | It is in [`../00-START-HERE/05-glossary.md`](../00-START-HERE/05-glossary.md). Look it up. |
 
 ---
 

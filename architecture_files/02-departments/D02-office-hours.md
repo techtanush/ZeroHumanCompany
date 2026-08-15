@@ -1,7 +1,7 @@
 # D02 — Office Hours
 
 Follows [`D00-department-template.md`](D00-department-template.md). Implements
-[Scene 2](../00-vision/02-end-to-end-journey.md).
+[Scene 2](../00-START-HERE/02-end-to-end-journey.md).
 
 **Provenance:** this department is a port of the local gstack skill
 `~/.claude/skills/gstack/office-hours/` — specifically its *Startup Mode* (Phase 2A) diagnostic:

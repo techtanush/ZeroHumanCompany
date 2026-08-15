@@ -350,7 +350,7 @@ is sandboxed.*
 **Reinvestment rule:** realized revenue increases the *next* cycle's budget by
 `min(revenue × 0.5, remaining founder cap)`. The other half accrues to runway. So a converting
 venture literally funds its own next cycle — which is the "the company pays for itself" beat at
-3:15 in the demo ([`../00-vision/04-demo-and-judging.md`](../00-vision/04-demo-and-judging.md)).
+3:15 in the demo ([`../00-START-HERE/04-demo-and-judging.md`](../00-START-HERE/04-demo-and-judging.md)).
 
 ---
 

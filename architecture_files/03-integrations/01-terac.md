@@ -61,7 +61,7 @@ Claude worker or a verified ER nurse in Ohio. That is the whole point.
 | **D08 / D10** | Message/positioning testing against real operators before a public launch | `interview_panel` |
 
 Workers never file requisitions — only Heads, per the inter-department protocol in
-[`../00-vision/03-org-chart.md`](../00-vision/03-org-chart.md).
+[`../00-START-HERE/03-org-chart.md`](../00-START-HERE/03-org-chart.md).
 
 ---
 

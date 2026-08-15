@@ -22,18 +22,21 @@ one-shot its slice without asking questions.
 
 | # | Path | What it gives you |
 |---|------|-------------------|
-| 1 | [`00-vision/01-north-star.md`](00-vision/01-north-star.md) | Why this exists, the thesis, non-negotiables |
-| 2 | [`00-vision/02-end-to-end-journey.md`](00-vision/02-end-to-end-journey.md) | The full user flow, scene by scene |
-| 3 | [`00-vision/03-org-chart.md`](00-vision/03-org-chart.md) | The 12 departments + who reports to whom |
-| 4 | [`00-vision/04-demo-and-judging.md`](00-vision/04-demo-and-judging.md) | The 4-minute demo, track-by-track win strategy |
-| 5 | [`00-vision/05-glossary.md`](00-vision/05-glossary.md) | Every noun used in this repo, defined once |
-| 6 | [`01-platform/*`](01-platform/) | The kernel: runtime, data model, event bus, memory, HITL, identity, money, observability |
-| 7 | [`02-departments/*`](02-departments/) | One spec per department. Agents, prompts, tools, I/O contracts, DoD |
-| 8 | [`03-integrations/*`](03-integrations/) | One spec per sponsor/vendor, with the *creative* usage that wins the track |
-| 9 | [`04-execution/*`](04-execution/) | Build order, speed playbook, the one-shot build prompt, demo seed data |
+| 1 | [`01-north-star.md`](01-north-star.md) | Why this exists, the thesis, non-negotiables |
+| 2 | [`02-end-to-end-journey.md`](02-end-to-end-journey.md) | The full user flow, scene by scene |
+| 3 | [`03-org-chart.md`](03-org-chart.md) | The departments + who reports to whom |
+| 4 | [`04-demo-and-judging.md`](04-demo-and-judging.md) | The 4-minute demo, track-by-track win strategy |
+| 5 | [`05-glossary.md`](05-glossary.md) | Every noun used in this repo, defined once |
+| 6 | [`06-BUILD-STATUS.md`](06-BUILD-STATUS.md) | Current doc coverage and next implementation tasks |
+| 7 | [`../01-platform/*`](../01-platform/) | The kernel: runtime, data model, event bus, memory, HITL, identity, money, observability, APIs, state machines |
+| 8 | [`../02-departments/*`](../02-departments/) | One spec per department. Agents, prompts, tools, I/O contracts, DoD |
+| 9 | [`../03-integrations/*`](../03-integrations/) | One spec per sponsor/vendor, with the creative usage that wins the track |
+| 10 | [`../04-execution/*`](../04-execution/) | Build order, speed playbook, one-shot prompt, demo seed, deployment, roadmap, risks |
+| 11 | [`../05-journeys/*`](../05-journeys/) | Founder, customer, messaging, and account-ceremony flows |
+| 12 | [`../06-reference/*`](../06-reference/) | Worker brief, product principles, catalogs, KPIs, research notes, decisions |
 
 **If you are a builder agent and read only one more file after this one, read
-[`04-execution/01-build-order.md`](04-execution/01-build-order.md).**
+[`../04-execution/01-build-order.md`](../04-execution/01-build-order.md).**
 
 ---
 

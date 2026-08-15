@@ -26,7 +26,7 @@ Most teams will use Band as a message bus with nicer logging. Three things make 
 
 **1. Departments are peers, not function calls.** Each of D01–D13 registers as a Band agent identity
 with a declared capability set. Nothing in Zeroth imports another department's code — the constraint
-in [`../00-vision/03-org-chart.md`](../00-vision/03-org-chart.md) ("departments never call each
+in [`../00-START-HERE/03-org-chart.md`](../00-START-HERE/03-org-chart.md) ("departments never call each
 other's functions") is *enforced by the transport*, not by convention.
 
 **2. Persistent rooms are where the company argues.** Five long-lived rooms carry shared context

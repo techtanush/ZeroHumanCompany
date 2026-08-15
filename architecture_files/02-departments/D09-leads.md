@@ -704,7 +704,7 @@ D09 gets **~10 seconds**, immediately before the Sales beat at 2:55.
 | ~2:55 | Compliance stamp animates onto the batch: green check, `C1–C14 · signed by leads.compliance · 6 suppressed`. | "And it checked whether it's allowed to contact them, before it did." |
 
 The compliance stamp is deliberately on screen — it is the cheapest possible answer to the judge
-question *"isn't this a spam machine?"* ([`../00-vision/04-demo-and-judging.md`](../00-vision/04-demo-and-judging.md)).
+question *"isn't this a spam machine?"* ([`../00-START-HERE/04-demo-and-judging.md`](../00-START-HERE/04-demo-and-judging.md)).
 
 ---
 

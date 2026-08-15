@@ -8,8 +8,7 @@
     "test": "pnpm -r test",
     "dev:kernel": "pnpm -F @zeroth/kernel dev",
     "dev:orchestrator": "pnpm -F @zeroth/orchestrator dev",
-    "seed": "tsx scripts/seed-events.ts",
-    "e2e": "tsx scripts/e2e.ts"
+    "demo": "pnpm -F @zeroth/orchestrator exec tsx src/demo.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

@@ -140,6 +140,51 @@ export async function mockTool(name: string, args: unknown): Promise<unknown> {
         honesty_note: 'Model-based estimate from Census PUMS microdata, not a survey of real respondents.',
       };
     }
+    case 'leadgen.search': {
+      const limit = Math.min(100, Math.max(1, (args as { limit?: number }).limit ?? 25));
+      const region = (args as { region?: string }).region ?? 'US';
+      return {
+        provider: 'mock-leadgen',
+        query: subject,
+        leads: Array.from({ length: Math.min(limit, 10) }, (_, index) => ({
+          alias: `lead-${hash.slice(index, index + 8)}`,
+          company: `${pick(rand, ['Northstar', 'Cedar', 'Atlas', 'Brightline', 'Union'])} ${pick(rand, ['Dental', 'Logistics', 'Studios', 'Clinics', 'Ops'])}`,
+          role: pick(rand, ['Owner', 'Operations Manager', 'Head of Sales', 'Practice Manager']),
+          region,
+          source_url: `https://example.com/leads/${hash.slice(index * 3, index * 3 + 9)}`,
+          trigger: pick(rand, ['hiring', 'recent bad review', 'new location', 'manual process mentioned']),
+        })),
+      };
+    }
+    case 'leadgen.enrich':
+      return {
+        provider: (args as { provider?: string }).provider ?? 'mock-enrichment',
+        leads: ((args as { leads?: Record<string, unknown>[] }).leads ?? []).map((lead, index) => ({
+          ...lead,
+          email: `person${index}@example.com`,
+          linkedin: `https://linkedin.com/in/${hash.slice(index, index + 12)}`,
+          confidence: Number((0.7 + rand() * 0.25).toFixed(3)),
+          suppression: { dnc: false, suppressed: false, basis: 'legitimate_interest' },
+        })),
+      };
+    case 'crm.upsert':
+      return {
+        object_type: (args as { object_type?: string }).object_type ?? 'lead',
+        upserted: ((args as { records?: unknown[] }).records ?? []).length,
+        batch_id: id('crm_batch', hash),
+      };
+    case 'support.upsert_ticket':
+      return {
+        ticket_id: id('ticket', hash),
+        status: (args as { status?: string }).status ?? 'open',
+        severity: (args as { severity?: string }).severity ?? 'medium',
+      };
+    case 'metrics.record_signal':
+      return {
+        signal_id: id('signal', hash),
+        recorded: true,
+        severity: (args as { severity?: string }).severity ?? 'medium',
+      };
     case 'github.push':
       return { commit_sha: hash.slice(0, 40), branch: (args as { branch?: string }).branch ?? 'main', url: `https://github.com/mock/repo/commit/${hash.slice(0, 40)}` };
     case 'band.publish':

@@ -9,6 +9,8 @@ head:
     - memory_read
     - memory_write
     - linq.send_card
+    - support.upsert_ticket
+    - metrics.record_signal
   max_tokens_per_run: 90000
 critic:
   agent_id: support.critic
@@ -26,6 +28,8 @@ workers:
       - memory_write
       - github.push
       - linq.send_card
+      - support.upsert_ticket
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: support.customer-success
     model: sonnet
@@ -37,6 +41,8 @@ workers:
       - memory_write
       - github.push
       - linq.send_card
+      - support.upsert_ticket
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: support.signal-miner
     model: sonnet
@@ -48,6 +54,8 @@ workers:
       - memory_write
       - github.push
       - linq.send_card
+      - support.upsert_ticket
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: support.ticket-triager
     model: haiku
@@ -57,6 +65,8 @@ workers:
       - calc
       - memory_read
       - pioneer.classify
+      - support.upsert_ticket
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: support.resolver
     model: sonnet

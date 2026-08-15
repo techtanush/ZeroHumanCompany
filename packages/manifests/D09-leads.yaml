@@ -10,6 +10,8 @@ head:
     - web_fetch
     - apify.run_actor
     - solari.browse
+    - leadgen.search
+    - leadgen.enrich
     - memory_read
     - memory_write
     - pioneer.classify
@@ -29,6 +31,8 @@ workers:
       - web_fetch
       - apify.run_actor
       - solari.browse
+      - leadgen.search
+      - leadgen.enrich
       - memory_read
       - memory_write
       - pioneer.classify
@@ -42,6 +46,8 @@ workers:
       - web_fetch
       - apify.run_actor
       - solari.browse
+      - leadgen.search
+      - leadgen.enrich
       - memory_read
       - memory_write
       - pioneer.classify
@@ -55,6 +61,8 @@ workers:
       - web_fetch
       - apify.run_actor
       - solari.browse
+      - leadgen.search
+      - leadgen.enrich
       - memory_read
       - memory_write
       - pioneer.classify
@@ -68,6 +76,8 @@ workers:
       - web_fetch
       - calc
       - memory_read
+      - leadgen.search
+      - leadgen.enrich
       - pioneer.classify
     max_tokens_per_run: 60000
   - agent_id: leads.community-miner

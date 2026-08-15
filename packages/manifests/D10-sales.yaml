@@ -7,6 +7,7 @@ head:
   system_prompt_ref: prompts/D10/head.md
   tools:
     - linq.send_card
+    - crm.upsert
     - memory_read
     - memory_write
   max_tokens_per_run: 90000
@@ -26,6 +27,7 @@ workers:
       - stripe.create_payment_link
       - whop.create_checkout
       - dodo.create_checkout
+      - crm.upsert
       - memory_read
       - memory_write
     max_tokens_per_run: 60000
@@ -39,6 +41,7 @@ workers:
       - stripe.create_payment_link
       - whop.create_checkout
       - dodo.create_checkout
+      - crm.upsert
       - memory_read
       - memory_write
     max_tokens_per_run: 60000
@@ -52,6 +55,7 @@ workers:
       - stripe.create_payment_link
       - whop.create_checkout
       - dodo.create_checkout
+      - crm.upsert
       - memory_read
       - memory_write
     max_tokens_per_run: 60000
@@ -64,6 +68,7 @@ workers:
       - web_fetch
       - calc
       - memory_read
+      - crm.upsert
       - pioneer.classify
     max_tokens_per_run: 60000
   - agent_id: sales.proposal-writer

@@ -9,6 +9,7 @@ head:
     - calc
     - memory_read
     - memory_write
+    - metrics.record_signal
   max_tokens_per_run: 90000
 critic:
   agent_id: finance.critic
@@ -24,6 +25,8 @@ workers:
       - stripe.create_payment_link
       - terac.post_requisition
       - calc
+      - crm.upsert
+      - metrics.record_signal
       - memory_read
       - memory_write
     max_tokens_per_run: 60000
@@ -35,6 +38,8 @@ workers:
       - stripe.create_payment_link
       - terac.post_requisition
       - calc
+      - crm.upsert
+      - metrics.record_signal
       - memory_read
       - memory_write
     max_tokens_per_run: 60000
@@ -46,6 +51,8 @@ workers:
       - stripe.create_payment_link
       - terac.post_requisition
       - calc
+      - crm.upsert
+      - metrics.record_signal
       - memory_read
       - memory_write
     max_tokens_per_run: 60000
@@ -57,6 +64,7 @@ workers:
       - calc
       - memory_read
       - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: finance.rail-selector
     model: sonnet

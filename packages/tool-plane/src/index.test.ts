@@ -29,6 +29,11 @@ const sampleArgs: Record<string, unknown> = {
   'pioneer.classify': { text: 'lead' },
   'simpop.build_panel': { region: 'CA', seed: 7, archetypes: 6 },
   'simpop.poll': { region: 'CA', questions: ['Would you try it?'], seed: 7, archetypes: 6 },
+  'leadgen.search': { query: 'dental clinics hiring office managers', region: 'CA', limit: 5 },
+  'leadgen.enrich': { leads: [{ company: 'Acme Dental', role: 'Owner' }] },
+  'crm.upsert': { object_type: 'lead', records: [{ company: 'Acme Dental' }] },
+  'support.upsert_ticket': { customer_alias: 'cust-1', subject: 'Cannot log in', body: 'Login link failed', severity: 'high' },
+  'metrics.record_signal': { source: 'sales', theme: 'price objection', severity: 'medium', evidence_refs: ['deal-1'] },
   'github.push': { branch: 'main' },
 };
 
@@ -50,6 +55,11 @@ const outputShapes: Record<string, z.ZodTypeAny> = {
   'pioneer.classify': z.object({ label: z.string(), confidence: z.number() }),
   'simpop.build_panel': z.object({ region: z.string(), seed: z.number(), pums_vintage: z.string(), archetypes: z.array(z.object({ label: z.string(), attributes: z.record(z.unknown()), population_weight: z.number() })).min(4) }),
   'simpop.poll': z.object({ region: z.string(), seed: z.number(), honesty_note: z.string(), questions: z.array(z.object({ question: z.string(), estimate: z.number(), ci: z.tuple([z.number(), z.number()]), n_eff: z.number(), design_effect: z.number() })).min(1) }),
+  'leadgen.search': z.object({ provider: z.string(), query: z.string(), leads: z.array(z.object({ alias: z.string(), company: z.string(), role: z.string(), region: z.string(), source_url: z.string().url(), trigger: z.string() })).min(1) }),
+  'leadgen.enrich': z.object({ provider: z.string(), leads: z.array(z.object({ email: z.string().email(), confidence: z.number(), suppression: z.object({ dnc: z.boolean(), suppressed: z.boolean(), basis: z.string() }) })).min(1) }),
+  'crm.upsert': z.object({ object_type: z.string(), upserted: z.number(), batch_id: z.string() }),
+  'support.upsert_ticket': z.object({ ticket_id: z.string(), status: z.string(), severity: z.string() }),
+  'metrics.record_signal': z.object({ signal_id: z.string(), recorded: z.boolean(), severity: z.string() }),
   'github.push': z.object({ commit_sha: z.string(), branch: z.string(), url: z.string().url() }),
   'band.publish': z.object({ message_id: z.string(), room: z.string() }),
   'whop.create_checkout': z.object({ id: z.string(), checkout_url: z.string().url() }),

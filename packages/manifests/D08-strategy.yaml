@@ -11,6 +11,7 @@ head:
     - calc
     - memory_read
     - memory_write
+    - metrics.record_signal
   max_tokens_per_run: 90000
 critic:
   agent_id: strategy.critic
@@ -28,6 +29,7 @@ workers:
       - calc
       - memory_read
       - memory_write
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: strategy.pricing
     model: sonnet
@@ -39,6 +41,7 @@ workers:
       - calc
       - memory_read
       - memory_write
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: strategy.launch
     model: sonnet
@@ -50,6 +53,7 @@ workers:
       - calc
       - memory_read
       - memory_write
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: strategy.channel-strategist
     model: sonnet
@@ -61,6 +65,7 @@ workers:
       - calc
       - memory_read
       - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: strategy.experiment-designer
     model: sonnet

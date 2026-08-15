@@ -11,6 +11,7 @@ head:
     - replay.run_suite
     - band.publish
     - pioneer.classify
+    - metrics.record_signal
   max_tokens_per_run: 90000
 critic:
   agent_id: chief.critic
@@ -29,6 +30,7 @@ workers:
       - replay.run_suite
       - band.publish
       - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: chief.designer
     model: sonnet
@@ -41,6 +43,7 @@ workers:
       - replay.run_suite
       - band.publish
       - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: chief.shadow-tester
     model: sonnet
@@ -53,6 +56,7 @@ workers:
       - replay.run_suite
       - band.publish
       - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: chief.metric-watcher
     model: sonnet
@@ -62,6 +66,7 @@ workers:
       - calc
       - memory_read
       - pioneer.classify
+      - metrics.record_signal
     max_tokens_per_run: 60000
   - agent_id: chief.gap-detector
     model: haiku

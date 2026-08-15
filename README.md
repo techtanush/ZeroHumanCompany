@@ -63,6 +63,8 @@ ZEROTH_LLM=real       # requires ANTHROPIC_API_KEY
 Any vendor whose key is still missing falls back to its mock automatically and
 emits a `degraded` notice, so a missing sponsor key never blocks the demo.
 For real `simpop.*` tools, run `pnpm dev:simpop` and keep `SIMPOP_URL=http://localhost:8080`.
+For real `leadgen.*`, `crm.upsert`, `support.upsert_ticket`, and `metrics.record_signal`,
+point `BUSINESS_TOOLS_URL` at an internal gateway; otherwise they use deterministic mocks.
 
 ## Database
 

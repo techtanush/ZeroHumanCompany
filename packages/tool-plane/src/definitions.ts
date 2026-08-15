@@ -24,6 +24,11 @@ export const toolNames = [
   'pioneer.classify',
   'simpop.build_panel',
   'simpop.poll',
+  'leadgen.search',
+  'leadgen.enrich',
+  'crm.upsert',
+  'support.upsert_ticket',
+  'metrics.record_signal',
   'github.push',
 ] as const;
 
@@ -64,6 +69,11 @@ const schemas: Record<ToolName, ZodTypeAny> = {
   'pioneer.classify': looseObject,
   'simpop.build_panel': z.object({ region: z.string().default('CA'), seed: z.number().int().optional(), archetypes: z.number().int().min(4).optional() }),
   'simpop.poll': z.object({ region: z.string().default('CA'), questions: z.array(z.string()).min(1), seed: z.number().int().optional(), archetypes: z.number().int().min(4).optional() }),
+  'leadgen.search': z.object({ query: z.string().min(1), icp: z.string().optional(), region: z.string().optional(), limit: z.number().int().min(1).max(100).default(25) }),
+  'leadgen.enrich': z.object({ leads: z.array(z.record(z.unknown())).min(1), provider: z.string().optional() }),
+  'crm.upsert': z.object({ object_type: z.enum(['lead', 'deal', 'customer', 'ticket']), records: z.array(z.record(z.unknown())).min(1) }),
+  'support.upsert_ticket': z.object({ customer_alias: z.string(), subject: z.string(), body: z.string(), severity: z.enum(['low', 'medium', 'high', 'critical']).default('medium'), status: z.enum(['open', 'pending', 'resolved', 'escalated']).default('open') }),
+  'metrics.record_signal': z.object({ source: z.string().min(1), theme: z.string().min(1), severity: z.enum(['low', 'medium', 'high', 'critical']).default('medium'), evidence_refs: z.array(z.string()).default([]), value: z.number().optional() }),
   'github.push': looseObject,
 };
 
@@ -74,7 +84,7 @@ const gates: Partial<Record<ToolName, GateType>> = {
   'render.deploy': 'deploy',
 };
 
-const nonSideEffecting = new Set<ToolName>(['web_search', 'web_fetch', 'calc', 'memory_read', 'pioneer.classify', 'simpop.build_panel', 'simpop.poll']);
+const nonSideEffecting = new Set<ToolName>(['web_search', 'web_fetch', 'calc', 'memory_read', 'pioneer.classify', 'simpop.build_panel', 'simpop.poll', 'leadgen.search', 'leadgen.enrich']);
 
 export const toolDefs = Object.fromEntries(
   toolNames.map((name) => [

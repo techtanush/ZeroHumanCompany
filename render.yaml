@@ -1,0 +1,108 @@
+services:
+  - type: web
+    name: zerohuman-kernel
+    runtime: node
+    plan: free
+    autoDeploy: true
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm -F @zeroth/kernel typecheck
+    startCommand: corepack enable && pnpm -F @zeroth/kernel start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: ZEROTH_ENV
+        value: prod
+      - key: ZEROTH_TOOLS
+        value: real
+      - key: ZEROTH_LLM
+        value: real
+      - key: ZEROTH_TIME_SCALE
+        value: "1.0"
+      - key: ZEROTH_KILL_SWITCH
+        value: off
+      - key: KERNEL_URL
+        value: https://zerohuman-kernel.onrender.com
+      - key: KERNEL_SHARED_TOKEN
+        sync: false
+      - key: KERNEL_SIGNING_KEY
+        sync: false
+      - key: KERNEL_VAULT_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ANTHROPIC_BASE_URL
+        value: https://api.anthropic.com
+      - key: ANTHROPIC_MODEL_OPUS
+        value: claude-sonnet-4-6
+      - key: ANTHROPIC_MODEL_SONNET
+        value: claude-sonnet-4-6
+      - key: ANTHROPIC_MODEL_HAIKU
+        value: claude-sonnet-4-6
+      - key: TERAC_API_KEY
+        sync: false
+      - key: TERAC_BASE_URL
+        value: https://terac.com/api/external/v2
+      - key: BAND_API_KEY
+        sync: false
+      - key: BAND_BASE_URL
+        sync: false
+      - key: BAND_WORKSPACE_ID
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: SOLARI_API_KEY
+        sync: false
+      - key: SOLARI_BASE_URL
+        sync: false
+      - key: SUPERSERVE_API_KEY
+        sync: false
+      - key: SUPERSERVE_POOL_SIZE
+        value: "4"
+      - key: LINQ_API_KEY
+        sync: false
+      - key: LINQ_BASE_URL
+        sync: false
+      - key: LINQ_WEBHOOK_SECRET
+        sync: false
+      - key: LINQ_FROM_NUMBER
+        sync: false
+      - key: FOUNDER_PHONE
+        sync: false
+      - key: REPLAY_API_KEY
+        sync: false
+      - key: RENDER_API_KEY
+        sync: false
+      - key: RENDER_OWNER_ID
+        sync: false
+      - key: COMPOSIO_API_KEY
+        sync: false
+      - key: COMPOSIO_ENTITY_ID
+        sync: false
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: ELEVENLABS_VOICE_ID
+        sync: false
+      - key: APIFY_TOKEN
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: GITHUB_ORG
+        sync: false
+      - key: COMPANY_EMAIL
+        sync: false
+      - key: SIMPOP_URL
+        sync: false
+      - key: SIMPOP_SEED
+        value: "42"
+      - key: SIMPOP_ARCHETYPES
+        value: "12"
+      - key: DEMO_VENTURE_ID
+        value: demo-1
+      - key: DEMO_REPLAY_SPEED
+        value: "8"
+      - key: DEMO_OFFLINE
+        value: "false"

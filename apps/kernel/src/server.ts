@@ -322,11 +322,11 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   });
   app.put('/v1/ventures/:id/settings', async (req) => {
     const { id } = req.params as { id: string };
-    return { settings: await kernel.settings.update(id, (req.body ?? {}) as Record<string, unknown>) };
+    return { settings: await kernel.settings.update(id, unwrapBody(req.body) as Record<string, unknown>) };
   });
   app.post('/v1/ventures/:id/workspace', async (req) => {
     const { id } = req.params as { id: string };
-    const b = (req.body ?? {}) as { workspace_root?: string; agency_workspace_path?: string; source?: string };
+    const b = unwrapBody(req.body) as { workspace_root?: string; agency_workspace_path?: string; source?: string };
     const root = b.workspace_root ?? b.agency_workspace_path;
     if (!root) throw new KernelError('bad_request', 'workspace_root is required', false, 400);
     const settings = await kernel.settings.update(id, { workspace: { workspace_root: root, source: b.source ?? 'typed', granted_at: nowIso() } });
@@ -340,7 +340,7 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   });
   app.post('/v1/ventures/:id/departments/:dept/ask', async (req) => {
     const { id, dept } = req.params as { id: string; dept: string };
-    const b = (req.body ?? {}) as { question?: string; actor?: string };
+    const b = unwrapBody(req.body) as { question?: string; actor?: string };
     if (!b.question?.trim()) throw new KernelError('bad_request', 'question is required', false, 400);
     const trace_id = await kernel.traceFor(id);
     return kernel.insight.ask(id, dept, b.question.trim(), { trace_id, actor: b.actor });
@@ -374,7 +374,7 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   });
   app.post('/v1/ventures/:id/chat', async (req, reply) => {
     const { id } = req.params as { id: string };
-    const b = (req.body ?? {}) as { room?: string; author?: string; text?: string; department_id?: string };
+    const b = unwrapBody(req.body) as { room?: string; author?: string; text?: string; department_id?: string };
     if (!b.text?.trim()) throw new KernelError('bad_request', 'text is required', false, 400);
     const e = await kernel.events.append({
       venture_id: id, type: 'dept.chat_posted', actor_kind: 'founder', actor_id: b.author ?? 'founder',
@@ -389,19 +389,19 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   app.get('/v1/voice/consent-text', async () => ({ version: 'v1', text: VOICE_CONSENT_TEXT_V1 }));
   app.post('/v1/ventures/:id/voice/consent', async (req, reply) => {
     const { id } = req.params as { id: string };
-    const r = await kernel.voice.consent(id, (req.body ?? {}) as any);
+    const r = await kernel.voice.consent(id, unwrapBody(req.body) as any);
     reply.code(201);
     return r;
   });
   app.post('/v1/ventures/:id/voice/clone', { bodyLimit: 30 * 1024 * 1024 }, async (req, reply) => {
     const { id } = req.params as { id: string };
-    const r = await kernel.voice.clone(id, (req.body ?? {}) as any);
+    const r = await kernel.voice.clone(id, unwrapBody(req.body) as any);
     reply.code(201);
     return r;
   });
   app.post('/v1/ventures/:id/voice/revoke', async (req) => {
     const { id } = req.params as { id: string };
-    return kernel.voice.revoke(id, (req.body as any)?.reason);
+    return kernel.voice.revoke(id, unwrapBody(req.body)?.reason);
   });
 
   app.get('/v1/ventures/:id/wallets', async (req) => {
@@ -410,7 +410,7 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   });
   app.post('/v1/ventures/:id/wallets/topup', async (req, reply) => {
     const { id } = req.params as { id: string };
-    const b = (req.body ?? {}) as { amount_usd?: number; success_url?: string; cancel_url?: string };
+    const b = unwrapBody(req.body) as { amount_usd?: number; success_url?: string; cancel_url?: string };
     const amount = Number(b.amount_usd ?? 0);
     if (!(amount > 0 && amount <= 10_000)) throw new KernelError('bad_request', 'amount_usd must be between 0 and 10000', false, 400);
     const origin = String(req.headers.origin ?? 'http://localhost:5173');
@@ -427,7 +427,7 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   });
   app.put('/v1/integrations/vars/:env', async (req) => {
     const { env } = req.params as { env: string };
-    const b = (req.body ?? {}) as { value?: string };
+    const b = unwrapBody(req.body) as { value?: string };
     try {
       const r = await setIntegrationVar(env, String(b.value ?? ''));
       return { env: r.env, configured: r.configured };
@@ -436,7 +436,7 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
     }
   });
   app.post('/v1/integrations/linq/test-message', async (req) => {
-    const b = (req.body ?? {}) as { to?: string; text?: string; venture_id?: string };
+    const b = unwrapBody(req.body) as { to?: string; text?: string; venture_id?: string };
     const to = b.to ?? process.env.FOUNDER_PHONE ?? '';
     const r = await sendLinqText(to, b.text ?? 'HELLO from Zeroth 👋 — your AI company can reach you here. Reply YES to confirm.', { kind: 'onboarding_test', venture_id: b.venture_id });
     if (b.venture_id) {
@@ -446,7 +446,7 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
     return { to, ...r };
   });
   app.post('/v1/integrations/linq/confirm', async (req) => {
-    const b = (req.body ?? {}) as { venture_id?: string; confirmed?: boolean };
+    const b = unwrapBody(req.body) as { venture_id?: string; confirmed?: boolean };
     if (!b.venture_id) throw new KernelError('bad_request', 'venture_id required', false, 400);
     const cur = await kernel.settings.get(b.venture_id);
     const settings = await kernel.settings.update(b.venture_id, { linq_test_message: { ...(cur.linq_test_message ?? { sent_at: nowIso(), delivered: false }), confirmed_by_founder: Boolean(b.confirmed) } });

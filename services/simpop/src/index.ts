@@ -12,7 +12,7 @@ export type RunPanelInput = {
   ask?: Ask;
 };
 
-export type PublicArchetype = Omit<Archetype, 'members' | 'cluster_index'>;
+export type PublicArchetype = Omit<Archetype, 'members' | 'cluster_index' | 'representative'>;
 
 export async function runPanel(input: RunPanelInput): Promise<SyntheticPanelResultType> {
   const seed = input.seed ?? 42;
@@ -21,8 +21,16 @@ export async function runPanel(input: RunPanelInput): Promise<SyntheticPanelResu
   const responseMap = await pollArchetypes(input.questions, archetypes, seed, input.ask);
   const questions = input.questions.map((question) => {
     const responses = responseMap.get(question) ?? [];
-    const estimate = weightedEstimate(responses);
-    return { question, estimate: estimate.estimate, ci: estimate.ci, responses };
+    const estimate = weightedEstimate(responses, `${seed}:${question}`);
+    return {
+      question,
+      estimate: estimate.estimate,
+      ci: estimate.ci,
+      n_eff: estimate.nEff,
+      design_effect: estimate.designEffect,
+      archetype_coverage: Number(responses.reduce((sum, response) => sum + (response.coverage ?? 0), 0).toFixed(6)),
+      responses,
+    };
   });
   return SyntheticPanelResult.parse({
     region: input.region,
@@ -35,6 +43,7 @@ export async function runPanel(input: RunPanelInput): Promise<SyntheticPanelResu
 }
 
 export { buildArchetypes } from './archetype.js';
+export { buildPopulation } from './persona.js';
 export { loadPumsRows } from './pums.js';
 export { pollArchetypes, defaultAsk, clearPollCache } from './poll.js';
 export { weightedEstimate } from './weight.js';

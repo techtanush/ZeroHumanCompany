@@ -12,6 +12,8 @@ head:
     - memory_read
     - memory_write
     - pioneer.classify
+    - simpop.build_panel
+    - simpop.poll
   max_tokens_per_run: 90000
 critic:
   agent_id: synthetic.critic
@@ -30,6 +32,8 @@ workers:
       - memory_read
       - memory_write
       - pioneer.classify
+      - simpop.build_panel
+      - simpop.poll
     max_tokens_per_run: 60000
   - agent_id: synthetic.calibrator
     model: sonnet
@@ -42,6 +46,8 @@ workers:
       - memory_read
       - memory_write
       - pioneer.classify
+      - simpop.build_panel
+      - simpop.poll
     max_tokens_per_run: 60000
   - agent_id: synthetic.analyst
     model: sonnet
@@ -54,6 +60,7 @@ workers:
       - memory_read
       - memory_write
       - pioneer.classify
+      - simpop.poll
     max_tokens_per_run: 60000
   - agent_id: synthetic.pums-loader
     model: sonnet
@@ -64,6 +71,7 @@ workers:
       - web_fetch
       - calc
       - memory_read
+      - simpop.build_panel
     max_tokens_per_run: 60000
   - agent_id: synthetic.archetype-clusterer
     model: sonnet
@@ -81,13 +89,23 @@ workers:
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D05/pollster.md
-    tools: *a1
+    tools:
+      - web_search
+      - web_fetch
+      - calc
+      - memory_read
+      - simpop.poll
     max_tokens_per_run: 60000
   - agent_id: synthetic.post-stratifier
     model: sonnet
     replicas: 1
     system_prompt_ref: prompts/D05/post-stratifier.md
-    tools: *a1
+    tools:
+      - web_search
+      - web_fetch
+      - calc
+      - memory_read
+      - simpop.poll
     max_tokens_per_run: 60000
   - agent_id: synthetic.honesty-labeler
     model: sonnet

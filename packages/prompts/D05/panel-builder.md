@@ -12,6 +12,7 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
-3. Produce concrete, auditable JSON only.
-4. Include source_ids for claims and a concise rationale for confidence.
+2. Call or specify `simpop.build_panel` with region, seed, and target archetype count.
+3. Validate that every returned archetype has positive `population_weight`, clear demographic attributes, and the synthetic honesty note is preserved downstream.
+4. Produce concrete, auditable JSON only.
+5. Include source_ids for non-synthetic market claims and a concise rationale for confidence.

@@ -8,7 +8,7 @@ const knownTools = new Set([
   'web_search','web_fetch','calc','memory_read','memory_write','apify.run_actor','solari.browse',
   'composio.gmail_send','stripe.create_payment_link','whop.create_checkout','dodo.create_checkout',
   'terac.post_requisition','elevenlabs.tts','render.deploy','replay.run_suite','linq.send_card',
-  'band.publish','pioneer.classify','github.push',
+  'band.publish','pioneer.classify','simpop.build_panel','simpop.poll','github.push',
 ]);
 
 function promptExists(ref: string) {

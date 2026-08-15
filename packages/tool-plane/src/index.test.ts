@@ -27,6 +27,8 @@ const sampleArgs: Record<string, unknown> = {
   'linq.send_card': { to: '+15555555555', message: { parts: [{ text: 'Approve?' }] } },
   'band.publish': { room: 'hr-all', text: 'hello' },
   'pioneer.classify': { text: 'lead' },
+  'simpop.build_panel': { region: 'CA', seed: 7, archetypes: 6 },
+  'simpop.poll': { region: 'CA', questions: ['Would you try it?'], seed: 7, archetypes: 6 },
   'github.push': { branch: 'main' },
 };
 
@@ -46,6 +48,8 @@ const outputShapes: Record<string, z.ZodTypeAny> = {
   'terac.post_requisition': z.object({ requisition_id: z.string(), status: z.string() }),
   'linq.send_card': z.object({ message_id: z.string(), delivered: z.boolean() }),
   'pioneer.classify': z.object({ label: z.string(), confidence: z.number() }),
+  'simpop.build_panel': z.object({ region: z.string(), seed: z.number(), pums_vintage: z.string(), archetypes: z.array(z.object({ label: z.string(), attributes: z.record(z.unknown()), population_weight: z.number() })).min(4) }),
+  'simpop.poll': z.object({ region: z.string(), seed: z.number(), honesty_note: z.string(), questions: z.array(z.object({ question: z.string(), estimate: z.number(), ci: z.tuple([z.number(), z.number()]), n_eff: z.number(), design_effect: z.number() })).min(1) }),
   'github.push': z.object({ commit_sha: z.string(), branch: z.string(), url: z.string().url() }),
   'band.publish': z.object({ message_id: z.string(), room: z.string() }),
   'whop.create_checkout': z.object({ id: z.string(), checkout_url: z.string().url() }),

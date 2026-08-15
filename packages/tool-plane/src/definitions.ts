@@ -22,6 +22,8 @@ export const toolNames = [
   'linq.send_card',
   'band.publish',
   'pioneer.classify',
+  'simpop.build_panel',
+  'simpop.poll',
   'github.push',
 ] as const;
 
@@ -60,6 +62,8 @@ const schemas: Record<ToolName, ZodTypeAny> = {
   'linq.send_card': looseObject,
   'band.publish': looseObject,
   'pioneer.classify': looseObject,
+  'simpop.build_panel': z.object({ region: z.string().default('CA'), seed: z.number().int().optional(), archetypes: z.number().int().min(4).optional() }),
+  'simpop.poll': z.object({ region: z.string().default('CA'), questions: z.array(z.string()).min(1), seed: z.number().int().optional(), archetypes: z.number().int().min(4).optional() }),
   'github.push': looseObject,
 };
 
@@ -70,7 +74,7 @@ const gates: Partial<Record<ToolName, GateType>> = {
   'render.deploy': 'deploy',
 };
 
-const nonSideEffecting = new Set<ToolName>(['web_search', 'web_fetch', 'calc', 'memory_read', 'pioneer.classify']);
+const nonSideEffecting = new Set<ToolName>(['web_search', 'web_fetch', 'calc', 'memory_read', 'pioneer.classify', 'simpop.build_panel', 'simpop.poll']);
 
 export const toolDefs = Object.fromEntries(
   toolNames.map((name) => [

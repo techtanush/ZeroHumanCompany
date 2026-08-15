@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { buildPopulation, type Agent } from './persona.js';
 import type { PumsRow } from './pums.js';
 
 export type Archetype = {
@@ -6,73 +7,109 @@ export type Archetype = {
   label: string;
   attributes: Record<string, string | number>;
   population_weight: number;
-  members: PumsRow[];
+  members: Agent[];
+  representative: Agent;
+  coverage: number;
 };
 
-const educationScore: Record<string, number> = { less_than_hs: 0, high_school: 1, some_college: 2, bachelors: 3, graduate: 4 };
-const occupationScore = new Map<string, number>();
-
-function rand(seed: number): () => number {
-  let s = seed >>> 0;
-  return () => {
-    s = (s + 0x6d2b79f5) >>> 0;
-    let t = s;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function vector(row: PumsRow): number[] {
-  if (!occupationScore.has(row.occupation)) occupationScore.set(row.occupation, occupationScore.size);
-  return [row.age / 90, row.income / 250000, row.household_size / 8, (educationScore[row.education] ?? 2) / 4, (occupationScore.get(row.occupation) ?? 0) / 12, row.sex === 'female' ? 1 : 0];
-}
-
-function dist(a: number[], b: number[]): number {
-  return a.reduce((sum, x, i) => sum + (x - b[i]) ** 2, 0);
+function hash(value: unknown): string {
+  return createHash('sha256').update(JSON.stringify(value)).digest('hex');
 }
 
 function mode(values: string[]): string {
-  return [...values].sort((a, b) => values.filter((v) => v === b).length - values.filter((v) => v === a).length || a.localeCompare(b))[0] ?? '';
+  const counts = new Map<string, number>();
+  for (const value of values) counts.set(value, (counts.get(value) ?? 0) + 1);
+  return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]?.[0] ?? '';
 }
 
 function mean(values: number[]): number {
   return values.reduce((a, b) => a + b, 0) / Math.max(1, values.length);
 }
 
-function stableLabel(attrs: Record<string, string | number>, idx: number): string {
-  const digest = createHash('sha256').update(JSON.stringify(attrs)).digest('hex').slice(0, 6);
-  return `archetype-${idx}-${attrs.region}-${attrs.education}-${digest}`;
+function weightedMean(rows: Agent[], selector: (row: Agent) => number): number {
+  const total = rows.reduce((sum, row) => sum + row.PWGTP, 0);
+  return total === 0 ? mean(rows.map(selector)) : rows.reduce((sum, row) => sum + selector(row) * row.PWGTP, 0) / total;
+}
+
+function groupKey(agent: Agent): string {
+  return [
+    agent.region,
+    agent.age_band,
+    agent.sex,
+    agent.education,
+    `q${agent.income_quintile}`,
+    agent.employed ? 'employed' : 'not-employed',
+  ].join('|');
+}
+
+function representative(members: Agent[], seed: number): Agent {
+  const targetAge = mean(members.map((m) => m.age));
+  const targetIncome = mean(members.map((m) => m.income));
+  return [...members].sort((a, b) => {
+    const aDistance = Math.abs(a.age - targetAge) / 100 + Math.abs(a.income - targetIncome) / 250_000;
+    const bDistance = Math.abs(b.age - targetAge) / 100 + Math.abs(b.income - targetIncome) / 250_000;
+    if (aDistance !== bDistance) return aDistance - bDistance;
+    return hash([seed, a.agent_id]).localeCompare(hash([seed, b.agent_id]));
+  })[0]!;
+}
+
+function attrsFor(members: Agent[], rep: Agent): Record<string, string | number> {
+  return {
+    age: Math.round(weightedMean(members, (m) => m.age)),
+    age_band: mode(members.map((m) => m.age_band)),
+    sex: mode(members.map((m) => m.sex)),
+    income: Math.round(weightedMean(members, (m) => m.income)),
+    income_quintile: Math.round(weightedMean(members, (m) => m.income_quintile)),
+    education: mode(members.map((m) => m.education)),
+    occupation: mode(members.map((m) => m.occupation)),
+    employed_share: Number(weightedMean(members, (m) => (m.employed ? 1 : 0)).toFixed(3)),
+    household_size: Number(weightedMean(members, (m) => m.household_size).toFixed(1)),
+    region: mode(members.map((m) => m.region)),
+    religion: mode(members.map((m) => m.religion)),
+    representative_persona: rep.persona,
+    price_sensitivity: Number(weightedMean(members, (m) => m.values.price_sensitivity).toFixed(3)),
+    novelty_seeking: Number(weightedMean(members, (m) => m.values.novelty_seeking).toFixed(3)),
+    convenience_bias: Number(weightedMean(members, (m) => m.values.convenience_bias).toFixed(3)),
+  };
+}
+
+function makeArchetype(members: Agent[], clusterIndex: number, seed: number, totalWeight: number): Archetype {
+  const rep = representative(members, seed);
+  const attributes = attrsFor(members, rep);
+  const populationWeight = members.reduce((sum, row) => sum + row.PWGTP, 0);
+  const digest = hash({ clusterIndex, seed, attributes, rep: rep.agent_id }).slice(0, 6);
+  return {
+    cluster_index: clusterIndex,
+    label: `archetype-${clusterIndex}-${attributes.region}-${attributes.age_band}-${digest}`,
+    attributes,
+    population_weight: populationWeight,
+    members,
+    representative: rep,
+    coverage: totalWeight === 0 ? 0 : populationWeight / totalWeight,
+  };
 }
 
 export function buildArchetypes(rows: PumsRow[], count = 12, seed = 42): Archetype[] {
-  const k = Math.max(4, Math.min(count, rows.length));
-  const vectors = rows.map(vector);
-  const rng = rand(seed);
-  const chosen = new Set<number>();
-  while (chosen.size < k) chosen.add(Math.floor(rng() * rows.length));
-  let centroids = [...chosen].map((i) => [...vectors[i]]);
-  let assignments = new Array<number>(rows.length).fill(0);
-  for (let iter = 0; iter < 20; iter++) {
-    assignments = vectors.map((v) => centroids.reduce((best, c, i) => dist(v, c) < dist(v, centroids[best]) ? i : best, 0));
-    centroids = centroids.map((c, i) => {
-      const assigned = vectors.filter((_, rowIndex) => assignments[rowIndex] === i);
-      if (assigned.length === 0) return c;
-      return c.map((_, dim) => mean(assigned.map((v) => v[dim])));
-    });
+  const population = buildPopulation(rows, seed);
+  const totalWeight = population.reduce((sum, row) => sum + row.PWGTP, 0);
+  const grouped = new Map<string, Agent[]>();
+  for (const agent of population) {
+    const key = groupKey(agent);
+    grouped.set(key, [...(grouped.get(key) ?? []), agent]);
   }
-  return centroids.map((_, i) => {
-    let members = rows.filter((_, rowIndex) => assignments[rowIndex] === i);
-    if (members.length === 0) members = [rows[i % rows.length]];
-    const attributes = {
-      age: Math.round(mean(members.map((m) => m.age))),
-      sex: mode(members.map((m) => m.sex)),
-      income: Math.round(mean(members.map((m) => m.income))),
-      education: mode(members.map((m) => m.education)),
-      occupation: mode(members.map((m) => m.occupation)),
-      household_size: Math.round(mean(members.map((m) => m.household_size))),
-      region: mode(members.map((m) => m.region)),
-    };
-    return { cluster_index: i, label: stableLabel(attributes, i), attributes, population_weight: members.reduce((s, m) => s + m.PWGTP, 0), members };
-  }).sort((a, b) => a.cluster_index - b.cluster_index);
+
+  const desired = Math.max(4, Math.min(count, population.length));
+  const groups = [...grouped.values()]
+    .sort((a, b) => b.reduce((sum, row) => sum + row.PWGTP, 0) - a.reduce((sum, row) => sum + row.PWGTP, 0)
+      || representative(a, seed).agent_id.localeCompare(representative(b, seed).agent_id));
+
+  const selected = groups.slice(0, desired);
+  const overflow = groups.slice(desired).flat();
+  if (overflow.length > 0) {
+    selected[selected.length - 1] = [...selected[selected.length - 1]!, ...overflow];
+  }
+
+  return selected
+    .map((members, index) => makeArchetype(members, index, seed, totalWeight))
+    .sort((a, b) => a.cluster_index - b.cluster_index);
 }

@@ -108,6 +108,38 @@ export async function mockTool(name: string, args: unknown): Promise<unknown> {
       return { message_id: id('linq_msg', hash), delivered: true };
     case 'pioneer.classify':
       return { label: pick(rand, ['high_intent', 'medium_intent', 'low_intent']), confidence: Number((0.6 + rand() * 0.39).toFixed(3)) };
+    case 'simpop.build_panel': {
+      const region = (args as { region?: string }).region ?? 'CA';
+      const archetypeCount = (args as { archetypes?: number }).archetypes ?? 12;
+      return {
+        region,
+        seed: (args as { seed?: number }).seed ?? 42,
+        archetypes: Array.from({ length: Math.max(4, archetypeCount) }, (_, index) => ({
+          label: `mock-archetype-${index}-${hash.slice(index, index + 6)}`,
+          attributes: { region, age_band: pick(rand, ['18-24', '25-34', '35-44', '45-54', '55-64', '65+']), income_quintile: 1 + (index % 5) },
+          population_weight: 100 + Math.floor(rand() * 900),
+        })),
+        pums_vintage: 'mock PUMS fixture',
+      };
+    }
+    case 'simpop.poll': {
+      const questions = (args as { questions?: string[] }).questions ?? ['Would you try it?'];
+      return {
+        region: (args as { region?: string }).region ?? 'CA',
+        seed: (args as { seed?: number }).seed ?? 42,
+        questions: questions.map((question) => {
+          const estimate = Number((0.25 + rand() * 0.5).toFixed(3));
+          return {
+            question,
+            estimate,
+            ci: [Math.max(0, Number((estimate - 0.12).toFixed(3))), Math.min(1, Number((estimate + 0.12).toFixed(3)))],
+            n_eff: Number((5 + rand() * 20).toFixed(3)),
+            design_effect: Number((1 + rand()).toFixed(3)),
+          };
+        }),
+        honesty_note: 'Model-based estimate from Census PUMS microdata, not a survey of real respondents.',
+      };
+    }
     case 'github.push':
       return { commit_sha: hash.slice(0, 40), branch: (args as { branch?: string }).branch ?? 'main', url: `https://github.com/mock/repo/commit/${hash.slice(0, 40)}` };
     case 'band.publish':

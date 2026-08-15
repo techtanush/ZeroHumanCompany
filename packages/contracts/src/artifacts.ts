@@ -242,8 +242,12 @@ export const SyntheticPanelResult = z.object({
     question: z.string(),
     estimate: z.number(),
     ci: z.tuple([z.number(), z.number()]),
+    n_eff: z.number().optional(),
+    design_effect: z.number().optional(),
+    archetype_coverage: z.number().optional(),
     responses: z.array(z.object({
       archetype: z.string(), answer: z.union([z.string(), z.number()]), weight: z.number(),
+      rationale: z.string().optional(), coverage: z.number().optional(),
     })).default([]),
   })).default([]),
   calibration: z.object({ n: z.number().int(), delta: z.number(), method: z.string() }).optional(),

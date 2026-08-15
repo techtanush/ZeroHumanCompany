@@ -34,8 +34,10 @@ describe('simpop panel', () => {
     ]);
     expect(got.estimate).toBeCloseTo(0.25, 12);
     expect(got.variance).toBeCloseTo(0.1171875, 12);
+    expect(got.nEff).toBeCloseTo(1.6, 12);
+    expect(got.designEffect).toBeCloseTo(1.25, 12);
     expect(got.ci[0]).toBe(0);
-    expect(got.ci[1]).toBeCloseTo(0.920960132944, 10);
+    expect(got.ci[1]).toBe(1);
   });
 
   it('every archetype has positive population weight and at least four exist', async () => {

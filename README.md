@@ -21,6 +21,7 @@ on the real code path; only the outside world is simulated.
 
 ```bash
 pnpm dev:kernel        # http://localhost:4000
+pnpm dev:simpop        # http://localhost:8080, optional for real simpop tools
 pnpm dev:orchestrator  # consumes work orders
 ```
 
@@ -36,6 +37,7 @@ pnpm dev:orchestrator  # consumes work orders
 | `packages/prompts` | Per-agent prompt files with shared evidence/safety preamble. |
 | `packages/tool-plane` | Every external tool behind one interface; mock and real drivers. |
 | `packages/sandbox` | `lease/pause/resume/fork/exec` with local and Superserve drivers. |
+| `services/simpop` | Local synthetic population service using PUMS-style weights, personas, archetypes, and bootstrap CIs. |
 | `apps/orchestrator` | Consumes work orders, runs departments, meters spend, opens gates. |
 
 ## Invariants (each has a test)
@@ -60,6 +62,7 @@ ZEROTH_LLM=real       # requires ANTHROPIC_API_KEY
 
 Any vendor whose key is still missing falls back to its mock automatically and
 emits a `degraded` notice, so a missing sponsor key never blocks the demo.
+For real `simpop.*` tools, run `pnpm dev:simpop` and keep `SIMPOP_URL=http://localhost:8080`.
 
 ## Database
 

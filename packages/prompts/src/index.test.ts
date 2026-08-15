@@ -14,4 +14,20 @@ describe('renderPrompt', () => {
   it('throws for missing referenced files', () => {
     expect(() => renderPrompt('prompts/D99/missing.md')).toThrow(/Prompt file not found/);
   });
+
+  it('encodes the D02 office-hours forcing loop', () => {
+    const rendered = renderPrompt('prompts/D02/questioner.md');
+    for (const lens of ['Demand reality', 'Status quo', 'Desperate specificity', 'Narrowest wedge', 'Observation and surprise', 'Future-fit']) {
+      expect(rendered).toContain(lens);
+    }
+    expect(rendered).toContain('Ask one question at a time');
+    expect(rendered).toContain('do not accept waitlists or compliments as proof');
+  });
+
+  it('makes the D02 critic reject generic founder-friendly output', () => {
+    const rendered = renderPrompt('prompts/D02/critic-rubric.md');
+    expect(rendered).toContain('Office-hours blockers');
+    expect(rendered).toContain('all six forcing lenses');
+    expect(rendered).toContain('Reject founder-friendly praise');
+  });
 });

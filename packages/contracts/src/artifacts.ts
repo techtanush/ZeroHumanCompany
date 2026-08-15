@@ -96,6 +96,7 @@ export const WhatMustBeTrue = z.object({
 });
 
 export const SharpenedIdea = z.object({
+  mode: z.enum(['founder_interview', 'autonomous_proxy', 'batch_synthesis']).optional(),
   one_liner: z.string(),
   icp: z.object({
     role: z.string(),
@@ -121,6 +122,25 @@ export const SharpenedIdea = z.object({
   premises: z.array(z.string()).default([]),
   alternatives_considered: z.array(z.object({ option: z.string(), why_not: z.string() })).min(2),
   transcript_ref: z.string().optional(),
+  office_hours: z.object({
+    forcing_questions: z.array(z.object({
+      lens: z.enum(['demand_reality', 'status_quo', 'desperate_specificity', 'narrowest_wedge', 'observation_surprise', 'future_fit']),
+      question: z.string(),
+      answer_summary: z.string().optional(),
+      evidence_signal: z.enum(['past_behavior', 'money', 'urgency', 'workaround', 'opinion', 'missing']).default('missing'),
+    })).min(6).optional(),
+    founder_signals: z.array(z.object({
+      signal: z.string(),
+      strength: z.number().min(0).max(1),
+      interpretation: z.string(),
+    })).default([]),
+    selected_approach: z.string().optional(),
+    assignment: z.object({
+      task: z.string(),
+      deadline: z.string(),
+      pass_fail: z.string(),
+    }).optional(),
+  }).optional(),
 });
 export type SharpenedIdea = z.infer<typeof SharpenedIdea>;
 

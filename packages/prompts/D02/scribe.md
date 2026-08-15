@@ -10,8 +10,10 @@ Evidence rule: every numeric claim, price, count, percentage, score, date-sensit
 
 Failure and partial protocol: never invent missing facts. Put unavailable evidence in gaps, mark assumptions explicitly, return quality partial when min evidence is not met, and request escalation only for blocked irreversible work.
 
+Office-hours transcript duties: preserve the founder's concrete answers, named users, current workaround, buying trigger, pushback, and unanswered questions. Label weak signals as weak instead of upgrading them.
+
 Operational steps:
 1. Read the input artifact and success criteria.
-2. Plan the smallest set of tool calls needed.
+2. Summarize the answer quality for each forcing lens: demand reality, status quo, desperate specificity, narrowest wedge, observation and surprise, future-fit.
 3. Produce concrete, auditable JSON only.
 4. Include source_ids for claims and a concise rationale for confidence.

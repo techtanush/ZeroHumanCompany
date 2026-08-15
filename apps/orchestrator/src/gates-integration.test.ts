@@ -1,4 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { openDb } from '@zeroth/db';
 import { Kernel } from '@zeroth/kernel';
 import { ToolPlane, GateRequiredError } from '@zeroth/tool-plane';
@@ -9,7 +12,8 @@ import { ToolPlane, GateRequiredError } from '@zeroth/tool-plane';
  * This is invariant #4/#5 in the README and the thing a judge will poke at.
  */
 async function harness() {
-  const db = await openDb({ dataDir: 'memory' });
+  const dataDir = mkdtempSync(join(tmpdir(), 'zeroth-orch-gates-'));
+  const db = await openDb({ dataDir });
   const kernel = await Kernel.create({ db, routing: [], signingKey: 'tp-key' });
   const v = await kernel.createVenture({
     mode: 'founder_led', name: 'Gate Co',
@@ -50,56 +54,66 @@ async function harness() {
     },
   };
 
-  return { kernel, venture: v, plane, ctx, metered };
+  const cleanup = async () => {
+    await kernel.close();
+    rmSync(dataDir, { recursive: true, force: true });
+  };
+
+  return { kernel, venture: v, plane, ctx, metered, cleanup };
 }
 
 describe('tool plane + gates', () => {
+  let shared: Awaited<ReturnType<typeof harness>>;
+
+  beforeAll(async () => {
+    shared = await harness();
+  }, 20_000);
+
+  afterAll(async () => {
+    await shared.cleanup();
+  });
+
   it('blocks a money_out tool until a human approves, then runs it', async () => {
-    const { kernel, plane, ctx, venture } = await harness();
-    const [pay] = plane.build(['stripe.create_payment_link'], ctx as any);
+    const { kernel, plane, ctx, venture } = shared;
+      const [pay] = plane.build(['stripe.create_payment_link'], ctx as any);
 
-    // 1. Unapproved: the call must fail, and a real pending gate must exist.
-    await expect(
-      pay.run({ name: 'Pilot', amount_cents: 19900, currency: 'usd' }, ctx as any),
-    ).rejects.toBeInstanceOf(GateRequiredError);
+      // 1. Unapproved: the call must fail, and a real pending gate must exist.
+      await expect(
+        pay.run({ name: 'Pilot', amount_cents: 19900, currency: 'usd' }, ctx as any),
+      ).rejects.toBeInstanceOf(GateRequiredError);
 
-    const pending = await kernel.gates.list(venture.venture_id, 'pending');
-    expect(pending).toHaveLength(1);
-    expect(pending[0].gate_type).toBe('money_out');
+      const pending = await kernel.gates.list(venture.venture_id, 'pending');
+      expect(pending).toHaveLength(1);
+      expect(pending[0].gate_type).toBe('money_out');
 
-    // 2. Approved: the same call now returns a real (mock-shaped) payment link.
-    const approvedCtx = { ...ctx, requestGate: async () => true };
-    const out: any = await pay.run({ name: 'Pilot', amount_cents: 19900, currency: 'usd' }, approvedCtx as any);
-    expect(JSON.stringify(out)).toMatch(/plink_|buy\.stripe\.com|url/);
-
-    await kernel.close();
+      // 2. Approved: the same call now returns a real (mock-shaped) payment link.
+      const approvedCtx = { ...ctx, requestGate: async () => true };
+      const out: any = await pay.run({ name: 'Pilot', amount_cents: 19900, currency: 'usd' }, approvedCtx as any);
+      expect(JSON.stringify(out)).toMatch(/plink_|buy\.stripe\.com|url/);
   }, 20_000);
 
   it('refuses a tool that is not in the agent allowlist', async () => {
-    const { plane, ctx, kernel } = await harness();
-    expect(() => plane.build(['stripe.create_payment_link'], ctx as any)).not.toThrow();
-    expect(() => plane.build(['definitely_not_a_tool'], ctx as any)).toThrow();
+    const { plane, ctx } = shared;
+      expect(() => plane.build(['stripe.create_payment_link'], ctx as any)).not.toThrow();
+      expect(() => plane.build(['definitely_not_a_tool'], ctx as any)).toThrow();
 
-    // An agent given only web_search cannot reach a payment tool at all.
-    const tools = plane.build(['web_search'], ctx as any);
-    expect(tools.map((t) => t.name)).toEqual(['web_search']);
-    await kernel.close();
+      // An agent given only web_search cannot reach a payment tool at all.
+      const tools = plane.build(['web_search'], ctx as any);
+      expect(tools.map((t) => t.name)).toEqual(['web_search']);
   });
 
   it('meters every tool call', async () => {
-    const { plane, ctx, metered, kernel } = await harness();
-    const [search] = plane.build(['web_search'], ctx as any);
-    await search.run({ query: 'dental no-show rates' }, ctx as any);
-    expect(metered.length).toBeGreaterThan(0);
-    await kernel.close();
+    const { plane, ctx, metered } = shared;
+      const [search] = plane.build(['web_search'], ctx as any);
+      await search.run({ query: 'dental no-show rates' }, ctx as any);
+      expect(metered.length).toBeGreaterThan(0);
   });
 
   it('returns identical mock output for identical arguments', async () => {
-    const { plane, ctx, kernel } = await harness();
-    const [search] = plane.build(['web_search'], ctx as any);
-    const a = await search.run({ query: 'same question' }, ctx as any);
-    const b = await search.run({ query: 'same question' }, ctx as any);
-    expect(JSON.stringify(a)).toBe(JSON.stringify(b));
-    await kernel.close();
+    const { plane, ctx } = shared;
+      const [search] = plane.build(['web_search'], ctx as any);
+      const a = await search.run({ query: 'same question' }, ctx as any);
+      const b = await search.run({ query: 'same question' }, ctx as any);
+      expect(JSON.stringify(a)).toBe(JSON.stringify(b));
   });
 });

@@ -106,64 +106,72 @@ async function setup() {
 describe('end-to-end venture flow', () => {
   it('turns a signed SharpenedIdea into niche research, a gate, and follow-on work', async () => {
     const { kernel, orch, venture } = await setup();
+    try {
 
-    // D02 signs the SharpenedIdea, which is what the routing table listens for.
-    await kernel.issueWorkOrder({
-      venture_id: venture.venture_id, to: 'D02', intent: 'run_office_hours', budget_usd: 3,
-    });
-    expect(await orch.tick('D02')).toBe(true);
-    await new Promise((r) => setTimeout(r, 200));
+      // D02 signs the SharpenedIdea, which is what the routing table listens for.
+      await kernel.issueWorkOrder({
+        venture_id: venture.venture_id, to: 'D02', intent: 'run_office_hours', budget_usd: 3,
+      });
+      expect(await orch.tick('D02')).toBe(true);
+      await new Promise((r) => setTimeout(r, 200));
 
-    const sharpenedArtifacts = await kernel.artifacts.list(venture.venture_id, { type: 'SharpenedIdea' });
-    expect(sharpenedArtifacts).toHaveLength(1);
-    expect(sharpenedArtifacts[0].quality).toBe('signed');
+      const sharpenedArtifacts = await kernel.artifacts.list(venture.venture_id, { type: 'SharpenedIdea' });
+      expect(sharpenedArtifacts).toHaveLength(1);
+      expect(sharpenedArtifacts[0].quality).toBe('signed');
 
-    const proj = await kernel.venture(venture.venture_id);
-    expect(proj.liveness.idea_locked).toBe(true);
+      const proj = await kernel.venture(venture.venture_id);
+      expect(proj.liveness.idea_locked).toBe(true);
 
-    // Routing fanned out to D03/D04/D05 without anyone telling it to.
-    const queued = await kernel.db.query(
-      `SELECT to_dept, intent FROM work_orders WHERE venture_id=$1 AND status='queued'`,
-      [venture.venture_id],
-    );
-    const depts = queued.rows.map((r: any) => r.to_dept);
-    expect(depts).toContain('D03');
+      // Routing fanned out to D03/D04/D05 without anyone telling it to.
+      const queued = await kernel.db.query(
+        `SELECT to_dept, intent FROM work_orders WHERE venture_id=$1 AND status='queued'`,
+        [venture.venture_id],
+      );
+      const depts = queued.rows.map((r: any) => r.to_dept);
+      expect(depts).toContain('D03');
 
-    // D03 produces 3 signed dossiers, which opens the niche_selection gate.
-    expect(await orch.tick('D03')).toBe(true);
-    await new Promise((r) => setTimeout(r, 300));
+      // D03 produces 3 signed dossiers, which opens the niche_selection gate.
+      expect(await orch.tick('D03')).toBe(true);
+      await new Promise((r) => setTimeout(r, 300));
 
-    const dossiers = await kernel.artifacts.list(venture.venture_id, { type: 'NicheDossier' });
-    expect(dossiers.length).toBeGreaterThanOrEqual(3);
-    expect(dossiers.every((d: any) => d.quality === 'signed')).toBe(true);
-    expect(dossiers[0].signature).toBeTruthy();
+      const dossiers = await kernel.artifacts.list(venture.venture_id, { type: 'NicheDossier' });
+      expect(dossiers.length).toBeGreaterThanOrEqual(3);
+      expect(dossiers.every((d: any) => d.quality === 'signed')).toBe(true);
+      expect(dossiers[0].signature).toBeTruthy();
 
-    const gateEvents = await kernel.events.readStream(venture.venture_id, { types: ['gate.opened'] });
-    expect(gateEvents.length).toBeGreaterThanOrEqual(1);
+      const gateEvents = await kernel.events.readStream(venture.venture_id, { types: ['gate.opened'] });
+      expect(gateEvents.length).toBeGreaterThanOrEqual(1);
 
-    // Money was actually metered against D02/D03 envelopes.
-    const budgets = await kernel.meter.budgets(venture.venture_id);
-    expect(budgets.find((b) => b.department_id === 'D03')!.spent_usd).toBeGreaterThan(0);
+      // Money was actually metered against D02/D03 envelopes.
+      const budgets = await kernel.meter.budgets(venture.venture_id);
+      expect(budgets.find((b) => b.department_id === 'D03')!.spent_usd).toBeGreaterThan(0);
 
-    // And every step is on the timeline, in order.
-    const types = (await kernel.events.readStream(venture.venture_id, { limit: 500 })).map((e) => e.type);
-    expect(types).toContain('venture.created');
-    expect(types).toContain('dept.work_started');
-    expect(types).toContain('artifact.signed');
-    expect(types).toContain('dept.work_completed');
-    expect(types).toContain('money.metered');
+      // And every step is on the timeline, in order.
+      const types = (await kernel.events.readStream(venture.venture_id, { limit: 500 })).map((e) => e.type);
+      expect(types).toContain('venture.created');
+      expect(types).toContain('dept.work_started');
+      expect(types).toContain('artifact.signed');
+      expect(types).toContain('dept.work_completed');
+      expect(types).toContain('money.metered');
+    } finally {
+      await kernel.close();
+    }
   }, 60_000);
 
   it('halts the whole company when the kill switch is engaged', async () => {
     const { kernel, orch, venture } = await setup();
-    await kernel.killSwitch(venture.venture_id, true);
-    await kernel.issueWorkOrder({
-      venture_id: venture.venture_id, to: 'D02', intent: 'run_office_hours', budget_usd: 3,
-    });
-    await orch.tick('D02');
-    const arts = await kernel.artifacts.list(venture.venture_id);
-    expect(arts).toHaveLength(0);
-    const wo = await kernel.db.query(`SELECT status FROM work_orders WHERE venture_id=$1`, [venture.venture_id]);
-    expect(wo.rows.every((r: any) => r.status === 'cancelled' || r.status === 'queued')).toBe(true);
+    try {
+      await kernel.killSwitch(venture.venture_id, true);
+      await kernel.issueWorkOrder({
+        venture_id: venture.venture_id, to: 'D02', intent: 'run_office_hours', budget_usd: 3,
+      });
+      await orch.tick('D02');
+      const arts = await kernel.artifacts.list(venture.venture_id);
+      expect(arts).toHaveLength(0);
+      const wo = await kernel.db.query(`SELECT status FROM work_orders WHERE venture_id=$1`, [venture.venture_id]);
+      expect(wo.rows.every((r: any) => r.status === 'cancelled' || r.status === 'queued')).toBe(true);
+    } finally {
+      await kernel.close();
+    }
   }, 30_000);
 });

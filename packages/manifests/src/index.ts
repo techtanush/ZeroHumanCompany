@@ -3,13 +3,13 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 import { DepartmentManifest, RoutingTable, type DepartmentManifest as DepartmentManifestType, type RoutingTable as RoutingTableType } from '@zeroth/contracts';
-import type { z } from 'zod';
+import type { z, ZodIssue } from 'zod';
 
 const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 let manifestCache: DepartmentManifestType[] | undefined;
 
 function formatIssues(file: string, error: z.ZodError): string[] {
-  return error.issues.map((issue) => `${file}:${issue.path.length ? issue.path.join('.') : '<root>'}: ${issue.message}`);
+  return error.issues.map((issue: ZodIssue) => `${file}:${issue.path.length ? issue.path.join('.') : '<root>'}: ${issue.message}`);
 }
 
 function readYaml(file: string): unknown {

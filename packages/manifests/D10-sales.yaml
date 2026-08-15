@@ -10,6 +10,10 @@ head:
     - web_fetch
     - composio.gmail_send
     - linq.send_card
+    - linq.await_reply
+    - elevenlabs.create_agent
+    - elevenlabs.place_call
+    - elevenlabs.transcribe
     - stripe.create_payment_link
     - whop.create_checkout
     - dodo.create_checkout
@@ -31,6 +35,7 @@ workers:
     tools:
       - composio.gmail_send
       - linq.send_card
+      - linq.await_reply
       - stripe.create_payment_link
       - whop.create_checkout
       - dodo.create_checkout
@@ -45,6 +50,10 @@ workers:
     tools:
       - composio.gmail_send
       - linq.send_card
+      - linq.await_reply
+      - elevenlabs.create_agent
+      - elevenlabs.place_call
+      - elevenlabs.transcribe
       - stripe.create_payment_link
       - whop.create_checkout
       - dodo.create_checkout
@@ -59,6 +68,7 @@ workers:
     tools:
       - composio.gmail_send
       - linq.send_card
+      - linq.await_reply
       - stripe.create_payment_link
       - whop.create_checkout
       - dodo.create_checkout
@@ -77,6 +87,10 @@ workers:
       - memory_read
       - composio.gmail_send
       - linq.send_card
+      - linq.await_reply
+      - elevenlabs.create_agent
+      - elevenlabs.place_call
+      - elevenlabs.transcribe
       - stripe.create_payment_link
       - whop.create_checkout
       - dodo.create_checkout

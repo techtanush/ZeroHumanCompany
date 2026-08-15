@@ -55,7 +55,7 @@ Departments open gates; the gate engine renders them into messages.
   `services/founder-channel`. Departments never see it.
 - **Number:** one Linq-assigned number per Zeroth instance is the **company's phone number**. The
   founder saves it as a contact ("Zeroth HQ") during onboarding. Per-venture numbers are POST-MVP.
-- **Send:** `POST /api/partner/v3/chats` with `{from, to: [founder E.164], message: {parts}}`.
+- **Send:** `POST /api/partner/v3/messages` with `{from, to: [founder E.164], message: {parts}}`.
 - **Receive:** webhook endpoint `POST https://kernel.zeroth.app/webhooks/linq` for inbound messages,
   reactions, delivery/read receipts. Signature verification per Linq's webhook docs; same webhook
   discipline as every other endpoint (verify → persist raw → 200 in <2s → queue).
@@ -127,6 +127,18 @@ inbound message (webhook)
 
 **A tapback is a first-class approval.** 👍 on an approval card approves it (Linq webhooks carry
 reactions). This is the single most iMessage-native thing in the product and we demo it.
+
+### Backend status
+
+Implemented in the current backend:
+
+- `linq.send_card` for agent-authored founder/customer cards.
+- `linq.await_reply` for polling/checking reply state when webhooks are unavailable.
+- Kernel-side gate notification: any `GateRequest` with `channel:"linq"` is rendered to the founder
+  phone via `LINQ_API_KEY` + `FOUNDER_PHONE`; if the key is missing, a `human.notified` degraded
+  event is still recorded and the Boardroom can show the pending gate.
+- Linq webhook gate decisions: inbound payloads with `gate_id` parse `yes/approve/ok/👍`, `no/reject/stop/👎`,
+  option ids, and option-label prefixes into `gate.approved` or `gate.rejected`.
 
 ### Digests, batching, quiet hours
 

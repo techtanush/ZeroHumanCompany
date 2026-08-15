@@ -265,6 +265,16 @@ describe('gates', () => {
     await expect(k.gates.decide(g.id, { option_id: 'ship_it', decided_by: 'f', decision: 'approve', note: '' }))
       .rejects.toThrow(/unknown_option|not offered/);
   });
+
+  it('notifies the founder when a gate uses the Linq channel', async () => {
+    const v = await venture(k);
+    const g = await k.gates.open(req(v.venture_id, { channel: 'linq' }) as any);
+    const notices = await k.events.readStream(v.venture_id, { types: ['human.notified'] });
+    expect(g.status).toBe('pending');
+    expect(notices).toContainEqual(expect.objectContaining({
+      payload: expect.objectContaining({ channel: 'linq', gate_id: g.id, delivered: false }),
+    }));
+  });
 });
 
 describe('budget meter', () => {
@@ -490,5 +500,37 @@ describe('http surface', () => {
     expect(evs[0].payload.amount_usd).toBe(49);
     const proj = await k.venture(v.venture_id);
     expect(proj.liveness.revenue_real).toBe(true);
+  });
+
+  it('maps a Linq founder reply into a gate decision', async () => {
+    const k = await freshKernel();
+    const app = buildServer({ kernel: k, token: 'tok' });
+    const v = await venture(k);
+    const gate = await k.gates.open({
+      venture_id: v.venture_id,
+      gate_type: 'pivot_approval',
+      requested_by: 'pivot.head',
+      department_id: 'D06',
+      action: { tool: 'artifact.sign', args: { diff: 'narrow ICP' } },
+      preview: { summary: 'Approve pivot to discharge coordinators' },
+      options: [{ id: 'approve', label: 'Approve', consequence: 'ProductSpec is updated' }],
+      suggested_option_id: 'approve',
+      risk: 'medium',
+      reversible: false,
+      channel: 'linq',
+      timeout_s: 900,
+      on_timeout: 'hold',
+      idempotency_key: 'linq-pivot-gate',
+      trace_id: v.trace_id,
+    } as any);
+
+    const res = await app.inject({
+      method: 'POST',
+      url: '/v1/webhooks/linq',
+      payload: { id: 'linq_reply_1', venture_id: v.venture_id, gate_id: gate.id, from: '+15555555555', text: 'yes' },
+    });
+
+    expect(res.statusCode).toBe(202);
+    expect((await k.gates.get(gate.id))?.status).toBe('approved');
   });
 });

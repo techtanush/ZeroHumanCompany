@@ -4,6 +4,7 @@ import { EventStore, KernelError } from './event-store.js';
 import { nowIso, uuid } from './util.js';
 
 export type GateExecutor = (gate: GateRecord) => Promise<void>;
+export type GateNotifier = (gate: GateRecord) => Promise<{ delivered: boolean; message_id?: string; degraded?: string }>;
 
 /**
  * The Gate Engine. Nothing irreversible happens in this company without a gate
@@ -16,6 +17,7 @@ export class GateEngine {
   constructor(
     private db: Db,
     private events: EventStore,
+    private notifyFounder?: GateNotifier,
   ) {}
 
   /** Registered per gate_type: what actually runs when the founder approves. */
@@ -87,8 +89,46 @@ export class GateEngine {
         trace_id: parsed.trace_id,
       });
       await this.execute(gate);
+    } else if (gate.channel === 'linq') {
+      await this.notifyFounderGate(gate);
     }
     return gate;
+  }
+
+  private async notifyFounderGate(gate: GateRecord): Promise<void> {
+    if (!this.notifyFounder) return;
+    try {
+      const result = await this.notifyFounder(gate);
+      await this.events.append({
+        venture_id: gate.venture_id,
+        type: 'human.notified',
+        actor_kind: 'system',
+        actor_id: 'kernel.founder-channel',
+        department_id: gate.department_id,
+        payload: {
+          channel: 'linq',
+          gate_id: gate.id,
+          delivered: result.delivered,
+          message_id: result.message_id,
+          degraded: result.degraded,
+        },
+        trace_id: gate.trace_id,
+        correlation_id: gate.work_order_id,
+        idempotency_key: `linq_gate_notice:${gate.id}`,
+      });
+    } catch (error) {
+      await this.events.append({
+        venture_id: gate.venture_id,
+        type: 'human.notified',
+        actor_kind: 'system',
+        actor_id: 'kernel.founder-channel',
+        department_id: gate.department_id,
+        payload: { channel: 'linq', gate_id: gate.id, delivered: false, degraded: error instanceof Error ? error.message : String(error) },
+        trace_id: gate.trace_id,
+        correlation_id: gate.work_order_id,
+        idempotency_key: `linq_gate_notice:${gate.id}`,
+      });
+    }
   }
 
   /**

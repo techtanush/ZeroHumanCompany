@@ -9,6 +9,8 @@ head:
     - github.push
     - render.deploy
     - replay.run_suite
+    - solari.act
+    - solari.screenshot
     - memory_read
     - memory_write
   max_tokens_per_run: 140000
@@ -24,6 +26,7 @@ workers:
     system_prompt_ref: prompts/D07/architect.md
     tools:
       - replay.run_suite
+      - solari.extract
       - memory_read
       - memory_write
     max_tokens_per_run: 60000
@@ -34,6 +37,8 @@ workers:
     tools:
       - github.push
       - replay.run_suite
+      - solari.act
+      - solari.screenshot
       - memory_read
       - memory_write
     max_tokens_per_run: 60000
@@ -56,6 +61,8 @@ workers:
       - calc
       - memory_read
       - replay.run_suite
+      - solari.browse
+      - solari.extract
     max_tokens_per_run: 60000
   - agent_id: build.frontend-engineer
     model: sonnet
@@ -103,6 +110,8 @@ workers:
       - memory_read
       - render.deploy
       - replay.run_suite
+      - solari.act
+      - solari.screenshot
     max_tokens_per_run: 60000
   - agent_id: build.accessibility-reviewer
     model: sonnet
@@ -121,6 +130,7 @@ io:
   min_outputs: 1
 gates:
   - deploy
+  - account_creation
 sandbox:
   image: zeroth/dept-base:latest
   cpu: 4

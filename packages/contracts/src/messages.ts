@@ -71,7 +71,7 @@ export type Escalation = z.infer<typeof Escalation>;
 
 export const GateType = z.enum([
   'money_out', 'public_content', 'outbound_to_real_person', 'account_creation',
-  'pivot_approval', 'deploy', 'refund', 'new_department', 'niche_selection',
+  'pivot_approval', 'deploy', 'refund', 'new_department', 'niche_selection', 'voice_clone_consent',
 ]);
 export type GateType = z.infer<typeof GateType>;
 

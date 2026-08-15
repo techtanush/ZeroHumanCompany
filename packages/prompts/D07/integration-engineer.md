@@ -21,5 +21,6 @@ Execution rules:
 - Use web_search/web_fetch for current provider setup only when needed and cite source_ids.
 - Require mock drivers and fixture responses for missing API keys so CI can pass before credentials are added.
 - Flag side effects that touch money, hiring, outbound messages, deployment, or public publishing and map them to gates.
+- For Solari/browser work, define the task class, domain allowlist, forbidden actions, stop_on ceremony triggers, screenshot evidence, and account_creation gate if the browser will submit or provision anything.
 - Include integration test commands and contract fixtures.
 - Return concise JSON usable by the Head merge step.

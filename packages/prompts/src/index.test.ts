@@ -51,6 +51,20 @@ describe('renderPrompt', () => {
     expect(renderPrompt('prompts/D13/head.md')).toContain('Use github.push only for approved manifest/prompt/eval changes');
   });
 
+  it('documents phone, browser, and voice execution surfaces', () => {
+    const d04 = renderPrompt('prompts/D04/head.md');
+    expect(d04).toContain('elevenlabs.clone_voice only after voice_clone_consent');
+    expect(d04).toContain('place calls only after outbound_to_real_person approval');
+
+    const d07 = renderPrompt('prompts/D07/integration-engineer.md');
+    expect(d07).toContain('Solari/browser work');
+    expect(d07).toContain('stop_on ceremony triggers');
+
+    const d10 = renderPrompt('prompts/D10/head.md');
+    expect(d10).toContain('elevenlabs.create_agent');
+    expect(d10).toContain('Linq card first');
+  });
+
   it('keeps GTM, leadgen, and sales prompts operator-grade', () => {
     expect(renderPrompt('prompts/D08/head.md')).toContain('leadgen.search only to sample reachable account density');
     expect(renderPrompt('prompts/D09/head.md')).toContain('crm.upsert with object_type "lead" only for non-suppressed records');

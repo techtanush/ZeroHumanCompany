@@ -10,6 +10,7 @@ head:
     - web_fetch
     - apify.run_actor
     - solari.browse
+    - solari.extract
     - leadgen.search
     - leadgen.enrich
     - crm.upsert
@@ -32,6 +33,7 @@ workers:
       - web_fetch
       - apify.run_actor
       - solari.browse
+      - solari.extract
       - leadgen.search
       - leadgen.enrich
       - crm.upsert
@@ -48,6 +50,7 @@ workers:
       - web_fetch
       - apify.run_actor
       - solari.browse
+      - solari.extract
       - leadgen.search
       - leadgen.enrich
       - crm.upsert
@@ -64,6 +67,7 @@ workers:
       - web_fetch
       - apify.run_actor
       - solari.browse
+      - solari.extract
       - leadgen.search
       - leadgen.enrich
       - crm.upsert
@@ -80,6 +84,8 @@ workers:
       - web_fetch
       - calc
       - memory_read
+      - solari.browse
+      - solari.extract
       - leadgen.search
       - leadgen.enrich
       - crm.upsert

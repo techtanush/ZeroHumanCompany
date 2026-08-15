@@ -138,6 +138,21 @@ export interface BrowserDriver {
 }
 ```
 
+### Backend status
+
+Implemented in the current backend through the tool plane:
+
+- `solari.browse` for read-only inspection.
+- `solari.extract` for structured extraction with optional schema hints.
+- `solari.screenshot` for session evidence.
+- `solari.act` for guarded browser actions and account ceremonies; it is gated as
+  `account_creation` because it can submit forms or provision accounts.
+
+Needed from Solari/Pinetree: `SOLARI_API_KEY` and the hosted `SOLARI_BASE_URL`, or confirmation that
+we should run a local Solari browser service and point `SOLARI_BASE_URL` at that. The adapter is
+isolated in one file so the endpoint paths can be corrected quickly once the sponsor confirms the
+exact API shape.
+
 **`guards` is the whole safety story in one object.** A `read` task on D03 gets
 `forbid: ['purchase','submit_form','post_public','delete','accept_terms']` and a domain allowlist of
 exactly the competitor domains in the work order. It is structurally incapable of buying something.

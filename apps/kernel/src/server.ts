@@ -326,6 +326,16 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
         trace_id: await kernel.traceFor(venture_id),
         idempotency_key: `wh:${vendor}:${body.id ?? uuid()}`,
       });
+      if (vendor === 'linq') {
+        const decision = await parseLinqGateDecision(kernel, body);
+        if (decision) {
+          try {
+            await kernel.gates.decide(decision.gate_id, decision);
+          } catch (error) {
+            if (!String(error).includes('gate_already_decided')) throw error;
+          }
+        }
+      }
       reply.code(202);
       return { accepted: true, type: mapped.type };
     });
@@ -362,7 +372,7 @@ export function mapWebhook(vendor: string, body: any): { type: string; payload: 
         ? { type: 'build.qa_failed', payload: { report: String(body.report_url ?? '') } }
         : { type: 'build.qa_passed', payload: { report: String(body.report_url ?? '') } };
     case 'linq':
-      return { type: 'human.replied', payload: { text: String(body.text ?? ''), from: String(body.from ?? '') } };
+      return { type: 'human.replied', payload: { text: String(body.text ?? body.message?.text ?? ''), from: String(body.from ?? ''), gate_id: body.gate_id ?? body.metadata?.gate_id } };
     case 'composio':
       return { type: 'sales.reply_received', payload: { from: String(body.from ?? ''), text: String(body.text ?? '') } };
     case 'terac':
@@ -374,4 +384,33 @@ export function mapWebhook(vendor: string, body: any): { type: string; payload: 
     default:
       return { type: 'human.notified', payload: { vendor } };
   }
+}
+
+async function parseLinqGateDecision(kernel: Kernel, body: any): Promise<({ gate_id: string; option_id: string; decided_by: string; decision: 'approve' | 'reject' | 'redirect'; note: string }) | null> {
+  const gate_id = String(body.gate_id ?? body.metadata?.gate_id ?? '');
+  if (!gate_id) return null;
+  const gate = await kernel.gates.get(gate_id);
+  if (!gate || gate.status !== 'pending') return null;
+
+  const raw = String(body.text ?? body.message?.text ?? body.reaction ?? '').trim();
+  const normalized = raw.toLowerCase();
+  const decided_by = String(body.from ?? 'linq-founder');
+  const rejectWords = new Set(['no', 'n', 'reject', 'stop', 'deny', '👎']);
+  const approveWords = new Set(['yes', 'y', 'approve', 'approved', 'ok', 'okay', '👍']);
+
+  if (rejectWords.has(normalized)) {
+    return { gate_id, option_id: gate.options[0]?.id ?? 'reject', decided_by, decision: 'reject', note: raw };
+  }
+
+  const exactOption = gate.options.find((option) => option.id.toLowerCase() === normalized);
+  const labelOption = gate.options.find((option) => option.label.toLowerCase().startsWith(normalized));
+  const option = exactOption ?? labelOption;
+  if (option) return { gate_id, option_id: option.id, decided_by, decision: 'approve', note: raw };
+
+  if (approveWords.has(normalized)) {
+    const option_id = gate.suggested_option_id ?? gate.options[0]?.id;
+    if (option_id) return { gate_id, option_id, decided_by, decision: 'approve', note: raw };
+  }
+
+  return null;
 }

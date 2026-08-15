@@ -13,7 +13,8 @@ export type GateType =
   | 'deploy'
   | 'refund'
   | 'new_department'
-  | 'niche_selection';
+  | 'niche_selection'
+  | 'voice_clone_consent';
 
 export interface ToolCtx {
   venture_id: string;

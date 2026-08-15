@@ -67,6 +67,23 @@ Without steps 1–2, step 4 is unreachable in code, not in policy: the clone cal
 requires a consent event id as an argument, and the kernel validates it.
 ```
 
+### Backend status
+
+Implemented in the current backend through the tool plane:
+
+- `elevenlabs.clone_voice` creates a voice from founder-provided audio and requires
+  `voice_clone_consent`.
+- `elevenlabs.tts` uses `ELEVENLABS_VOICE_ID` or a provided `voice_id`.
+- `elevenlabs.create_agent` creates the conversation agent shell.
+- `elevenlabs.place_call` is gated as `outbound_to_real_person` and requires
+  `disclosure:true`.
+- `elevenlabs.transcribe` captures transcript output for D04/D10 claim extraction.
+- `elevenlabs.delete_voice` supports revocation and is gated as `voice_clone_consent`.
+
+Needed from ElevenLabs: `ELEVENLABS_API_KEY`. After cloning, store `ELEVENLABS_VOICE_ID`. For phone
+calls, also configure `ELEVENLABS_AGENT_ID` and `ELEVENLABS_PHONE_NUMBER_ID` or the equivalent
+Twilio/SIP connection if the account uses bring-your-own telephony.
+
 `consent.revoked` triggers: vendor voice deletion, vault purge, all pending `CallOrder`s re-routed
 to the generic neutral voice, and a digest confirmation. Recordings of *other people* (call
 counterparties) are governed separately below — **we never clone anyone but the founder.**

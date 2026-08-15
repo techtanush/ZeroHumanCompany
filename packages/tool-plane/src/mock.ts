@@ -89,6 +89,26 @@ export async function mockTool(name: string, args: unknown): Promise<unknown> {
         final_url: (args as { url?: string }).url ?? `https://example.com/${hash.slice(0, 8)}`,
         screenshot_uri: `mock://screenshots/${hash.slice(0, 16)}.png`,
       };
+    case 'solari.act':
+      return {
+        status: 'completed',
+        session_id: id('solari_sess', hash),
+        steps: [
+          { action: 'open', url: (args as { url?: string }).url ?? 'about:blank' },
+          { action: 'act', note: subject },
+        ],
+        final_url: (args as { url?: string }).url ?? `https://example.com/${hash.slice(0, 8)}`,
+        screenshot_uri: `mock://screenshots/${hash.slice(0, 16)}.png`,
+      };
+    case 'solari.extract':
+      return {
+        status: 'completed',
+        extracted: { summary: `Structured extraction for ${subject}`, confidence: Number((0.75 + rand() * 0.2).toFixed(3)) },
+        final_url: (args as { url?: string }).url ?? `https://example.com/${hash.slice(0, 8)}`,
+        screenshot_uri: `mock://screenshots/${hash.slice(0, 16)}.png`,
+      };
+    case 'solari.screenshot':
+      return { session_id: (args as { session_id?: string }).session_id ?? id('solari_sess', hash), screenshot_uri: `mock://screenshots/${hash.slice(0, 16)}.png` };
     case 'composio.gmail_send':
       return { message_id: id('msg', hash), thread_id: id('thr', hash.slice(8)), sent_at: iso(hash) };
     case 'stripe.create_payment_link':
@@ -102,10 +122,22 @@ export async function mockTool(name: string, args: unknown): Promise<unknown> {
     }
     case 'elevenlabs.tts':
       return { audio_uri: `mock://audio/${hash.slice(0, 16)}.mp3`, duration_s: Number((1 + subject.length / 15).toFixed(2)), voice_id: (args as { voice_id?: string }).voice_id ?? 'mock_voice' };
+    case 'elevenlabs.clone_voice':
+      return { voice_id: id('voice', hash), consent_event_id: (args as { consent_event_id?: string }).consent_event_id, status: 'created' };
+    case 'elevenlabs.create_agent':
+      return { agent_id: id('voice_agent', hash), status: 'created' };
+    case 'elevenlabs.place_call':
+      return { call_id: id('call', hash), status: 'queued', disclosure: true };
+    case 'elevenlabs.transcribe':
+      return { transcript_id: id('transcript', hash), text: `Mock transcript for ${subject}`, language_code: (args as { language_code?: string }).language_code ?? 'en' };
+    case 'elevenlabs.delete_voice':
+      return { voice_id: (args as { voice_id?: string }).voice_id ?? id('voice', hash), deleted: true };
     case 'terac.post_requisition':
       return { requisition_id: id('req', hash), status: 'filed' };
     case 'linq.send_card':
       return { message_id: id('linq_msg', hash), delivered: true };
+    case 'linq.await_reply':
+      return { gate_id: (args as { gate_id?: string }).gate_id, status: 'pending', replies: [] };
     case 'pioneer.classify':
       return { label: pick(rand, ['high_intent', 'medium_intent', 'low_intent']), confidence: Number((0.6 + rand() * 0.39).toFixed(3)) };
     case 'simpop.build_panel': {

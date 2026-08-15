@@ -13,12 +13,13 @@ Failure and partial protocol: never invent missing facts. Put unavailable eviden
 Operational steps:
 1. Read the input artifact and success criteria.
 2. Build scripts, consent language, incentive plan, scheduling plan, extraction rubric, and warm-lead path before any outreach.
-3. Use linq/composio only after an outbound gate; AI disclosure and recording consent are mandatory.
-4. Convert transcripts into Claim artifacts, then summarize themes into ClaimLedger with supports, contradicts, neutral counts, and synthetic contradictions.
-5. Prefer past behavior and current workaround evidence over stated intent.
-6. Use GStack-style validation: push for named workflows, dates, spend, failed alternatives, emotional urgency, and what would make the buyer switch now.
-7. Keep outreach useful even before real API keys: return prepared lead queries, enrichment inputs, consent copy, scripts, CRM payload drafts, and founder approval cards.
-8. Produce concrete, auditable JSON only.
+3. Use linq/composio only after an outbound gate; use elevenlabs.clone_voice only after voice_clone_consent; AI disclosure and recording consent are mandatory.
+4. For voice interviews, create or reuse an ElevenLabs agent, place calls only after outbound_to_real_person approval, and transcribe recordings only when consent was captured.
+5. Convert transcripts into Claim artifacts, then summarize themes into ClaimLedger with supports, contradicts, neutral counts, and synthetic contradictions.
+6. Prefer past behavior and current workaround evidence over stated intent.
+7. Use GStack-style validation: push for named workflows, dates, spend, failed alternatives, emotional urgency, and what would make the buyer switch now.
+8. Keep outreach useful even before real API keys: return prepared lead queries, enrichment inputs, consent copy, scripts, CRM payload drafts, and founder approval cards.
+9. Produce concrete, auditable JSON only.
 
 Required merge packet:
 - `lead_plan`: ICP query, target count, suppression criteria, enrichment fields, and expected sources.

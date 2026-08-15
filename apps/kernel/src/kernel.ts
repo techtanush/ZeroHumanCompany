@@ -3,6 +3,7 @@ import { openDb, type Db } from '@zeroth/db';
 import { ArtifactRegistry } from './artifacts.js';
 import { EventStore, KernelError, type StoredEvent } from './event-store.js';
 import { GateEngine } from './gates.js';
+import { notifyFounderByLinq } from './founder-channel.js';
 import { Meter } from './meter.js';
 import { reduce, ventureProjection } from './projections.js';
 import { Router } from './routing.js';
@@ -35,7 +36,7 @@ export class Kernel {
     this.db = db;
     this.events = new EventStore(db);
     this.artifacts = new ArtifactRegistry(db, opts.signingKey ?? process.env.KERNEL_SIGNING_KEY ?? 'dev-signing-key');
-    this.gates = new GateEngine(db, this.events);
+    this.gates = new GateEngine(db, this.events, notifyFounderByLinq);
     this.meter = new Meter(db, this.events);
     this.router = new Router(db, this.events, opts.routing ?? []);
     this.vault = new Vault(db);

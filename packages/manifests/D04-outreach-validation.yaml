@@ -11,7 +11,12 @@ head:
     - memory_read
     - memory_write
     - linq.send_card
+    - linq.await_reply
     - elevenlabs.tts
+    - elevenlabs.clone_voice
+    - elevenlabs.create_agent
+    - elevenlabs.place_call
+    - elevenlabs.transcribe
   max_tokens_per_run: 90000
 critic:
   agent_id: outreach.critic
@@ -33,7 +38,11 @@ workers:
       - memory_write
       - composio.gmail_send
       - linq.send_card
+      - linq.await_reply
       - elevenlabs.tts
+      - elevenlabs.create_agent
+      - elevenlabs.place_call
+      - elevenlabs.transcribe
       - terac.post_requisition
     max_tokens_per_run: 60000
   - agent_id: outreach.scriptwright
@@ -47,7 +56,11 @@ workers:
       - memory_write
       - composio.gmail_send
       - linq.send_card
+      - linq.await_reply
       - elevenlabs.tts
+      - elevenlabs.create_agent
+      - elevenlabs.place_call
+      - elevenlabs.transcribe
       - terac.post_requisition
     max_tokens_per_run: 60000
   - agent_id: outreach.composer
@@ -61,7 +74,11 @@ workers:
       - memory_write
       - composio.gmail_send
       - linq.send_card
+      - linq.await_reply
       - elevenlabs.tts
+      - elevenlabs.create_agent
+      - elevenlabs.place_call
+      - elevenlabs.transcribe
       - terac.post_requisition
     max_tokens_per_run: 60000
   - agent_id: outreach.interviewer
@@ -75,7 +92,11 @@ workers:
       - memory_write
       - composio.gmail_send
       - linq.send_card
+      - linq.await_reply
       - elevenlabs.tts
+      - elevenlabs.create_agent
+      - elevenlabs.place_call
+      - elevenlabs.transcribe
       - terac.post_requisition
     max_tokens_per_run: 60000
   - agent_id: outreach.extractor
@@ -89,7 +110,11 @@ workers:
       - memory_write
       - composio.gmail_send
       - linq.send_card
+      - linq.await_reply
       - elevenlabs.tts
+      - elevenlabs.create_agent
+      - elevenlabs.place_call
+      - elevenlabs.transcribe
       - terac.post_requisition
     max_tokens_per_run: 60000
   - agent_id: outreach.consent-officer
@@ -113,6 +138,7 @@ workers:
       - memory_read
       - crm.upsert
       - linq.send_card
+      - linq.await_reply
     max_tokens_per_run: 60000
   - agent_id: outreach.voice-disclosure
     model: sonnet
@@ -157,6 +183,7 @@ io:
 gates:
   - outbound_to_real_person
   - money_out
+  - voice_clone_consent
 sandbox:
   image: zeroth/dept-base:latest
   cpu: 2

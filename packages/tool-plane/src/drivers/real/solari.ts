@@ -8,8 +8,19 @@ export function hasKey(): boolean {
 }
 
 export async function run(args: unknown): Promise<unknown> {
+  return runTool('solari.browse', args);
+}
+
+export async function runTool(toolName: string, args: unknown): Promise<unknown> {
   const key = process.env[env]!;
   const baseUrl = process.env.SOLARI_BASE_URL ?? defaultBaseUrl;
-  // Solari's hosted API is sponsor-provided and must be confirmed at the booth.
-  return postJson({ vendor: 'solari', url: `${baseUrl}/v1/browse`, apiKey: key, headers: bearer(key), body: args });
+  // Solari's hosted API is sponsor-provided; the path is isolated here for easy booth-time correction.
+  const path = toolName === 'solari.act'
+    ? '/v1/act'
+    : toolName === 'solari.extract'
+      ? '/v1/extract'
+      : toolName === 'solari.screenshot'
+        ? '/v1/screenshot'
+        : '/v1/browse';
+  return postJson({ vendor: 'solari', url: `${baseUrl}${path}`, apiKey: key, headers: bearer(key), body: args });
 }

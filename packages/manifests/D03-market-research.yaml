@@ -10,6 +10,7 @@ head:
     - web_fetch
     - apify.run_actor
     - solari.browse
+    - solari.extract
     - calc
     - memory_read
     - memory_write
@@ -29,6 +30,7 @@ workers:
       - web_fetch
       - apify.run_actor
       - solari.browse
+      - solari.extract
       - calc
       - memory_read
       - memory_write
@@ -42,6 +44,7 @@ workers:
       - web_fetch
       - apify.run_actor
       - solari.browse
+      - solari.extract
       - calc
       - memory_read
       - memory_write
@@ -55,6 +58,7 @@ workers:
       - web_fetch
       - apify.run_actor
       - solari.browse
+      - solari.extract
       - calc
       - memory_read
       - memory_write
@@ -68,8 +72,11 @@ workers:
       - web_fetch
       - apify.run_actor
       - solari.browse
+      - solari.extract
       - calc
       - memory_read
+      - solari.browse
+      - solari.extract
       - memory_write
     max_tokens_per_run: 60000
   - agent_id: market.source-validator

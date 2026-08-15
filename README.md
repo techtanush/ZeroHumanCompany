@@ -66,6 +66,19 @@ For real `simpop.*` tools, run `pnpm dev:simpop` and keep `SIMPOP_URL=http://loc
 For real `leadgen.*`, `crm.upsert`, `support.upsert_ticket`, and `metrics.record_signal`,
 point `BUSINESS_TOOLS_URL` at an internal gateway; otherwise they use deterministic mocks.
 
+Founder phone approvals are ready through Linq: set `LINQ_API_KEY`, optional `LINQ_BASE_URL`,
+`LINQ_WEBHOOK_SECRET`, and `FOUNDER_PHONE`, then use gates with `channel:"linq"`. The kernel texts
+the founder when the gate opens and Linq webhooks can approve/reject by reply.
+
+Solari/computer-use is ready behind `solari.browse`, `solari.act`, `solari.extract`, and
+`solari.screenshot`. Set `SOLARI_API_KEY` and `SOLARI_BASE_URL` once Pinetree/Solari gives the
+hosted endpoint; without them the same guarded task interface uses mocks.
+
+ElevenLabs voice is ready behind `elevenlabs.clone_voice`, `elevenlabs.create_agent`,
+`elevenlabs.place_call`, `elevenlabs.transcribe`, `elevenlabs.tts`, and `elevenlabs.delete_voice`.
+Set `ELEVENLABS_API_KEY`; add `ELEVENLABS_VOICE_ID` after founder consent/clone, plus
+`ELEVENLABS_AGENT_ID` and `ELEVENLABS_PHONE_NUMBER_ID` for outbound calling.
+
 ## Database
 
 Local dev uses PGlite and needs nothing installed. For real Postgres:

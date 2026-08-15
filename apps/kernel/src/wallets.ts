@@ -60,7 +60,7 @@ export class Wallets {
     form.set('line_items[0][quantity]', '1');
     form.set('line_items[0][price_data][currency]', 'usd');
     form.set('line_items[0][price_data][unit_amount]', String(cents));
-    form.set('line_items[0][price_data][product_data][name]', 'Zeroth agent wallet top-up');
+    form.set('line_items[0][price_data][product_data][name]', `${process.env.COMPANY_NAME ?? 'YCBF'} agent wallet top-up`);
     form.set('metadata[venture_id]', venture_id);
     form.set('metadata[kind]', 'wallet_topup');
     const res = await fetch('https://api.stripe.com/v1/checkout/sessions', { method: 'POST', headers: { authorization: `Basic ${Buffer.from(`${key}:`).toString('base64')}`, 'content-type': 'application/x-www-form-urlencoded' }, body: form });

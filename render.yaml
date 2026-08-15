@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: zerohuman-kernel
+    name: ycbf-kernel
     runtime: node
     plan: free
     autoDeploy: true
@@ -10,6 +10,10 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 22
+      - key: NODE_OPTIONS
+        value: "--max-old-space-size=384"
+      - key: PORT
+        value: "10000"
       - key: ZEROTH_ENV
         value: prod
       - key: ZEROTH_TOOLS
@@ -22,6 +26,8 @@ services:
         value: off
       - key: KERNEL_URL
         value: https://zerohuman-kernel.onrender.com
+      - key: COMPANY_NAME
+        value: YCBF
       - key: KERNEL_SHARED_TOKEN
         sync: false
       - key: KERNEL_SIGNING_KEY

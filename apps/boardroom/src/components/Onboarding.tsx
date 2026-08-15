@@ -15,6 +15,7 @@ import { toE164 } from '../lib/phone';
  */
 const STEPS = ['You', 'Phone', 'Idea', 'Budget', 'Workspace', 'Schedule', 'Integrations', 'Voice', 'Launch'] as const;
 const TZ_GUESS = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Los_Angeles';
+const ALL_DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
 // Module-level so React keeps the same component identity across renders;
 // defining it inside Onboarding remounted every input on each keystroke
@@ -51,7 +52,7 @@ export function Onboarding({ onDone, initialProfile }: { onDone: () => void; ini
     try {
       // FOUNDER_PHONE is written to .env so gates reach this phone from now on.
       await api.setVar('FOUNDER_PHONE', phoneE164).catch(() => undefined);
-      const r = await api.linqTest({ to: phoneE164, text: `HELLO ${f.display_name || 'founder'} 👋 — this is Zeroth, your AI company. Approvals and alerts will arrive here. Reply YES to confirm.` });
+      const r = await api.linqTest({ to: phoneE164, text: `HELLO ${f.display_name || 'founder'} - this is YCBF, your AI company. Approvals and alerts will arrive here. Reply YES to confirm.` });
       setLinq({ sent: true, ok: r.ok, detail: r.ok ? `Sent to ${r.to}` : (r.degraded ?? r.detail), confirmed: false });
       toast(r.ok ? 'HELLO sent — check your phone' : `Linq: ${r.degraded ?? r.detail}`, r.ok ? 'ok' : 'warn');
     } finally { setLinqBusy(false); }
@@ -104,12 +105,12 @@ export function Onboarding({ onDone, initialProfile }: { onDone: () => void; ini
     onDone();
   };
 
-  const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+  const twentyFourSeven = sched.work_start === '00:00' && sched.work_end === '23:59' && ALL_DAYS.every((d) => sched.days.includes(d));
 
   return (
     <div className="onboard">
       <aside className="onboard-side">
-        <div><div className="brand">Zeroth</div><div className="spec muted">The AI-run company · onboarding</div></div>
+        <div><div className="brand">YCBF</div><div className="spec muted">The AI-run company · onboarding</div></div>
         <div className="steps">
           {STEPS.map((s, i) => <button key={s} className={`${i === step ? 'active' : ''} ${i < step ? 'done' : ''}`} onClick={() => i <= step && setStep(i)}><span className="n">{i < step ? '✓' : i + 1}</span>{s}</button>)}
         </div>
@@ -122,7 +123,7 @@ export function Onboarding({ onDone, initialProfile }: { onDone: () => void; ini
         <div className="onboard-body">
           {step === 0 && (<>
             <h1>Who is the founder?</h1>
-            <p className="lede">Zeroth builds a company around <i>you</i>: it interviews you, researches the market, calls people in your voice, builds, sells, and hires humans when it must. It needs to know who it works for.</p>
+            <p className="lede">YCBF builds a company around <i>you</i>: it interviews you, researches the market, calls people in your voice, builds, sells, and hires humans when it must. It needs to know who it works for.</p>
             <div className="grid2">
               <Field label="Name"><input className="input" value={f.display_name} onChange={(e) => setF({ ...f, display_name: e.target.value })} placeholder="Ada Lovelace" autoFocus /></Field>
               <Field label="Email"><input className="input" type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} placeholder="ada@example.com" /></Field>
@@ -173,6 +174,20 @@ export function Onboarding({ onDone, initialProfile }: { onDone: () => void; ini
           {step === 5 && (<>
             <h1>When does the company work and meet?</h1>
             <p className="lede">Heads meet the CEO each morning to set goals; the leads address the whole company at the all-hands (every agent gathers in the boardroom); the improvement branch reviews the day after hours.</p>
+            <div className="row wrap mb" style={{ gap: 8 }}>
+              <button
+                className={`btn ${twentyFourSeven ? 'primary' : ''}`}
+                onClick={() => setSched({ ...sched, work_start: '00:00', work_end: '23:59', days: ALL_DAYS })}
+              >
+                24/7 agents
+              </button>
+              <button
+                className={`btn ${!twentyFourSeven ? 'primary' : ''}`}
+                onClick={() => setSched({ ...sched, work_start: '09:00', work_end: '17:00', days: ['mon', 'tue', 'wed', 'thu', 'fri'] })}
+              >
+                Business hours
+              </button>
+            </div>
             <div className="grid3">
               <Field label="Timezone"><input className="input" value={sched.timezone} onChange={(e) => setSched({ ...sched, timezone: e.target.value })} list="tzs" /></Field>
               <Field label="Workday starts"><input className="input" type="time" value={sched.work_start} onChange={(e) => setSched({ ...sched, work_start: e.target.value })} /></Field>
@@ -181,7 +196,7 @@ export function Onboarding({ onDone, initialProfile }: { onDone: () => void; ini
               <Field label="All-hands (whole company)"><input className="input" type="time" value={sched.all_hands_time} onChange={(e) => setSched({ ...sched, all_hands_time: e.target.value })} /></Field>
               <Field label="Improvement branch"><input className="input" type="time" value={sched.improvement_time} onChange={(e) => setSched({ ...sched, improvement_time: e.target.value })} /></Field>
             </div>
-            <div className="field"><span className="spec muted">Days</span><div className="row wrap" style={{ gap: 6 }}>{DAYS.map((d) => <button key={d} className={`btn sm ${sched.days.includes(d) ? 'primary' : ''}`} onClick={() => setSched({ ...sched, days: sched.days.includes(d) ? sched.days.filter((x) => x !== d) : [...sched.days, d] })}>{d}</button>)}</div></div>
+            <div className="field"><span className="spec muted">Days</span><div className="row wrap" style={{ gap: 6 }}>{ALL_DAYS.map((d) => <button key={d} className={`btn sm ${sched.days.includes(d) ? 'primary' : ''}`} onClick={() => setSched({ ...sched, days: sched.days.includes(d) ? sched.days.filter((x) => x !== d) : [...sched.days, d] })}>{d}</button>)}</div></div>
           </>)}
           {step === 6 && (<>
             <h1>Connect the company's tools.</h1>

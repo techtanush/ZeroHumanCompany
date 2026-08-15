@@ -7,7 +7,7 @@ import { nowIso } from './util.js';
 
 export const VOICE_CONSENT_TEXT_V1 = [
   'I am the founder and this is my own voice.',
-  'I allow Zeroth to clone my voice for THIS venture\'s discovery and sales calls only.',
+  'I allow YCBF to clone my voice for THIS venture\'s discovery and sales calls only.',
   'Every call made in my voice must disclose that it is an AI in the first utterance.',
   'I can revoke this consent at any time; the clone is then deleted from ElevenLabs.',
 ].join(' ');
@@ -62,7 +62,7 @@ export class VoiceService {
     const plane = new ToolPlane({ driver: this.toolDriver(), onCall: (ev) => { if (ev.type === 'degraded') degraded = ev.reason; } });
     const ctx = { venture_id, department_id: 'D04', agent_id: 'founder', budget: { record() {} }, requestGate: async () => true };
     const [tool] = plane.build(['elevenlabs.clone_voice'], ctx);
-    const result = (await tool.run({ name: input.name ?? 'Founder voice', consent_event_id: s.voice.consent_event_id, audio_base64: input.audio_base64, mime_type: input.mime_type ?? 'audio/webm', description: `Zeroth venture ${venture_id}` }, ctx)) as any;
+    const result = (await tool.run({ name: input.name ?? 'Founder voice', consent_event_id: s.voice.consent_event_id, audio_base64: input.audio_base64, mime_type: input.mime_type ?? 'audio/webm', description: `${process.env.COMPANY_NAME ?? 'YCBF'} venture ${venture_id}` }, ctx)) as any;
     const voice_id = String(result?.voice_id ?? result?.voiceId ?? '');
     if (!voice_id) throw new Error('clone returned no voice_id');
     await setIntegrationVar('ELEVENLABS_VOICE_ID', voice_id).catch(() => undefined);

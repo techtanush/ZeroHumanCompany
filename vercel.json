@@ -1,0 +1,8 @@
+{
+  "buildCommand": "corepack pnpm@9.15.4 install --frozen-lockfile --prod=false && corepack pnpm@9.15.4 -F @zeroth/boardroom build",
+  "outputDirectory": "apps/boardroom/dist",
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

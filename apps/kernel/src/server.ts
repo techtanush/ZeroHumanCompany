@@ -23,6 +23,10 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   const { kernel } = opts;
   const token = opts.token ?? process.env.KERNEL_SHARED_TOKEN ?? 'dev-only-token';
   const app = Fastify({ logger: opts.logger ?? false });
+  const allowedOrigins = (process.env.CORS_ORIGINS ?? process.env.BOARDROOM_URL ?? '*')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
 
   app.addContentTypeParser('application/json', { parseAs: 'string' }, (_req, body, done) => {
     try {
@@ -48,6 +52,18 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   });
 
   app.addHook('onRequest', async (req, reply) => {
+    const origin = req.headers.origin;
+    const allowOrigin =
+      !origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin)
+        ? (origin ?? '*')
+        : (allowedOrigins[0] ?? origin);
+    reply.header('Access-Control-Allow-Origin', allowOrigin);
+    reply.header('Vary', 'Origin');
+    reply.header('Access-Control-Allow-Headers', 'authorization,content-type,x-trace-id,accept');
+    reply.header('Access-Control-Allow-Methods', 'GET,POST,PUT,OPTIONS');
+    if (req.method === 'OPTIONS') {
+      return reply.code(204).send();
+    }
     if (req.url.startsWith('/health') || req.url.startsWith('/v1/webhooks/')) return;
     const auth = req.headers.authorization ?? '';
     if (auth !== `Bearer ${token}`) {
@@ -471,7 +487,7 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   app.post('/v1/integrations/linq/test-message', async (req) => {
     const b = unwrapBody(req.body) as { to?: string; text?: string; venture_id?: string };
     const to = b.to ?? process.env.FOUNDER_PHONE ?? '';
-    const r = await sendLinqText(to, b.text ?? 'HELLO from Zeroth 👋 — your AI company can reach you here. Reply YES to confirm.', { kind: 'onboarding_test', venture_id: b.venture_id });
+    const r = await sendLinqText(to, b.text ?? 'HELLO from YCBF - your AI company can reach you here. Reply YES to confirm.', { kind: 'onboarding_test', venture_id: b.venture_id });
     if (b.venture_id) {
       await kernel.settings.update(b.venture_id, { linq_test_message: { sent_at: nowIso(), delivered: r.ok, degraded: r.degraded } }).catch(() => undefined);
       await kernel.events.append({ venture_id: b.venture_id, type: 'human.notified', actor_kind: 'system', actor_id: 'kernel.integrations', payload: { channel: 'linq', kind: 'onboarding_test', delivered: r.ok, degraded: r.degraded }, trace_id: await kernel.traceFor(b.venture_id) }).catch(() => undefined);

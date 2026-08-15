@@ -4,8 +4,12 @@ export const TOKEN_KEY = 'zeroth.kernel_token';
 export const VENTURE_KEY = 'zeroth.venture_id';
 export const KERNEL_URL_KEY = 'zeroth.kernel_url';
 
-export function kernelToken(): string { return localStorage.getItem(TOKEN_KEY) || 'dev-only-token'; }
-export function kernelBase(): string { return localStorage.getItem(KERNEL_URL_KEY) || ''; }
+const env = (import.meta as any).env ?? {};
+const defaultKernelUrl = env.VITE_KERNEL_URL ?? '';
+const defaultKernelToken = env.VITE_KERNEL_SHARED_TOKEN ?? 'dev-only-token';
+
+export function kernelToken(): string { return localStorage.getItem(TOKEN_KEY) || defaultKernelToken; }
+export function kernelBase(): string { return localStorage.getItem(KERNEL_URL_KEY) || defaultKernelUrl; }
 
 export class ApiError extends Error {
   constructor(public status: number, public code: string, message: string, public details?: unknown) { super(message); }

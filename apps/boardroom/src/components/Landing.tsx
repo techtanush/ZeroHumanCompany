@@ -31,7 +31,7 @@ export function Landing({ onStart }: LandingProps) {
     <div className="landing">
       <section className="landing-hero">
         <div className="landing-copy">
-          <div className="brand-mark">Zeroth</div>
+          <div className="brand-mark">YCBF</div>
           <h1>Your zero-human company, with you still in control.</h1>
           <p>
             Thirteen specialist departments research, build, sell, support, hire and improve the company.

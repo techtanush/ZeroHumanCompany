@@ -1,0 +1,4002 @@
+[
+  {
+    "age": 18,
+    "sex": "male",
+    "income": 21900,
+    "education": "high_school",
+    "occupation": "student",
+    "household_size": 1,
+    "region": "CA-Bay-Area",
+    "PWGTP": 89
+  },
+  {
+    "age": 54,
+    "sex": "female",
+    "income": 54400,
+    "education": "high_school",
+    "occupation": "sales",
+    "household_size": 2,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 226
+  },
+  {
+    "age": 21,
+    "sex": "male",
+    "income": 95600,
+    "education": "graduate",
+    "occupation": "transportation",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 156
+  },
+  {
+    "age": 59,
+    "sex": "female",
+    "income": 70000,
+    "education": "bachelors",
+    "occupation": "service",
+    "household_size": 3,
+    "region": "CA-San-Diego",
+    "PWGTP": 299
+  },
+  {
+    "age": 27,
+    "sex": "male",
+    "income": 53100,
+    "education": "high_school",
+    "occupation": "transportation",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 232
+  },
+  {
+    "age": 64,
+    "sex": "female",
+    "income": 120300,
+    "education": "high_school",
+    "occupation": "management",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 372
+  },
+  {
+    "age": 32,
+    "sex": "male",
+    "income": 81800,
+    "education": "graduate",
+    "occupation": "production",
+    "household_size": 3,
+    "region": "CA-Sacramento",
+    "PWGTP": 305
+  },
+  {
+    "age": 65,
+    "sex": "female",
+    "income": 101400,
+    "education": "bachelors",
+    "occupation": "production",
+    "household_size": 1,
+    "region": "CA-San-Diego",
+    "PWGTP": 433
+  },
+  {
+    "age": 33,
+    "sex": "male",
+    "income": 105900,
+    "education": "high_school",
+    "occupation": "management",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 366
+  },
+  {
+    "age": 70,
+    "sex": "female",
+    "income": 34900,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 86
+  },
+  {
+    "age": 38,
+    "sex": "male",
+    "income": 170100,
+    "education": "bachelors",
+    "occupation": "software",
+    "household_size": 1,
+    "region": "CA-Sacramento",
+    "PWGTP": 439
+  },
+  {
+    "age": 76,
+    "sex": "female",
+    "income": 75100,
+    "education": "bachelors",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-San-Diego",
+    "PWGTP": 162
+  },
+  {
+    "age": 43,
+    "sex": "male",
+    "income": 64100,
+    "education": "high_school",
+    "occupation": "education",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 92
+  },
+  {
+    "age": 81,
+    "sex": "female",
+    "income": 42600,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 5,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 235
+  },
+  {
+    "age": 44,
+    "sex": "male",
+    "income": 72500,
+    "education": "bachelors",
+    "occupation": "admin",
+    "household_size": 5,
+    "region": "CA-Sacramento",
+    "PWGTP": 153
+  },
+  {
+    "age": 82,
+    "sex": "female",
+    "income": 68300,
+    "education": "bachelors",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 296
+  },
+  {
+    "age": 49,
+    "sex": "male",
+    "income": 55900,
+    "education": "less_than_hs",
+    "occupation": "sales",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 226
+  },
+  {
+    "age": 87,
+    "sex": "female",
+    "income": 29500,
+    "education": "less_than_hs",
+    "occupation": "retired",
+    "household_size": 3,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 369
+  },
+  {
+    "age": 55,
+    "sex": "male",
+    "income": 99100,
+    "education": "bachelors",
+    "occupation": "sales",
+    "household_size": 2,
+    "region": "CA-Sacramento",
+    "PWGTP": 302
+  },
+  {
+    "age": 22,
+    "sex": "female",
+    "income": 46900,
+    "education": "high_school",
+    "occupation": "transportation",
+    "household_size": 6,
+    "region": "CA-San-Diego",
+    "PWGTP": 232
+  },
+  {
+    "age": 60,
+    "sex": "male",
+    "income": 53900,
+    "education": "high_school",
+    "occupation": "service",
+    "household_size": 3,
+    "region": "CA-Bay-Area",
+    "PWGTP": 375
+  },
+  {
+    "age": 23,
+    "sex": "female",
+    "income": 57200,
+    "education": "bachelors",
+    "occupation": "service",
+    "household_size": 3,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 293
+  },
+  {
+    "age": 61,
+    "sex": "male",
+    "income": 117600,
+    "education": "bachelors",
+    "occupation": "transportation",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 436
+  },
+  {
+    "age": 28,
+    "sex": "female",
+    "income": 54700,
+    "education": "less_than_hs",
+    "occupation": "management",
+    "household_size": 4,
+    "region": "CA-San-Diego",
+    "PWGTP": 366
+  },
+  {
+    "age": 66,
+    "sex": "male",
+    "income": 58200,
+    "education": "less_than_hs",
+    "occupation": "production",
+    "household_size": 1,
+    "region": "CA-Bay-Area",
+    "PWGTP": 89
+  },
+  {
+    "age": 34,
+    "sex": "female",
+    "income": 170200,
+    "education": "bachelors",
+    "occupation": "management",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 442
+  },
+  {
+    "age": 71,
+    "sex": "male",
+    "income": 63900,
+    "education": "bachelors",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 162
+  },
+  {
+    "age": 39,
+    "sex": "female",
+    "income": 88400,
+    "education": "less_than_hs",
+    "occupation": "software",
+    "household_size": 1,
+    "region": "CA-Bay-Area",
+    "PWGTP": 95
+  },
+  {
+    "age": 72,
+    "sex": "male",
+    "income": 27700,
+    "education": "less_than_hs",
+    "occupation": "retired",
+    "household_size": 5,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 223
+  },
+  {
+    "age": 40,
+    "sex": "female",
+    "income": 92000,
+    "education": "bachelors",
+    "occupation": "construction",
+    "household_size": 4,
+    "region": "CA-Sacramento",
+    "PWGTP": 156
+  },
+  {
+    "age": 77,
+    "sex": "male",
+    "income": 52000,
+    "education": "some_college",
+    "occupation": "retired",
+    "household_size": 6,
+    "region": "CA-San-Diego",
+    "PWGTP": 296
+  },
+  {
+    "age": 45,
+    "sex": "female",
+    "income": 42600,
+    "education": "less_than_hs",
+    "occupation": "admin",
+    "household_size": 5,
+    "region": "CA-Bay-Area",
+    "PWGTP": 229
+  },
+  {
+    "age": 83,
+    "sex": "male",
+    "income": 33600,
+    "education": "less_than_hs",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 372
+  },
+  {
+    "age": 50,
+    "sex": "female",
+    "income": 105100,
+    "education": "bachelors",
+    "occupation": "sales",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 302
+  },
+  {
+    "age": 88,
+    "sex": "male",
+    "income": 49000,
+    "education": "some_college",
+    "occupation": "retired",
+    "household_size": 3,
+    "region": "CA-San-Diego",
+    "PWGTP": 445
+  },
+  {
+    "age": 51,
+    "sex": "female",
+    "income": 66500,
+    "education": "less_than_hs",
+    "occupation": "healthcare",
+    "household_size": 3,
+    "region": "CA-Bay-Area",
+    "PWGTP": 363
+  },
+  {
+    "age": 19,
+    "sex": "male",
+    "income": 22400,
+    "education": "some_college",
+    "occupation": "student",
+    "household_size": 2,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 296
+  },
+  {
+    "age": 56,
+    "sex": "female",
+    "income": 64300,
+    "education": "some_college",
+    "occupation": "transportation",
+    "household_size": 4,
+    "region": "CA-Sacramento",
+    "PWGTP": 436
+  },
+  {
+    "age": 24,
+    "sex": "male",
+    "income": 29000,
+    "education": "less_than_hs",
+    "occupation": "service",
+    "household_size": 3,
+    "region": "CA-San-Diego",
+    "PWGTP": 369
+  },
+  {
+    "age": 62,
+    "sex": "female",
+    "income": 49300,
+    "education": "less_than_hs",
+    "occupation": "transportation",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 92
+  },
+  {
+    "age": 29,
+    "sex": "male",
+    "income": 91500,
+    "education": "some_college",
+    "occupation": "management",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 442
+  },
+  {
+    "age": 67,
+    "sex": "female",
+    "income": 75800,
+    "education": "some_college",
+    "occupation": "production",
+    "household_size": 1,
+    "region": "CA-Sacramento",
+    "PWGTP": 165
+  },
+  {
+    "age": 30,
+    "sex": "male",
+    "income": 29400,
+    "education": "less_than_hs",
+    "occupation": "production",
+    "household_size": 1,
+    "region": "CA-San-Diego",
+    "PWGTP": 83
+  },
+  {
+    "age": 68,
+    "sex": "female",
+    "income": 240000,
+    "education": "graduate",
+    "occupation": "management",
+    "household_size": 4,
+    "region": "CA-Bay-Area",
+    "PWGTP": 226
+  },
+  {
+    "age": 35,
+    "sex": "male",
+    "income": 71200,
+    "education": "some_college",
+    "occupation": "construction",
+    "household_size": 2,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 156
+  },
+  {
+    "age": 73,
+    "sex": "female",
+    "income": 41600,
+    "education": "some_college",
+    "occupation": "retired",
+    "household_size": 5,
+    "region": "CA-Sacramento",
+    "PWGTP": 299
+  },
+  {
+    "age": 41,
+    "sex": "male",
+    "income": 45300,
+    "education": "less_than_hs",
+    "occupation": "construction",
+    "household_size": 4,
+    "region": "CA-San-Diego",
+    "PWGTP": 232
+  },
+  {
+    "age": 78,
+    "sex": "female",
+    "income": 102600,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 372
+  },
+  {
+    "age": 46,
+    "sex": "male",
+    "income": 56400,
+    "education": "some_college",
+    "occupation": "admin",
+    "household_size": 5,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 305
+  },
+  {
+    "age": 79,
+    "sex": "female",
+    "income": 41600,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 3,
+    "region": "CA-Sacramento",
+    "PWGTP": 433
+  },
+  {
+    "age": 47,
+    "sex": "male",
+    "income": 156500,
+    "education": "graduate",
+    "occupation": "education",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 366
+  },
+  {
+    "age": 84,
+    "sex": "female",
+    "income": 85100,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 86
+  },
+  {
+    "age": 52,
+    "sex": "male",
+    "income": 94300,
+    "education": "some_college",
+    "occupation": "healthcare",
+    "household_size": 3,
+    "region": "CA-Sacramento",
+    "PWGTP": 439
+  },
+  {
+    "age": 20,
+    "sex": "female",
+    "income": 24800,
+    "education": "less_than_hs",
+    "occupation": "sales",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 372
+  },
+  {
+    "age": 57,
+    "sex": "male",
+    "income": 132200,
+    "education": "graduate",
+    "occupation": "transportation",
+    "household_size": 4,
+    "region": "CA-Bay-Area",
+    "PWGTP": 92
+  },
+  {
+    "age": 25,
+    "sex": "female",
+    "income": 44300,
+    "education": "some_college",
+    "occupation": "service",
+    "household_size": 3,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 445
+  },
+  {
+    "age": 58,
+    "sex": "male",
+    "income": 43500,
+    "education": "high_school",
+    "occupation": "service",
+    "household_size": 1,
+    "region": "CA-Sacramento",
+    "PWGTP": 153
+  },
+  {
+    "age": 26,
+    "sex": "female",
+    "income": 91500,
+    "education": "graduate",
+    "occupation": "transportation",
+    "household_size": 6,
+    "region": "CA-San-Diego",
+    "PWGTP": 86
+  },
+  {
+    "age": 63,
+    "sex": "male",
+    "income": 240000,
+    "education": "graduate",
+    "occupation": "management",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 226
+  },
+  {
+    "age": 31,
+    "sex": "female",
+    "income": 45400,
+    "education": "some_college",
+    "occupation": "production",
+    "household_size": 1,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 159
+  },
+  {
+    "age": 69,
+    "sex": "male",
+    "income": 40100,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-Sacramento",
+    "PWGTP": 302
+  },
+  {
+    "age": 36,
+    "sex": "female",
+    "income": 131100,
+    "education": "graduate",
+    "occupation": "construction",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 232
+  },
+  {
+    "age": 74,
+    "sex": "male",
+    "income": 88900,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 5,
+    "region": "CA-Bay-Area",
+    "PWGTP": 375
+  },
+  {
+    "age": 37,
+    "sex": "female",
+    "income": 100400,
+    "education": "high_school",
+    "occupation": "software",
+    "household_size": 5,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 293
+  },
+  {
+    "age": 75,
+    "sex": "male",
+    "income": 36100,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-Sacramento",
+    "PWGTP": 436
+  },
+  {
+    "age": 42,
+    "sex": "female",
+    "income": 114900,
+    "education": "graduate",
+    "occupation": "education",
+    "household_size": 6,
+    "region": "CA-San-Diego",
+    "PWGTP": 366
+  },
+  {
+    "age": 80,
+    "sex": "male",
+    "income": 102100,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 3,
+    "region": "CA-Bay-Area",
+    "PWGTP": 89
+  },
+  {
+    "age": 48,
+    "sex": "female",
+    "income": 52100,
+    "education": "high_school",
+    "occupation": "education",
+    "household_size": 2,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 442
+  },
+  {
+    "age": 85,
+    "sex": "male",
+    "income": 43500,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-Sacramento",
+    "PWGTP": 162
+  },
+  {
+    "age": 53,
+    "sex": "female",
+    "income": 173900,
+    "education": "graduate",
+    "occupation": "healthcare",
+    "household_size": 3,
+    "region": "CA-San-Diego",
+    "PWGTP": 95
+  },
+  {
+    "age": 18,
+    "sex": "male",
+    "income": 76000,
+    "education": "high_school",
+    "occupation": "software",
+    "household_size": 5,
+    "region": "CA-Bay-Area",
+    "PWGTP": 439
+  },
+  {
+    "age": 54,
+    "sex": "female",
+    "income": 57900,
+    "education": "high_school",
+    "occupation": "sales",
+    "household_size": 6,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 156
+  },
+  {
+    "age": 21,
+    "sex": "male",
+    "income": 39100,
+    "education": "graduate",
+    "occupation": "student",
+    "household_size": 4,
+    "region": "CA-Sacramento",
+    "PWGTP": 86
+  },
+  {
+    "age": 59,
+    "sex": "female",
+    "income": 74700,
+    "education": "bachelors",
+    "occupation": "service",
+    "household_size": 1,
+    "region": "CA-San-Diego",
+    "PWGTP": 229
+  },
+  {
+    "age": 27,
+    "sex": "male",
+    "income": 56600,
+    "education": "high_school",
+    "occupation": "transportation",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 162
+  },
+  {
+    "age": 64,
+    "sex": "female",
+    "income": 126600,
+    "education": "high_school",
+    "occupation": "management",
+    "household_size": 2,
+    "region": "CA-Sacramento",
+    "PWGTP": 302
+  },
+  {
+    "age": 32,
+    "sex": "male",
+    "income": 88800,
+    "education": "graduate",
+    "occupation": "production",
+    "household_size": 1,
+    "region": "CA-San-Diego",
+    "PWGTP": 235
+  },
+  {
+    "age": 65,
+    "sex": "female",
+    "income": 116100,
+    "education": "bachelors",
+    "occupation": "production",
+    "household_size": 5,
+    "region": "CA-Bay-Area",
+    "PWGTP": 363
+  },
+  {
+    "age": 33,
+    "sex": "male",
+    "income": 71400,
+    "education": "high_school",
+    "occupation": "management",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 296
+  },
+  {
+    "age": 70,
+    "sex": "female",
+    "income": 36900,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 436
+  },
+  {
+    "age": 38,
+    "sex": "male",
+    "income": 181700,
+    "education": "bachelors",
+    "occupation": "software",
+    "household_size": 5,
+    "region": "CA-San-Diego",
+    "PWGTP": 369
+  },
+  {
+    "age": 76,
+    "sex": "female",
+    "income": 70100,
+    "education": "bachelors",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 92
+  },
+  {
+    "age": 43,
+    "sex": "male",
+    "income": 58900,
+    "education": "high_school",
+    "occupation": "education",
+    "household_size": 6,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 442
+  },
+  {
+    "age": 81,
+    "sex": "female",
+    "income": 44600,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 3,
+    "region": "CA-Sacramento",
+    "PWGTP": 165
+  },
+  {
+    "age": 44,
+    "sex": "male",
+    "income": 78100,
+    "education": "bachelors",
+    "occupation": "admin",
+    "household_size": 3,
+    "region": "CA-San-Diego",
+    "PWGTP": 83
+  },
+  {
+    "age": 82,
+    "sex": "female",
+    "income": 80700,
+    "education": "bachelors",
+    "occupation": "retired",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 226
+  },
+  {
+    "age": 49,
+    "sex": "male",
+    "income": 49600,
+    "education": "less_than_hs",
+    "occupation": "sales",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 156
+  },
+  {
+    "age": 87,
+    "sex": "female",
+    "income": 31100,
+    "education": "less_than_hs",
+    "occupation": "retired",
+    "household_size": 1,
+    "region": "CA-Sacramento",
+    "PWGTP": 299
+  },
+  {
+    "age": 55,
+    "sex": "male",
+    "income": 105100,
+    "education": "bachelors",
+    "occupation": "sales",
+    "household_size": 6,
+    "region": "CA-San-Diego",
+    "PWGTP": 232
+  },
+  {
+    "age": 22,
+    "sex": "female",
+    "income": 41600,
+    "education": "high_school",
+    "occupation": "transportation",
+    "household_size": 4,
+    "region": "CA-Bay-Area",
+    "PWGTP": 162
+  },
+  {
+    "age": 60,
+    "sex": "male",
+    "income": 47600,
+    "education": "high_school",
+    "occupation": "service",
+    "household_size": 1,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 305
+  },
+  {
+    "age": 23,
+    "sex": "female",
+    "income": 61900,
+    "education": "bachelors",
+    "occupation": "service",
+    "household_size": 1,
+    "region": "CA-Sacramento",
+    "PWGTP": 223
+  },
+  {
+    "age": 61,
+    "sex": "male",
+    "income": 93200,
+    "education": "bachelors",
+    "occupation": "transportation",
+    "household_size": 4,
+    "region": "CA-San-Diego",
+    "PWGTP": 366
+  },
+  {
+    "age": 28,
+    "sex": "female",
+    "income": 68500,
+    "education": "less_than_hs",
+    "occupation": "management",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 296
+  },
+  {
+    "age": 66,
+    "sex": "male",
+    "income": 51700,
+    "education": "less_than_hs",
+    "occupation": "production",
+    "household_size": 5,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 439
+  },
+  {
+    "age": 34,
+    "sex": "female",
+    "income": 126700,
+    "education": "bachelors",
+    "occupation": "management",
+    "household_size": 4,
+    "region": "CA-Sacramento",
+    "PWGTP": 372
+  },
+  {
+    "age": 71,
+    "sex": "male",
+    "income": 67400,
+    "education": "bachelors",
+    "occupation": "retired",
+    "household_size": 6,
+    "region": "CA-San-Diego",
+    "PWGTP": 92
+  },
+  {
+    "age": 39,
+    "sex": "female",
+    "income": 93600,
+    "education": "less_than_hs",
+    "occupation": "software",
+    "household_size": 5,
+    "region": "CA-Bay-Area",
+    "PWGTP": 445
+  },
+  {
+    "age": 72,
+    "sex": "male",
+    "income": 29200,
+    "education": "less_than_hs",
+    "occupation": "retired",
+    "household_size": 3,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 153
+  },
+  {
+    "age": 40,
+    "sex": "female",
+    "income": 98600,
+    "education": "bachelors",
+    "occupation": "construction",
+    "household_size": 2,
+    "region": "CA-Sacramento",
+    "PWGTP": 86
+  },
+  {
+    "age": 77,
+    "sex": "male",
+    "income": 63400,
+    "education": "some_college",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-Bay-Area",
+    "PWGTP": 226
+  },
+  {
+    "age": 45,
+    "sex": "female",
+    "income": 36100,
+    "education": "less_than_hs",
+    "occupation": "admin",
+    "household_size": 3,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 159
+  },
+  {
+    "age": 83,
+    "sex": "male",
+    "income": 35100,
+    "education": "less_than_hs",
+    "occupation": "retired",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 302
+  },
+  {
+    "age": 50,
+    "sex": "female",
+    "income": 80800,
+    "education": "bachelors",
+    "occupation": "sales",
+    "household_size": 4,
+    "region": "CA-San-Diego",
+    "PWGTP": 232
+  },
+  {
+    "age": 88,
+    "sex": "male",
+    "income": 60400,
+    "education": "some_college",
+    "occupation": "retired",
+    "household_size": 1,
+    "region": "CA-Bay-Area",
+    "PWGTP": 375
+  },
+  {
+    "age": 51,
+    "sex": "female",
+    "income": 61000,
+    "education": "less_than_hs",
+    "occupation": "healthcare",
+    "household_size": 1,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 293
+  },
+  {
+    "age": 19,
+    "sex": "male",
+    "income": 40900,
+    "education": "some_college",
+    "occupation": "sales",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 226
+  },
+  {
+    "age": 56,
+    "sex": "female",
+    "income": 68500,
+    "education": "some_college",
+    "occupation": "transportation",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 366
+  },
+  {
+    "age": 24,
+    "sex": "male",
+    "income": 40100,
+    "education": "less_than_hs",
+    "occupation": "service",
+    "household_size": 1,
+    "region": "CA-Bay-Area",
+    "PWGTP": 299
+  },
+  {
+    "age": 62,
+    "sex": "female",
+    "income": 43000,
+    "education": "less_than_hs",
+    "occupation": "transportation",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 442
+  },
+  {
+    "age": 29,
+    "sex": "male",
+    "income": 98800,
+    "education": "some_college",
+    "occupation": "management",
+    "household_size": 2,
+    "region": "CA-Sacramento",
+    "PWGTP": 372
+  },
+  {
+    "age": 67,
+    "sex": "female",
+    "income": 79700,
+    "education": "some_college",
+    "occupation": "production",
+    "household_size": 5,
+    "region": "CA-San-Diego",
+    "PWGTP": 95
+  },
+  {
+    "age": 30,
+    "sex": "male",
+    "income": 40900,
+    "education": "less_than_hs",
+    "occupation": "production",
+    "household_size": 5,
+    "region": "CA-Bay-Area",
+    "PWGTP": 433
+  },
+  {
+    "age": 68,
+    "sex": "female",
+    "income": 240000,
+    "education": "graduate",
+    "occupation": "management",
+    "household_size": 2,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 156
+  },
+  {
+    "age": 35,
+    "sex": "male",
+    "income": 52700,
+    "education": "some_college",
+    "occupation": "construction",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 86
+  },
+  {
+    "age": 73,
+    "sex": "female",
+    "income": 44000,
+    "education": "some_college",
+    "occupation": "retired",
+    "household_size": 3,
+    "region": "CA-San-Diego",
+    "PWGTP": 229
+  },
+  {
+    "age": 41,
+    "sex": "male",
+    "income": 57200,
+    "education": "less_than_hs",
+    "occupation": "construction",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 162
+  },
+  {
+    "age": 78,
+    "sex": "female",
+    "income": 76100,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 302
+  },
+  {
+    "age": 46,
+    "sex": "male",
+    "income": 60300,
+    "education": "some_college",
+    "occupation": "admin",
+    "household_size": 3,
+    "region": "CA-Sacramento",
+    "PWGTP": 235
+  },
+  {
+    "age": 79,
+    "sex": "female",
+    "income": 43600,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 1,
+    "region": "CA-San-Diego",
+    "PWGTP": 363
+  },
+  {
+    "age": 47,
+    "sex": "male",
+    "income": 123100,
+    "education": "graduate",
+    "occupation": "education",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 296
+  },
+  {
+    "age": 84,
+    "sex": "female",
+    "income": 89400,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 436
+  },
+  {
+    "age": 52,
+    "sex": "male",
+    "income": 99700,
+    "education": "some_college",
+    "occupation": "healthcare",
+    "household_size": 1,
+    "region": "CA-Sacramento",
+    "PWGTP": 369
+  },
+  {
+    "age": 20,
+    "sex": "female",
+    "income": 10100,
+    "education": "less_than_hs",
+    "occupation": "student",
+    "household_size": 6,
+    "region": "CA-San-Diego",
+    "PWGTP": 302
+  },
+  {
+    "age": 57,
+    "sex": "male",
+    "income": 139600,
+    "education": "graduate",
+    "occupation": "transportation",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 442
+  },
+  {
+    "age": 25,
+    "sex": "female",
+    "income": 47500,
+    "education": "some_college",
+    "occupation": "service",
+    "household_size": 1,
+    "region": "CA-Sacramento",
+    "PWGTP": 375
+  },
+  {
+    "age": 58,
+    "sex": "male",
+    "income": 46300,
+    "education": "high_school",
+    "occupation": "service",
+    "household_size": 5,
+    "region": "CA-San-Diego",
+    "PWGTP": 83
+  },
+  {
+    "age": 26,
+    "sex": "female",
+    "income": 107900,
+    "education": "graduate",
+    "occupation": "transportation",
+    "household_size": 4,
+    "region": "CA-Bay-Area",
+    "PWGTP": 436
+  },
+  {
+    "age": 63,
+    "sex": "male",
+    "income": 205900,
+    "education": "graduate",
+    "occupation": "management",
+    "household_size": 6,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 156
+  },
+  {
+    "age": 31,
+    "sex": "female",
+    "income": 49300,
+    "education": "some_college",
+    "occupation": "production",
+    "household_size": 5,
+    "region": "CA-Sacramento",
+    "PWGTP": 89
+  },
+  {
+    "age": 69,
+    "sex": "male",
+    "income": 42100,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 232
+  },
+  {
+    "age": 36,
+    "sex": "female",
+    "income": 106700,
+    "education": "graduate",
+    "occupation": "construction",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 162
+  },
+  {
+    "age": 74,
+    "sex": "male",
+    "income": 84200,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 3,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 305
+  },
+  {
+    "age": 37,
+    "sex": "female",
+    "income": 107200,
+    "education": "high_school",
+    "occupation": "software",
+    "household_size": 3,
+    "region": "CA-Sacramento",
+    "PWGTP": 223
+  },
+  {
+    "age": 75,
+    "sex": "male",
+    "income": 38100,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 6,
+    "region": "CA-San-Diego",
+    "PWGTP": 366
+  },
+  {
+    "age": 42,
+    "sex": "female",
+    "income": 132000,
+    "education": "graduate",
+    "occupation": "education",
+    "household_size": 4,
+    "region": "CA-Bay-Area",
+    "PWGTP": 296
+  },
+  {
+    "age": 80,
+    "sex": "male",
+    "income": 97400,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 1,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 439
+  },
+  {
+    "age": 48,
+    "sex": "female",
+    "income": 55900,
+    "education": "high_school",
+    "occupation": "education",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 372
+  },
+  {
+    "age": 85,
+    "sex": "male",
+    "income": 45500,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 92
+  },
+  {
+    "age": 53,
+    "sex": "female",
+    "income": 143100,
+    "education": "graduate",
+    "occupation": "healthcare",
+    "household_size": 1,
+    "region": "CA-Bay-Area",
+    "PWGTP": 445
+  },
+  {
+    "age": 18,
+    "sex": "male",
+    "income": 73900,
+    "education": "high_school",
+    "occupation": "software",
+    "household_size": 3,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 369
+  },
+  {
+    "age": 54,
+    "sex": "female",
+    "income": 61400,
+    "education": "high_school",
+    "occupation": "sales",
+    "household_size": 4,
+    "region": "CA-Sacramento",
+    "PWGTP": 86
+  },
+  {
+    "age": 21,
+    "sex": "male",
+    "income": 72800,
+    "education": "graduate",
+    "occupation": "transportation",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 436
+  },
+  {
+    "age": 59,
+    "sex": "female",
+    "income": 88400,
+    "education": "bachelors",
+    "occupation": "service",
+    "household_size": 5,
+    "region": "CA-Bay-Area",
+    "PWGTP": 159
+  },
+  {
+    "age": 27,
+    "sex": "male",
+    "income": 51100,
+    "education": "high_school",
+    "occupation": "transportation",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 92
+  },
+  {
+    "age": 64,
+    "sex": "female",
+    "income": 101100,
+    "education": "high_school",
+    "occupation": "management",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 232
+  },
+  {
+    "age": 32,
+    "sex": "male",
+    "income": 95800,
+    "education": "graduate",
+    "occupation": "production",
+    "household_size": 5,
+    "region": "CA-San-Diego",
+    "PWGTP": 165
+  },
+  {
+    "age": 65,
+    "sex": "female",
+    "income": 121700,
+    "education": "bachelors",
+    "occupation": "production",
+    "household_size": 3,
+    "region": "CA-Bay-Area",
+    "PWGTP": 293
+  },
+  {
+    "age": 33,
+    "sex": "male",
+    "income": 77600,
+    "education": "high_school",
+    "occupation": "management",
+    "household_size": 2,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 226
+  },
+  {
+    "age": 70,
+    "sex": "female",
+    "income": 39000,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-Sacramento",
+    "PWGTP": 366
+  },
+  {
+    "age": 38,
+    "sex": "male",
+    "income": 202400,
+    "education": "bachelors",
+    "occupation": "software",
+    "household_size": 3,
+    "region": "CA-Bay-Area",
+    "PWGTP": 299
+  },
+  {
+    "age": 76,
+    "sex": "female",
+    "income": 64500,
+    "education": "bachelors",
+    "occupation": "retired",
+    "household_size": 6,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 442
+  },
+  {
+    "age": 43,
+    "sex": "male",
+    "income": 62800,
+    "education": "high_school",
+    "occupation": "education",
+    "household_size": 4,
+    "region": "CA-Sacramento",
+    "PWGTP": 372
+  },
+  {
+    "age": 81,
+    "sex": "female",
+    "income": 36400,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 1,
+    "region": "CA-San-Diego",
+    "PWGTP": 95
+  },
+  {
+    "age": 44,
+    "sex": "male",
+    "income": 92800,
+    "education": "bachelors",
+    "occupation": "admin",
+    "household_size": 1,
+    "region": "CA-Bay-Area",
+    "PWGTP": 433
+  },
+  {
+    "age": 82,
+    "sex": "female",
+    "income": 75200,
+    "education": "bachelors",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 156
+  },
+  {
+    "age": 49,
+    "sex": "male",
+    "income": 38700,
+    "education": "less_than_hs",
+    "occupation": "sales",
+    "household_size": 2,
+    "region": "CA-Sacramento",
+    "PWGTP": 86
+  },
+  {
+    "age": 87,
+    "sex": "female",
+    "income": 32600,
+    "education": "less_than_hs",
+    "occupation": "retired",
+    "household_size": 5,
+    "region": "CA-San-Diego",
+    "PWGTP": 229
+  },
+  {
+    "age": 55,
+    "sex": "male",
+    "income": 120000,
+    "education": "bachelors",
+    "occupation": "sales",
+    "household_size": 4,
+    "region": "CA-Bay-Area",
+    "PWGTP": 162
+  },
+  {
+    "age": 22,
+    "sex": "female",
+    "income": 13300,
+    "education": "high_school",
+    "occupation": "student",
+    "household_size": 2,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 92
+  },
+  {
+    "age": 60,
+    "sex": "male",
+    "income": 50400,
+    "education": "high_school",
+    "occupation": "service",
+    "household_size": 5,
+    "region": "CA-Sacramento",
+    "PWGTP": 235
+  },
+  {
+    "age": 23,
+    "sex": "female",
+    "income": 66600,
+    "education": "bachelors",
+    "occupation": "service",
+    "household_size": 5,
+    "region": "CA-San-Diego",
+    "PWGTP": 153
+  },
+  {
+    "age": 61,
+    "sex": "male",
+    "income": 108200,
+    "education": "bachelors",
+    "occupation": "transportation",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 296
+  },
+  {
+    "age": 28,
+    "sex": "female",
+    "income": 64300,
+    "education": "less_than_hs",
+    "occupation": "management",
+    "household_size": 6,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 226
+  },
+  {
+    "age": 66,
+    "sex": "male",
+    "income": 41400,
+    "education": "less_than_hs",
+    "occupation": "production",
+    "household_size": 3,
+    "region": "CA-Sacramento",
+    "PWGTP": 369
+  },
+  {
+    "age": 34,
+    "sex": "female",
+    "income": 137300,
+    "education": "bachelors",
+    "occupation": "management",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 302
+  },
+  {
+    "age": 71,
+    "sex": "male",
+    "income": 79800,
+    "education": "bachelors",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-Bay-Area",
+    "PWGTP": 442
+  },
+  {
+    "age": 39,
+    "sex": "female",
+    "income": 63300,
+    "education": "less_than_hs",
+    "occupation": "software",
+    "household_size": 3,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 375
+  },
+  {
+    "age": 72,
+    "sex": "male",
+    "income": 30800,
+    "education": "less_than_hs",
+    "occupation": "retired",
+    "household_size": 1,
+    "region": "CA-Sacramento",
+    "PWGTP": 83
+  },
+  {
+    "age": 40,
+    "sex": "female",
+    "income": 105200,
+    "education": "bachelors",
+    "occupation": "construction",
+    "household_size": 6,
+    "region": "CA-San-Diego",
+    "PWGTP": 436
+  },
+  {
+    "age": 77,
+    "sex": "male",
+    "income": 53700,
+    "education": "some_college",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 156
+  },
+  {
+    "age": 45,
+    "sex": "female",
+    "income": 38600,
+    "education": "less_than_hs",
+    "occupation": "admin",
+    "household_size": 1,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 89
+  },
+  {
+    "age": 83,
+    "sex": "male",
+    "income": 36700,
+    "education": "less_than_hs",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-Sacramento",
+    "PWGTP": 232
+  },
+  {
+    "age": 50,
+    "sex": "female",
+    "income": 86800,
+    "education": "bachelors",
+    "occupation": "sales",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 162
+  },
+  {
+    "age": 88,
+    "sex": "male",
+    "income": 62800,
+    "education": "some_college",
+    "occupation": "retired",
+    "household_size": 5,
+    "region": "CA-Bay-Area",
+    "PWGTP": 305
+  },
+  {
+    "age": 51,
+    "sex": "female",
+    "income": 64500,
+    "education": "less_than_hs",
+    "occupation": "healthcare",
+    "household_size": 5,
+    "region": "CA-Sacramento",
+    "PWGTP": 223
+  },
+  {
+    "age": 19,
+    "sex": "male",
+    "income": 45000,
+    "education": "some_college",
+    "occupation": "sales",
+    "household_size": 4,
+    "region": "CA-San-Diego",
+    "PWGTP": 156
+  },
+  {
+    "age": 56,
+    "sex": "female",
+    "income": 81600,
+    "education": "some_college",
+    "occupation": "transportation",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 296
+  },
+  {
+    "age": 24,
+    "sex": "male",
+    "income": 22500,
+    "education": "less_than_hs",
+    "occupation": "service",
+    "household_size": 5,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 229
+  },
+  {
+    "age": 62,
+    "sex": "female",
+    "income": 45700,
+    "education": "less_than_hs",
+    "occupation": "transportation",
+    "household_size": 2,
+    "region": "CA-Sacramento",
+    "PWGTP": 372
+  },
+  {
+    "age": 29,
+    "sex": "male",
+    "income": 106200,
+    "education": "some_college",
+    "occupation": "management",
+    "household_size": 6,
+    "region": "CA-San-Diego",
+    "PWGTP": 302
+  },
+  {
+    "age": 67,
+    "sex": "female",
+    "income": 72800,
+    "education": "some_college",
+    "occupation": "production",
+    "household_size": 3,
+    "region": "CA-Bay-Area",
+    "PWGTP": 445
+  },
+  {
+    "age": 30,
+    "sex": "male",
+    "income": 34500,
+    "education": "less_than_hs",
+    "occupation": "production",
+    "household_size": 3,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 363
+  },
+  {
+    "age": 68,
+    "sex": "female",
+    "income": 240000,
+    "education": "graduate",
+    "occupation": "management",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 86
+  },
+  {
+    "age": 35,
+    "sex": "male",
+    "income": 57200,
+    "education": "some_college",
+    "occupation": "construction",
+    "household_size": 4,
+    "region": "CA-San-Diego",
+    "PWGTP": 436
+  },
+  {
+    "age": 73,
+    "sex": "female",
+    "income": 55400,
+    "education": "some_college",
+    "occupation": "retired",
+    "household_size": 1,
+    "region": "CA-Bay-Area",
+    "PWGTP": 159
+  },
+  {
+    "age": 41,
+    "sex": "male",
+    "income": 51200,
+    "education": "less_than_hs",
+    "occupation": "construction",
+    "household_size": 6,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 92
+  },
+  {
+    "age": 78,
+    "sex": "female",
+    "income": 80400,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-Sacramento",
+    "PWGTP": 232
+  },
+  {
+    "age": 46,
+    "sex": "male",
+    "income": 64200,
+    "education": "some_college",
+    "occupation": "admin",
+    "household_size": 1,
+    "region": "CA-San-Diego",
+    "PWGTP": 165
+  },
+  {
+    "age": 79,
+    "sex": "female",
+    "income": 44400,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 5,
+    "region": "CA-Bay-Area",
+    "PWGTP": 293
+  },
+  {
+    "age": 47,
+    "sex": "male",
+    "income": 122300,
+    "education": "graduate",
+    "occupation": "education",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 226
+  },
+  {
+    "age": 84,
+    "sex": "female",
+    "income": 93700,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 366
+  },
+  {
+    "age": 52,
+    "sex": "male",
+    "income": 77700,
+    "education": "some_college",
+    "occupation": "healthcare",
+    "household_size": 5,
+    "region": "CA-San-Diego",
+    "PWGTP": 299
+  },
+  {
+    "age": 20,
+    "sex": "female",
+    "income": 39100,
+    "education": "less_than_hs",
+    "occupation": "sales",
+    "household_size": 4,
+    "region": "CA-Bay-Area",
+    "PWGTP": 232
+  },
+  {
+    "age": 57,
+    "sex": "male",
+    "income": 138000,
+    "education": "graduate",
+    "occupation": "transportation",
+    "household_size": 6,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 372
+  },
+  {
+    "age": 25,
+    "sex": "female",
+    "income": 34300,
+    "education": "some_college",
+    "occupation": "service",
+    "household_size": 5,
+    "region": "CA-Sacramento",
+    "PWGTP": 305
+  },
+  {
+    "age": 58,
+    "sex": "male",
+    "income": 49000,
+    "education": "high_school",
+    "occupation": "service",
+    "household_size": 3,
+    "region": "CA-San-Diego",
+    "PWGTP": 433
+  },
+  {
+    "age": 26,
+    "sex": "female",
+    "income": 115300,
+    "education": "graduate",
+    "occupation": "transportation",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 366
+  },
+  {
+    "age": 63,
+    "sex": "male",
+    "income": 219100,
+    "education": "graduate",
+    "occupation": "management",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 86
+  },
+  {
+    "age": 31,
+    "sex": "female",
+    "income": 53200,
+    "education": "some_college",
+    "occupation": "production",
+    "household_size": 3,
+    "region": "CA-Sacramento",
+    "PWGTP": 439
+  },
+  {
+    "age": 69,
+    "sex": "male",
+    "income": 53100,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 162
+  },
+  {
+    "age": 36,
+    "sex": "female",
+    "income": 105900,
+    "education": "graduate",
+    "occupation": "construction",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 92
+  },
+  {
+    "age": 74,
+    "sex": "male",
+    "income": 88400,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 1,
+    "region": "CA-Sacramento",
+    "PWGTP": 235
+  },
+  {
+    "age": 37,
+    "sex": "female",
+    "income": 79400,
+    "education": "high_school",
+    "occupation": "software",
+    "household_size": 1,
+    "region": "CA-San-Diego",
+    "PWGTP": 153
+  },
+  {
+    "age": 75,
+    "sex": "male",
+    "income": 49100,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-Bay-Area",
+    "PWGTP": 296
+  },
+  {
+    "age": 42,
+    "sex": "female",
+    "income": 131200,
+    "education": "graduate",
+    "occupation": "education",
+    "household_size": 2,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 226
+  },
+  {
+    "age": 80,
+    "sex": "male",
+    "income": 79900,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 5,
+    "region": "CA-Sacramento",
+    "PWGTP": 369
+  },
+  {
+    "age": 48,
+    "sex": "female",
+    "income": 59800,
+    "education": "high_school",
+    "occupation": "education",
+    "household_size": 4,
+    "region": "CA-San-Diego",
+    "PWGTP": 302
+  },
+  {
+    "age": 85,
+    "sex": "male",
+    "income": 56500,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 442
+  },
+  {
+    "age": 53,
+    "sex": "female",
+    "income": 143800,
+    "education": "graduate",
+    "occupation": "healthcare",
+    "household_size": 5,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 375
+  },
+  {
+    "age": 18,
+    "sex": "male",
+    "income": 16700,
+    "education": "high_school",
+    "occupation": "student",
+    "household_size": 1,
+    "region": "CA-Sacramento",
+    "PWGTP": 299
+  },
+  {
+    "age": 54,
+    "sex": "female",
+    "income": 64900,
+    "education": "high_school",
+    "occupation": "sales",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 436
+  },
+  {
+    "age": 21,
+    "sex": "male",
+    "income": 89200,
+    "education": "graduate",
+    "occupation": "transportation",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 366
+  },
+  {
+    "age": 59,
+    "sex": "female",
+    "income": 84100,
+    "education": "bachelors",
+    "occupation": "service",
+    "household_size": 3,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 89
+  },
+  {
+    "age": 27,
+    "sex": "male",
+    "income": 36900,
+    "education": "high_school",
+    "occupation": "transportation",
+    "household_size": 2,
+    "region": "CA-Sacramento",
+    "PWGTP": 442
+  },
+  {
+    "age": 64,
+    "sex": "female",
+    "income": 107300,
+    "education": "high_school",
+    "occupation": "management",
+    "household_size": 4,
+    "region": "CA-San-Diego",
+    "PWGTP": 162
+  },
+  {
+    "age": 32,
+    "sex": "male",
+    "income": 111800,
+    "education": "graduate",
+    "occupation": "production",
+    "household_size": 3,
+    "region": "CA-Bay-Area",
+    "PWGTP": 95
+  },
+  {
+    "age": 65,
+    "sex": "female",
+    "income": 89700,
+    "education": "bachelors",
+    "occupation": "production",
+    "household_size": 1,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 223
+  },
+  {
+    "age": 33,
+    "sex": "male",
+    "income": 83900,
+    "education": "high_school",
+    "occupation": "management",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 156
+  },
+  {
+    "age": 70,
+    "sex": "female",
+    "income": 41000,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 296
+  },
+  {
+    "age": 38,
+    "sex": "male",
+    "income": 155000,
+    "education": "bachelors",
+    "occupation": "software",
+    "household_size": 1,
+    "region": "CA-Bay-Area",
+    "PWGTP": 229
+  },
+  {
+    "age": 76,
+    "sex": "female",
+    "income": 68000,
+    "education": "bachelors",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 372
+  },
+  {
+    "age": 43,
+    "sex": "male",
+    "income": 66700,
+    "education": "high_school",
+    "occupation": "education",
+    "household_size": 2,
+    "region": "CA-Sacramento",
+    "PWGTP": 302
+  },
+  {
+    "age": 81,
+    "sex": "female",
+    "income": 38400,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 5,
+    "region": "CA-San-Diego",
+    "PWGTP": 445
+  },
+  {
+    "age": 44,
+    "sex": "male",
+    "income": 98400,
+    "education": "bachelors",
+    "occupation": "admin",
+    "household_size": 5,
+    "region": "CA-Bay-Area",
+    "PWGTP": 363
+  },
+  {
+    "age": 82,
+    "sex": "female",
+    "income": 78600,
+    "education": "bachelors",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-Sacramento",
+    "PWGTP": 86
+  },
+  {
+    "age": 49,
+    "sex": "male",
+    "income": 41400,
+    "education": "less_than_hs",
+    "occupation": "sales",
+    "household_size": 6,
+    "region": "CA-San-Diego",
+    "PWGTP": 436
+  },
+  {
+    "age": 87,
+    "sex": "female",
+    "income": 43200,
+    "education": "less_than_hs",
+    "occupation": "retired",
+    "household_size": 3,
+    "region": "CA-Bay-Area",
+    "PWGTP": 159
+  },
+  {
+    "age": 55,
+    "sex": "male",
+    "income": 86700,
+    "education": "bachelors",
+    "occupation": "sales",
+    "household_size": 2,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 92
+  },
+  {
+    "age": 22,
+    "sex": "female",
+    "income": 39600,
+    "education": "high_school",
+    "occupation": "transportation",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 442
+  },
+  {
+    "age": 60,
+    "sex": "male",
+    "income": 53200,
+    "education": "high_school",
+    "occupation": "service",
+    "household_size": 3,
+    "region": "CA-San-Diego",
+    "PWGTP": 165
+  },
+  {
+    "age": 23,
+    "sex": "female",
+    "income": 56400,
+    "education": "bachelors",
+    "occupation": "service",
+    "household_size": 3,
+    "region": "CA-Bay-Area",
+    "PWGTP": 83
+  },
+  {
+    "age": 61,
+    "sex": "male",
+    "income": 105200,
+    "education": "bachelors",
+    "occupation": "transportation",
+    "household_size": 6,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 226
+  },
+  {
+    "age": 28,
+    "sex": "female",
+    "income": 69000,
+    "education": "less_than_hs",
+    "occupation": "management",
+    "household_size": 4,
+    "region": "CA-Sacramento",
+    "PWGTP": 156
+  },
+  {
+    "age": 66,
+    "sex": "male",
+    "income": 43900,
+    "education": "less_than_hs",
+    "occupation": "production",
+    "household_size": 1,
+    "region": "CA-San-Diego",
+    "PWGTP": 299
+  },
+  {
+    "age": 34,
+    "sex": "female",
+    "income": 157000,
+    "education": "bachelors",
+    "occupation": "management",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 232
+  },
+  {
+    "age": 71,
+    "sex": "male",
+    "income": 74300,
+    "education": "bachelors",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 372
+  },
+  {
+    "age": 39,
+    "sex": "female",
+    "income": 68500,
+    "education": "less_than_hs",
+    "occupation": "software",
+    "household_size": 1,
+    "region": "CA-Sacramento",
+    "PWGTP": 305
+  },
+  {
+    "age": 72,
+    "sex": "male",
+    "income": 32300,
+    "education": "less_than_hs",
+    "occupation": "retired",
+    "household_size": 5,
+    "region": "CA-San-Diego",
+    "PWGTP": 433
+  },
+  {
+    "age": 40,
+    "sex": "female",
+    "income": 87300,
+    "education": "bachelors",
+    "occupation": "construction",
+    "household_size": 4,
+    "region": "CA-Bay-Area",
+    "PWGTP": 366
+  },
+  {
+    "age": 77,
+    "sex": "male",
+    "income": 47100,
+    "education": "some_college",
+    "occupation": "retired",
+    "household_size": 6,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 86
+  },
+  {
+    "age": 45,
+    "sex": "female",
+    "income": 41200,
+    "education": "less_than_hs",
+    "occupation": "admin",
+    "household_size": 5,
+    "region": "CA-Sacramento",
+    "PWGTP": 439
+  },
+  {
+    "age": 83,
+    "sex": "male",
+    "income": 30300,
+    "education": "less_than_hs",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 162
+  },
+  {
+    "age": 50,
+    "sex": "female",
+    "income": 101700,
+    "education": "bachelors",
+    "occupation": "sales",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 92
+  },
+  {
+    "age": 88,
+    "sex": "male",
+    "income": 56100,
+    "education": "some_college",
+    "occupation": "retired",
+    "household_size": 3,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 235
+  },
+  {
+    "age": 51,
+    "sex": "female",
+    "income": 50200,
+    "education": "less_than_hs",
+    "occupation": "healthcare",
+    "household_size": 3,
+    "region": "CA-Sacramento",
+    "PWGTP": 153
+  },
+  {
+    "age": 19,
+    "sex": "male",
+    "income": 19200,
+    "education": "some_college",
+    "occupation": "student",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 86
+  },
+  {
+    "age": 56,
+    "sex": "female",
+    "income": 85700,
+    "education": "some_college",
+    "occupation": "transportation",
+    "household_size": 4,
+    "region": "CA-Bay-Area",
+    "PWGTP": 226
+  },
+  {
+    "age": 24,
+    "sex": "male",
+    "income": 24600,
+    "education": "less_than_hs",
+    "occupation": "service",
+    "household_size": 3,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 159
+  },
+  {
+    "age": 62,
+    "sex": "female",
+    "income": 48300,
+    "education": "less_than_hs",
+    "occupation": "transportation",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 302
+  },
+  {
+    "age": 29,
+    "sex": "male",
+    "income": 122500,
+    "education": "some_college",
+    "occupation": "management",
+    "household_size": 4,
+    "region": "CA-Bay-Area",
+    "PWGTP": 232
+  },
+  {
+    "age": 67,
+    "sex": "female",
+    "income": 67700,
+    "education": "some_college",
+    "occupation": "production",
+    "household_size": 1,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 375
+  },
+  {
+    "age": 30,
+    "sex": "male",
+    "income": 37000,
+    "education": "less_than_hs",
+    "occupation": "production",
+    "household_size": 1,
+    "region": "CA-Sacramento",
+    "PWGTP": 293
+  },
+  {
+    "age": 68,
+    "sex": "female",
+    "income": 213200,
+    "education": "graduate",
+    "occupation": "management",
+    "household_size": 4,
+    "region": "CA-San-Diego",
+    "PWGTP": 436
+  },
+  {
+    "age": 35,
+    "sex": "male",
+    "income": 70800,
+    "education": "some_college",
+    "occupation": "construction",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 366
+  },
+  {
+    "age": 73,
+    "sex": "female",
+    "income": 48700,
+    "education": "some_college",
+    "occupation": "retired",
+    "household_size": 5,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 89
+  },
+  {
+    "age": 41,
+    "sex": "male",
+    "income": 39100,
+    "education": "less_than_hs",
+    "occupation": "construction",
+    "household_size": 4,
+    "region": "CA-Sacramento",
+    "PWGTP": 442
+  },
+  {
+    "age": 78,
+    "sex": "female",
+    "income": 84700,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 6,
+    "region": "CA-San-Diego",
+    "PWGTP": 162
+  },
+  {
+    "age": 46,
+    "sex": "male",
+    "income": 77100,
+    "education": "some_college",
+    "occupation": "admin",
+    "household_size": 5,
+    "region": "CA-Bay-Area",
+    "PWGTP": 95
+  },
+  {
+    "age": 79,
+    "sex": "female",
+    "income": 37400,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 3,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 223
+  },
+  {
+    "age": 47,
+    "sex": "male",
+    "income": 130500,
+    "education": "graduate",
+    "occupation": "education",
+    "household_size": 2,
+    "region": "CA-Sacramento",
+    "PWGTP": 156
+  },
+  {
+    "age": 84,
+    "sex": "female",
+    "income": 97900,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-San-Diego",
+    "PWGTP": 296
+  },
+  {
+    "age": 52,
+    "sex": "male",
+    "income": 92100,
+    "education": "some_college",
+    "occupation": "healthcare",
+    "household_size": 3,
+    "region": "CA-Bay-Area",
+    "PWGTP": 229
+  },
+  {
+    "age": 20,
+    "sex": "female",
+    "income": 32800,
+    "education": "less_than_hs",
+    "occupation": "sales",
+    "household_size": 2,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 162
+  },
+  {
+    "age": 57,
+    "sex": "male",
+    "income": 107700,
+    "education": "graduate",
+    "occupation": "transportation",
+    "household_size": 4,
+    "region": "CA-Sacramento",
+    "PWGTP": 302
+  },
+  {
+    "age": 25,
+    "sex": "female",
+    "income": 37500,
+    "education": "some_college",
+    "occupation": "service",
+    "household_size": 3,
+    "region": "CA-San-Diego",
+    "PWGTP": 235
+  },
+  {
+    "age": 58,
+    "sex": "male",
+    "income": 60800,
+    "education": "high_school",
+    "occupation": "service",
+    "household_size": 1,
+    "region": "CA-Bay-Area",
+    "PWGTP": 363
+  },
+  {
+    "age": 26,
+    "sex": "female",
+    "income": 76100,
+    "education": "graduate",
+    "occupation": "transportation",
+    "household_size": 6,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 296
+  },
+  {
+    "age": 63,
+    "sex": "male",
+    "income": 232400,
+    "education": "graduate",
+    "occupation": "management",
+    "household_size": 2,
+    "region": "CA-Sacramento",
+    "PWGTP": 436
+  },
+  {
+    "age": 31,
+    "sex": "female",
+    "income": 57100,
+    "education": "some_college",
+    "occupation": "production",
+    "household_size": 1,
+    "region": "CA-San-Diego",
+    "PWGTP": 369
+  },
+  {
+    "age": 69,
+    "sex": "male",
+    "income": 44900,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-Bay-Area",
+    "PWGTP": 92
+  },
+  {
+    "age": 36,
+    "sex": "female",
+    "income": 114100,
+    "education": "graduate",
+    "occupation": "construction",
+    "household_size": 2,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 442
+  },
+  {
+    "age": 74,
+    "sex": "male",
+    "income": 92700,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 5,
+    "region": "CA-Sacramento",
+    "PWGTP": 165
+  },
+  {
+    "age": 37,
+    "sex": "female",
+    "income": 86200,
+    "education": "high_school",
+    "occupation": "software",
+    "household_size": 5,
+    "region": "CA-San-Diego",
+    "PWGTP": 83
+  },
+  {
+    "age": 75,
+    "sex": "male",
+    "income": 51100,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 226
+  },
+  {
+    "age": 42,
+    "sex": "female",
+    "income": 139400,
+    "education": "graduate",
+    "occupation": "education",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 156
+  },
+  {
+    "age": 80,
+    "sex": "male",
+    "income": 84200,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 3,
+    "region": "CA-San-Diego",
+    "PWGTP": 299
+  },
+  {
+    "age": 48,
+    "sex": "female",
+    "income": 72700,
+    "education": "high_school",
+    "occupation": "education",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 232
+  },
+  {
+    "age": 85,
+    "sex": "male",
+    "income": 39300,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 372
+  },
+  {
+    "age": 53,
+    "sex": "female",
+    "income": 153600,
+    "education": "graduate",
+    "occupation": "healthcare",
+    "household_size": 3,
+    "region": "CA-Sacramento",
+    "PWGTP": 305
+  },
+  {
+    "age": 18,
+    "sex": "male",
+    "income": 87500,
+    "education": "high_school",
+    "occupation": "software",
+    "household_size": 5,
+    "region": "CA-San-Diego",
+    "PWGTP": 229
+  },
+  {
+    "age": 54,
+    "sex": "female",
+    "income": 59600,
+    "education": "high_school",
+    "occupation": "sales",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 366
+  },
+  {
+    "age": 21,
+    "sex": "male",
+    "income": 33400,
+    "education": "graduate",
+    "occupation": "student",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 296
+  },
+  {
+    "age": 59,
+    "sex": "female",
+    "income": 88800,
+    "education": "bachelors",
+    "occupation": "service",
+    "household_size": 1,
+    "region": "CA-Sacramento",
+    "PWGTP": 439
+  },
+  {
+    "age": 27,
+    "sex": "male",
+    "income": 40300,
+    "education": "high_school",
+    "occupation": "transportation",
+    "household_size": 6,
+    "region": "CA-San-Diego",
+    "PWGTP": 372
+  },
+  {
+    "age": 64,
+    "sex": "female",
+    "income": 122600,
+    "education": "high_school",
+    "occupation": "management",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 92
+  },
+  {
+    "age": 32,
+    "sex": "male",
+    "income": 109800,
+    "education": "graduate",
+    "occupation": "production",
+    "household_size": 1,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 445
+  },
+  {
+    "age": 65,
+    "sex": "female",
+    "income": 95300,
+    "education": "bachelors",
+    "occupation": "production",
+    "household_size": 5,
+    "region": "CA-Sacramento",
+    "PWGTP": 153
+  },
+  {
+    "age": 33,
+    "sex": "male",
+    "income": 90100,
+    "education": "high_school",
+    "occupation": "management",
+    "household_size": 4,
+    "region": "CA-San-Diego",
+    "PWGTP": 86
+  },
+  {
+    "age": 70,
+    "sex": "female",
+    "income": 41700,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 226
+  },
+  {
+    "age": 38,
+    "sex": "male",
+    "income": 157600,
+    "education": "bachelors",
+    "occupation": "software",
+    "household_size": 5,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 159
+  },
+  {
+    "age": 76,
+    "sex": "female",
+    "income": 71400,
+    "education": "bachelors",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-Sacramento",
+    "PWGTP": 302
+  },
+  {
+    "age": 43,
+    "sex": "male",
+    "income": 50900,
+    "education": "high_school",
+    "occupation": "education",
+    "household_size": 6,
+    "region": "CA-San-Diego",
+    "PWGTP": 232
+  },
+  {
+    "age": 81,
+    "sex": "female",
+    "income": 49400,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 3,
+    "region": "CA-Bay-Area",
+    "PWGTP": 375
+  },
+  {
+    "age": 44,
+    "sex": "male",
+    "income": 95100,
+    "education": "bachelors",
+    "occupation": "admin",
+    "household_size": 3,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 293
+  },
+  {
+    "age": 82,
+    "sex": "female",
+    "income": 64600,
+    "education": "bachelors",
+    "occupation": "retired",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 436
+  },
+  {
+    "age": 49,
+    "sex": "male",
+    "income": 44000,
+    "education": "less_than_hs",
+    "occupation": "sales",
+    "household_size": 4,
+    "region": "CA-San-Diego",
+    "PWGTP": 366
+  },
+  {
+    "age": 87,
+    "sex": "female",
+    "income": 44700,
+    "education": "less_than_hs",
+    "occupation": "retired",
+    "household_size": 1,
+    "region": "CA-Bay-Area",
+    "PWGTP": 89
+  },
+  {
+    "age": 55,
+    "sex": "male",
+    "income": 92700,
+    "education": "bachelors",
+    "occupation": "sales",
+    "household_size": 6,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 442
+  },
+  {
+    "age": 22,
+    "sex": "female",
+    "income": 43100,
+    "education": "high_school",
+    "occupation": "transportation",
+    "household_size": 4,
+    "region": "CA-Sacramento",
+    "PWGTP": 372
+  },
+  {
+    "age": 60,
+    "sex": "male",
+    "income": 64900,
+    "education": "high_school",
+    "occupation": "service",
+    "household_size": 1,
+    "region": "CA-Bay-Area",
+    "PWGTP": 95
+  },
+  {
+    "age": 23,
+    "sex": "female",
+    "income": 52100,
+    "education": "bachelors",
+    "occupation": "service",
+    "household_size": 1,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 433
+  },
+  {
+    "age": 61,
+    "sex": "male",
+    "income": 111100,
+    "education": "bachelors",
+    "occupation": "transportation",
+    "household_size": 4,
+    "region": "CA-Sacramento",
+    "PWGTP": 156
+  },
+  {
+    "age": 28,
+    "sex": "female",
+    "income": 49500,
+    "education": "less_than_hs",
+    "occupation": "management",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 86
+  },
+  {
+    "age": 66,
+    "sex": "male",
+    "income": 55400,
+    "education": "less_than_hs",
+    "occupation": "production",
+    "household_size": 5,
+    "region": "CA-Bay-Area",
+    "PWGTP": 229
+  },
+  {
+    "age": 34,
+    "sex": "female",
+    "income": 158700,
+    "education": "bachelors",
+    "occupation": "management",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 162
+  },
+  {
+    "age": 71,
+    "sex": "male",
+    "income": 60200,
+    "education": "bachelors",
+    "occupation": "retired",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 302
+  },
+  {
+    "age": 39,
+    "sex": "female",
+    "income": 73700,
+    "education": "less_than_hs",
+    "occupation": "software",
+    "household_size": 5,
+    "region": "CA-San-Diego",
+    "PWGTP": 235
+  },
+  {
+    "age": 72,
+    "sex": "male",
+    "income": 42900,
+    "education": "less_than_hs",
+    "occupation": "retired",
+    "household_size": 3,
+    "region": "CA-Bay-Area",
+    "PWGTP": 363
+  },
+  {
+    "age": 40,
+    "sex": "female",
+    "income": 84900,
+    "education": "bachelors",
+    "occupation": "construction",
+    "household_size": 2,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 296
+  },
+  {
+    "age": 77,
+    "sex": "male",
+    "income": 49400,
+    "education": "some_college",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-Sacramento",
+    "PWGTP": 436
+  },
+  {
+    "age": 45,
+    "sex": "female",
+    "income": 43700,
+    "education": "less_than_hs",
+    "occupation": "admin",
+    "household_size": 3,
+    "region": "CA-San-Diego",
+    "PWGTP": 369
+  },
+  {
+    "age": 83,
+    "sex": "male",
+    "income": 40900,
+    "education": "less_than_hs",
+    "occupation": "retired",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 92
+  },
+  {
+    "age": 50,
+    "sex": "female",
+    "income": 98700,
+    "education": "bachelors",
+    "occupation": "sales",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 442
+  },
+  {
+    "age": 88,
+    "sex": "male",
+    "income": 46400,
+    "education": "some_college",
+    "occupation": "retired",
+    "household_size": 1,
+    "region": "CA-Sacramento",
+    "PWGTP": 165
+  },
+  {
+    "age": 51,
+    "sex": "female",
+    "income": 53700,
+    "education": "less_than_hs",
+    "occupation": "healthcare",
+    "household_size": 1,
+    "region": "CA-San-Diego",
+    "PWGTP": 83
+  },
+  {
+    "age": 19,
+    "sex": "male",
+    "income": 62300,
+    "education": "some_college",
+    "occupation": "sales",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 436
+  },
+  {
+    "age": 56,
+    "sex": "female",
+    "income": 59900,
+    "education": "some_college",
+    "occupation": "transportation",
+    "household_size": 2,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 156
+  },
+  {
+    "age": 24,
+    "sex": "male",
+    "income": 26700,
+    "education": "less_than_hs",
+    "occupation": "service",
+    "household_size": 1,
+    "region": "CA-Sacramento",
+    "PWGTP": 89
+  },
+  {
+    "age": 62,
+    "sex": "female",
+    "income": 51000,
+    "education": "less_than_hs",
+    "occupation": "transportation",
+    "household_size": 4,
+    "region": "CA-San-Diego",
+    "PWGTP": 232
+  },
+  {
+    "age": 29,
+    "sex": "male",
+    "income": 92500,
+    "education": "some_college",
+    "occupation": "management",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 162
+  },
+  {
+    "age": 67,
+    "sex": "female",
+    "income": 71600,
+    "education": "some_college",
+    "occupation": "production",
+    "household_size": 5,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 305
+  },
+  {
+    "age": 30,
+    "sex": "male",
+    "income": 39500,
+    "education": "less_than_hs",
+    "occupation": "production",
+    "household_size": 5,
+    "region": "CA-Sacramento",
+    "PWGTP": 223
+  },
+  {
+    "age": 68,
+    "sex": "female",
+    "income": 226400,
+    "education": "graduate",
+    "occupation": "management",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 366
+  },
+  {
+    "age": 35,
+    "sex": "male",
+    "income": 75300,
+    "education": "some_college",
+    "occupation": "construction",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 296
+  },
+  {
+    "age": 73,
+    "sex": "female",
+    "income": 51100,
+    "education": "some_college",
+    "occupation": "retired",
+    "household_size": 3,
+    "region": "CA-Sacramento",
+    "PWGTP": 439
+  },
+  {
+    "age": 41,
+    "sex": "male",
+    "income": 42100,
+    "education": "less_than_hs",
+    "occupation": "construction",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 372
+  },
+  {
+    "age": 78,
+    "sex": "female",
+    "income": 98000,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-Bay-Area",
+    "PWGTP": 92
+  },
+  {
+    "age": 46,
+    "sex": "male",
+    "income": 52200,
+    "education": "some_college",
+    "occupation": "admin",
+    "household_size": 3,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 445
+  },
+  {
+    "age": 79,
+    "sex": "female",
+    "income": 39400,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 1,
+    "region": "CA-Sacramento",
+    "PWGTP": 153
+  },
+  {
+    "age": 47,
+    "sex": "male",
+    "income": 138700,
+    "education": "graduate",
+    "occupation": "education",
+    "household_size": 6,
+    "region": "CA-San-Diego",
+    "PWGTP": 86
+  },
+  {
+    "age": 84,
+    "sex": "female",
+    "income": 89500,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 226
+  },
+  {
+    "age": 52,
+    "sex": "male",
+    "income": 88500,
+    "education": "some_college",
+    "occupation": "healthcare",
+    "household_size": 1,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 159
+  },
+  {
+    "age": 20,
+    "sex": "female",
+    "income": 13100,
+    "education": "less_than_hs",
+    "occupation": "student",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 92
+  },
+  {
+    "age": 57,
+    "sex": "male",
+    "income": 115100,
+    "education": "graduate",
+    "occupation": "transportation",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 232
+  },
+  {
+    "age": 25,
+    "sex": "female",
+    "income": 49800,
+    "education": "some_college",
+    "occupation": "service",
+    "household_size": 1,
+    "region": "CA-Bay-Area",
+    "PWGTP": 165
+  },
+  {
+    "age": 58,
+    "sex": "male",
+    "income": 54500,
+    "education": "high_school",
+    "occupation": "service",
+    "household_size": 5,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 293
+  },
+  {
+    "age": 26,
+    "sex": "female",
+    "income": 83500,
+    "education": "graduate",
+    "occupation": "transportation",
+    "household_size": 4,
+    "region": "CA-Sacramento",
+    "PWGTP": 226
+  },
+  {
+    "age": 63,
+    "sex": "male",
+    "income": 240000,
+    "education": "graduate",
+    "occupation": "management",
+    "household_size": 6,
+    "region": "CA-San-Diego",
+    "PWGTP": 366
+  },
+  {
+    "age": 31,
+    "sex": "female",
+    "income": 50200,
+    "education": "some_college",
+    "occupation": "production",
+    "household_size": 5,
+    "region": "CA-Bay-Area",
+    "PWGTP": 299
+  },
+  {
+    "age": 69,
+    "sex": "male",
+    "income": 37900,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 442
+  },
+  {
+    "age": 36,
+    "sex": "female",
+    "income": 122300,
+    "education": "graduate",
+    "occupation": "construction",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 372
+  },
+  {
+    "age": 74,
+    "sex": "male",
+    "income": 75200,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 3,
+    "region": "CA-San-Diego",
+    "PWGTP": 95
+  },
+  {
+    "age": 37,
+    "sex": "female",
+    "income": 102000,
+    "education": "high_school",
+    "occupation": "software",
+    "household_size": 3,
+    "region": "CA-Bay-Area",
+    "PWGTP": 433
+  },
+  {
+    "age": 75,
+    "sex": "male",
+    "income": 44200,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 6,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 156
+  },
+  {
+    "age": 42,
+    "sex": "female",
+    "income": 106000,
+    "education": "graduate",
+    "occupation": "education",
+    "household_size": 4,
+    "region": "CA-Sacramento",
+    "PWGTP": 86
+  },
+  {
+    "age": 80,
+    "sex": "male",
+    "income": 88500,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 1,
+    "region": "CA-San-Diego",
+    "PWGTP": 229
+  },
+  {
+    "age": 48,
+    "sex": "female",
+    "income": 76500,
+    "education": "high_school",
+    "occupation": "education",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 162
+  },
+  {
+    "age": 85,
+    "sex": "male",
+    "income": 41300,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 302
+  },
+  {
+    "age": 53,
+    "sex": "female",
+    "income": 163300,
+    "education": "graduate",
+    "occupation": "healthcare",
+    "household_size": 1,
+    "region": "CA-Sacramento",
+    "PWGTP": 235
+  },
+  {
+    "age": 18,
+    "sex": "male",
+    "income": 103300,
+    "education": "high_school",
+    "occupation": "software",
+    "household_size": 3,
+    "region": "CA-Bay-Area",
+    "PWGTP": 159
+  },
+  {
+    "age": 54,
+    "sex": "female",
+    "income": 54100,
+    "education": "high_school",
+    "occupation": "sales",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 296
+  },
+  {
+    "age": 21,
+    "sex": "male",
+    "income": 95000,
+    "education": "graduate",
+    "occupation": "transportation",
+    "household_size": 2,
+    "region": "CA-Sacramento",
+    "PWGTP": 226
+  },
+  {
+    "age": 59,
+    "sex": "female",
+    "income": 69600,
+    "education": "bachelors",
+    "occupation": "service",
+    "household_size": 5,
+    "region": "CA-San-Diego",
+    "PWGTP": 369
+  },
+  {
+    "age": 27,
+    "sex": "male",
+    "income": 52800,
+    "education": "high_school",
+    "occupation": "transportation",
+    "household_size": 4,
+    "region": "CA-Bay-Area",
+    "PWGTP": 302
+  },
+  {
+    "age": 64,
+    "sex": "female",
+    "income": 119800,
+    "education": "high_school",
+    "occupation": "management",
+    "household_size": 6,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 442
+  },
+  {
+    "age": 32,
+    "sex": "male",
+    "income": 81200,
+    "education": "graduate",
+    "occupation": "production",
+    "household_size": 5,
+    "region": "CA-Sacramento",
+    "PWGTP": 375
+  },
+  {
+    "age": 65,
+    "sex": "female",
+    "income": 101000,
+    "education": "bachelors",
+    "occupation": "production",
+    "household_size": 3,
+    "region": "CA-San-Diego",
+    "PWGTP": 83
+  },
+  {
+    "age": 33,
+    "sex": "male",
+    "income": 105400,
+    "education": "high_school",
+    "occupation": "management",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 436
+  },
+  {
+    "age": 70,
+    "sex": "female",
+    "income": 34700,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 156
+  },
+  {
+    "age": 38,
+    "sex": "male",
+    "income": 169200,
+    "education": "bachelors",
+    "occupation": "software",
+    "household_size": 3,
+    "region": "CA-Sacramento",
+    "PWGTP": 89
+  },
+  {
+    "age": 76,
+    "sex": "female",
+    "income": 74900,
+    "education": "bachelors",
+    "occupation": "retired",
+    "household_size": 6,
+    "region": "CA-San-Diego",
+    "PWGTP": 232
+  },
+  {
+    "age": 43,
+    "sex": "male",
+    "income": 63800,
+    "education": "high_school",
+    "occupation": "education",
+    "household_size": 4,
+    "region": "CA-Bay-Area",
+    "PWGTP": 162
+  },
+  {
+    "age": 81,
+    "sex": "female",
+    "income": 42500,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 1,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 305
+  },
+  {
+    "age": 44,
+    "sex": "male",
+    "income": 72000,
+    "education": "bachelors",
+    "occupation": "admin",
+    "household_size": 1,
+    "region": "CA-Sacramento",
+    "PWGTP": 223
+  },
+  {
+    "age": 82,
+    "sex": "female",
+    "income": 68000,
+    "education": "bachelors",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-San-Diego",
+    "PWGTP": 366
+  },
+  {
+    "age": 49,
+    "sex": "male",
+    "income": 55700,
+    "education": "less_than_hs",
+    "occupation": "sales",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 296
+  },
+  {
+    "age": 87,
+    "sex": "female",
+    "income": 29400,
+    "education": "less_than_hs",
+    "occupation": "retired",
+    "household_size": 5,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 439
+  },
+  {
+    "age": 55,
+    "sex": "male",
+    "income": 98600,
+    "education": "bachelors",
+    "occupation": "sales",
+    "household_size": 4,
+    "region": "CA-Sacramento",
+    "PWGTP": 372
+  },
+  {
+    "age": 22,
+    "sex": "female",
+    "income": 17200,
+    "education": "high_school",
+    "occupation": "student",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 302
+  },
+  {
+    "age": 60,
+    "sex": "male",
+    "income": 53700,
+    "education": "high_school",
+    "occupation": "service",
+    "household_size": 5,
+    "region": "CA-Bay-Area",
+    "PWGTP": 445
+  },
+  {
+    "age": 23,
+    "sex": "female",
+    "income": 56800,
+    "education": "bachelors",
+    "occupation": "service",
+    "household_size": 5,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 363
+  },
+  {
+    "age": 61,
+    "sex": "male",
+    "income": 117100,
+    "education": "bachelors",
+    "occupation": "transportation",
+    "household_size": 2,
+    "region": "CA-Sacramento",
+    "PWGTP": 86
+  },
+  {
+    "age": 28,
+    "sex": "female",
+    "income": 54300,
+    "education": "less_than_hs",
+    "occupation": "management",
+    "household_size": 6,
+    "region": "CA-San-Diego",
+    "PWGTP": 436
+  },
+  {
+    "age": 66,
+    "sex": "male",
+    "income": 58000,
+    "education": "less_than_hs",
+    "occupation": "production",
+    "household_size": 3,
+    "region": "CA-Bay-Area",
+    "PWGTP": 159
+  },
+  {
+    "age": 34,
+    "sex": "female",
+    "income": 169400,
+    "education": "bachelors",
+    "occupation": "management",
+    "household_size": 2,
+    "region": "CA-Sacramento",
+    "PWGTP": 92
+  },
+  {
+    "age": 71,
+    "sex": "male",
+    "income": 63700,
+    "education": "bachelors",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-San-Diego",
+    "PWGTP": 232
+  },
+  {
+    "age": 39,
+    "sex": "female",
+    "income": 87900,
+    "education": "less_than_hs",
+    "occupation": "software",
+    "household_size": 3,
+    "region": "CA-Bay-Area",
+    "PWGTP": 165
+  },
+  {
+    "age": 72,
+    "sex": "male",
+    "income": 27500,
+    "education": "less_than_hs",
+    "occupation": "retired",
+    "household_size": 1,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 293
+  },
+  {
+    "age": 40,
+    "sex": "female",
+    "income": 91500,
+    "education": "bachelors",
+    "occupation": "construction",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 226
+  },
+  {
+    "age": 77,
+    "sex": "male",
+    "income": 51800,
+    "education": "some_college",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-San-Diego",
+    "PWGTP": 366
+  },
+  {
+    "age": 45,
+    "sex": "female",
+    "income": 42400,
+    "education": "less_than_hs",
+    "occupation": "admin",
+    "household_size": 1,
+    "region": "CA-Bay-Area",
+    "PWGTP": 299
+  },
+  {
+    "age": 83,
+    "sex": "male",
+    "income": 33400,
+    "education": "less_than_hs",
+    "occupation": "retired",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 442
+  },
+  {
+    "age": 50,
+    "sex": "female",
+    "income": 104700,
+    "education": "bachelors",
+    "occupation": "sales",
+    "household_size": 2,
+    "region": "CA-Sacramento",
+    "PWGTP": 372
+  },
+  {
+    "age": 88,
+    "sex": "male",
+    "income": 48800,
+    "education": "some_college",
+    "occupation": "retired",
+    "household_size": 5,
+    "region": "CA-San-Diego",
+    "PWGTP": 95
+  },
+  {
+    "age": 51,
+    "sex": "female",
+    "income": 66200,
+    "education": "less_than_hs",
+    "occupation": "healthcare",
+    "household_size": 5,
+    "region": "CA-Bay-Area",
+    "PWGTP": 433
+  },
+  {
+    "age": 19,
+    "sex": "male",
+    "income": 57400,
+    "education": "some_college",
+    "occupation": "sales",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 366
+  },
+  {
+    "age": 56,
+    "sex": "female",
+    "income": 64000,
+    "education": "some_college",
+    "occupation": "transportation",
+    "household_size": 6,
+    "region": "CA-Sacramento",
+    "PWGTP": 86
+  },
+  {
+    "age": 24,
+    "sex": "male",
+    "income": 28800,
+    "education": "less_than_hs",
+    "occupation": "service",
+    "household_size": 5,
+    "region": "CA-San-Diego",
+    "PWGTP": 439
+  },
+  {
+    "age": 62,
+    "sex": "female",
+    "income": 49100,
+    "education": "less_than_hs",
+    "occupation": "transportation",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 162
+  },
+  {
+    "age": 29,
+    "sex": "male",
+    "income": 90900,
+    "education": "some_college",
+    "occupation": "management",
+    "household_size": 6,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 92
+  },
+  {
+    "age": 67,
+    "sex": "female",
+    "income": 75500,
+    "education": "some_college",
+    "occupation": "production",
+    "household_size": 3,
+    "region": "CA-Sacramento",
+    "PWGTP": 235
+  },
+  {
+    "age": 30,
+    "sex": "male",
+    "income": 29200,
+    "education": "less_than_hs",
+    "occupation": "production",
+    "household_size": 3,
+    "region": "CA-San-Diego",
+    "PWGTP": 153
+  },
+  {
+    "age": 68,
+    "sex": "female",
+    "income": 240000,
+    "education": "graduate",
+    "occupation": "management",
+    "household_size": 6,
+    "region": "CA-Bay-Area",
+    "PWGTP": 296
+  },
+  {
+    "age": 35,
+    "sex": "male",
+    "income": 70900,
+    "education": "some_college",
+    "occupation": "construction",
+    "household_size": 4,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 226
+  },
+  {
+    "age": 73,
+    "sex": "female",
+    "income": 41400,
+    "education": "some_college",
+    "occupation": "retired",
+    "household_size": 1,
+    "region": "CA-Sacramento",
+    "PWGTP": 369
+  },
+  {
+    "age": 41,
+    "sex": "male",
+    "income": 45000,
+    "education": "less_than_hs",
+    "occupation": "construction",
+    "household_size": 6,
+    "region": "CA-San-Diego",
+    "PWGTP": 302
+  },
+  {
+    "age": 78,
+    "sex": "female",
+    "income": 102300,
+    "education": "graduate",
+    "occupation": "retired",
+    "household_size": 2,
+    "region": "CA-Bay-Area",
+    "PWGTP": 442
+  },
+  {
+    "age": 46,
+    "sex": "male",
+    "income": 56100,
+    "education": "some_college",
+    "occupation": "admin",
+    "household_size": 1,
+    "region": "CA-Los-Angeles",
+    "PWGTP": 375
+  },
+  {
+    "age": 79,
+    "sex": "female",
+    "income": 41400,
+    "education": "high_school",
+    "occupation": "retired",
+    "household_size": 5,
+    "region": "CA-Sacramento",
+    "PWGTP": 83
+  }
+]

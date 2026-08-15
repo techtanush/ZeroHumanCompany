@@ -28,7 +28,8 @@ export function VoiceRecorder({ onSample, disabled }: { onSample: (s: { audio_ba
       const started = Date.now();
       r.onstop = () => { stream.getTracks().forEach((t) => t.stop()); void finish(new Blob(chunks.current, { type: r.mimeType }), (Date.now() - started) / 1000); if (timer.current) clearInterval(timer.current); setRec(null); };
       r.start(250); setRec(r); setSecs(0);
-      timer.current = window.setInterval(() => setSecs((s) => { if (s >= 60) { r.stop(); } return s + 1; }), 1000);
+      let elapsed = 0;
+      timer.current = window.setInterval(() => { elapsed += 1; setSecs(elapsed); if (elapsed >= 60 && r.state === 'recording') r.stop(); }, 1000);
     } catch (e: any) { setErr(`Microphone unavailable: ${e.message}`); }
   };
   const upload = async (f: File | undefined) => { if (!f) return; setErr(null); await finish(f, 0); };

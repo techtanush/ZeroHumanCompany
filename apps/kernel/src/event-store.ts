@@ -17,7 +17,8 @@ export interface AppendInput {
   idempotency_key?: string;
 }
 
-export type StoredEvent = EventEnvelope & { seq: number };
+/** `replayed` is true when an idempotency_key matched a prior append (subscribers were NOT notified). */
+export type StoredEvent = EventEnvelope & { seq: number; replayed?: boolean };
 export type Subscriber = (e: StoredEvent) => void;
 
 /**
@@ -57,6 +58,7 @@ export class EventStore {
       );
     }
 
+    let replayed = false;
     return this.db.tx(async (tx) => {
       if (input.idempotency_key) {
         const seen = await tx.query<{ result_ref: string }>(
@@ -65,7 +67,7 @@ export class EventStore {
         );
         if (seen.rows.length > 0 && seen.rows[0].result_ref) {
           const prior = await tx.query('SELECT * FROM events WHERE id = $1', [seen.rows[0].result_ref]);
-          if (prior.rows.length > 0) return this.rowToEvent(prior.rows[0]);
+          if (prior.rows.length > 0) { replayed = true; return this.rowToEvent(prior.rows[0]); }
         }
       }
 
@@ -105,6 +107,8 @@ export class EventStore {
       for (const r of this.reducers) await r(stored, tx);
       return stored;
     }).then((stored) => {
+      // An idempotent replay is not a new fact: routing/subscribers must not fire twice.
+      if (replayed) return Object.assign(stored, { replayed: true });
       // Notify subscribers only after the transaction committed.
       for (const s of this.subs) {
         try {

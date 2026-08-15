@@ -23,7 +23,7 @@ export const ROOM_TO_DEPT: Record<string, DepartmentId[]> = {
   sales: ['D10'],
   finance: ['D11'],
   hr: ['D11'],
-  recruitment: ['D11'],
+  recruitment: ['D13'],
   support: ['D12'],
   improvement: ['D13'],
   exec: DEPTS,
@@ -94,9 +94,10 @@ export class Insight {
     );
     const budget = await this.db.query<any>(
       `SELECT ba.department_id, ba.envelope_usd, ba.reserved_usd, ba.spent_usd, ba.state
-       FROM budget_allocations ba JOIN budgets b ON b.cycle_id = ba.cycle_id
+       FROM budget_allocations ba
        WHERE ba.venture_id = $1 AND ba.department_id = ANY($2::text[])
-       ORDER BY b.cycle_index DESC LIMIT ${inList.length}`,
+         AND ba.cycle_id = (SELECT cycle_id FROM budgets WHERE venture_id = $1 ORDER BY cycle_index DESC LIMIT 1)
+       ORDER BY ba.department_id`,
       [venture_id, inList],
     ).catch(() => ({ rows: [] as any[] }));
 

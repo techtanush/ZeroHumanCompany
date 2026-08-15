@@ -31,7 +31,8 @@ function toMinutes(hhmm: string): number { const [h, m] = hhmm.split(':').map(Nu
 /** Which schedule points are due at this local minute (within a 2-minute window so a slow tick never misses). */
 export function dueKinds(schedule: MeetingSchedule, minutes: number, day: string): Kind[] {
   if (!schedule.days.includes(day as any)) return [];
-  const within = (t: string) => { const d = minutes - toMinutes(t); return d >= 0 && d < 2; };
+  // Exact-minute match; the once-a-minute tick plus per-day idempotency keys make this safe.
+  const within = (t: string) => minutes === toMinutes(t);
   const out: Kind[] = [];
   if (within(schedule.work_start)) out.push('workday_start');
   if (within(schedule.exec_meeting_time)) out.push('executive');
@@ -49,6 +50,7 @@ export class CompanyClock {
 
   start(intervalMs = 60_000): void {
     if (this.timer) return;
+    void this.closeStaleMeetings().catch(() => undefined);
     this.timer = setInterval(() => { void this.tick().catch((e) => console.error('[clock] tick failed', e)); }, intervalMs);
     this.timer.unref?.();
   }
@@ -58,6 +60,19 @@ export class CompanyClock {
     this.timer = null;
     for (const t of this.meetingTimers.values()) clearTimeout(t);
     this.meetingTimers.clear();
+  }
+
+  /** Meeting-end timers live in memory: after a restart, end any meeting that never got its ops.meeting_ended. */
+  private async closeStaleMeetings(): Promise<void> {
+    const rows = await this.db.query<{ venture_id: string; kind: string }>(
+      `SELECT s.venture_id, s.payload->>'kind' AS kind FROM events s
+       WHERE s.type = 'ops.meeting_started'
+         AND NOT EXISTS (SELECT 1 FROM events e WHERE e.venture_id = s.venture_id AND e.type = 'ops.meeting_ended' AND e.seq > s.seq)`);
+    for (const r of rows.rows) {
+      const trace_id = await this.kernel.traceFor(r.venture_id).catch(() => null);
+      if (!trace_id) continue;
+      await this.events.append({ venture_id: r.venture_id, type: 'ops.meeting_ended', actor_kind: 'system', actor_id: 'kernel.clock', department_id: 'D13', payload: { kind: (r.kind as any) ?? 'executive', room: 'exec' }, trace_id }).catch(() => undefined);
+    }
   }
 
   async tick(now = new Date()): Promise<void> {
@@ -109,11 +124,13 @@ export class CompanyClock {
         return { fired: true, event_id: e.id };
       }
       case 'improvement': {
-        const work_order_id = await this.kernel.issueWorkOrder({
+        // Append first (idempotent) so a repeated scheduled tick cannot issue a second $2 work order.
+        const e = await this.events.append({ ...base, department_id: 'D13', type: 'ops.improvement_run_started', payload: { trigger: ctx.scheduled ? 'scheduled' : 'manual' } });
+        if (e.replayed) return { fired: false, event_id: e.id };
+        await this.kernel.issueWorkOrder({
           venture_id, to: 'D13', intent: 'review_company', budget_usd: 2.0, trace_id,
-          params: { trigger: ctx.scheduled ? 'scheduled' : 'manual', date, note: 'End-of-day improvement branch: mine today\'s telemetry for capability gaps. Founder approval (via Linq) is required before anything new is built.' },
+          params: { trigger: ctx.scheduled ? 'scheduled' : 'manual', date, improvement_run_event_id: e.id, note: 'End-of-day improvement branch: mine today\'s telemetry for capability gaps. Founder approval (via Linq) is required before anything new is built.' },
         });
-        const e = await this.events.append({ ...base, department_id: 'D13', type: 'ops.improvement_run_started', payload: { work_order_id, trigger: ctx.scheduled ? 'scheduled' : 'manual' } });
         return { fired: true, event_id: e.id };
       }
     }

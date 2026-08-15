@@ -75,7 +75,7 @@ function GateCard({ g, onDone, toast }: { g: Gate; onDone: () => void; toast: (m
           <div className="row" style={{ marginTop: 8 }}>
             <input className="input" style={{ padding: '6px 8px' }} placeholder="Note or redirect instruction (optional)" value={note} onChange={(e) => setNote(e.target.value)} />
             <button className="btn sm" disabled={busy || !note.trim()} onClick={() => decide('redirect', g.options[0]?.id ?? 'redirect')}>Redirect</button>
-            <button className="btn sm danger" disabled={busy} onClick={() => decide('reject', g.options.find((o) => o.id === 'reject')?.id ?? g.options[0].id)}>Reject</button>
+            <button className="btn sm danger" disabled={busy} onClick={() => decide('reject', g.options.find((o) => o.id === 'reject')?.id ?? g.options[0]?.id ?? 'reject')}>Reject</button>
           </div>
         </>
       ) : (

@@ -43,6 +43,20 @@ Terac is **MCP-first**: `terac.*` tools call `https://terac.com/api/mcp` with `T
 bearer (feasibility → draft → launch → submissions); REST is the fallback. Build agents work only
 inside the founder-granted folder via `workspace.*` tools, and Replay runs before any push/deploy.
 
+## Boardroom (frontend)
+
+`apps/boardroom` is the Vite + React app: an onboarding wizard (founder → phone HELLO → idea →
+budget → workspace → schedule → integrations → voice → launch) and a live pixel-art HQ whose
+sprites, meetings and day/night follow the kernel's agents and events. Panels cover gates, the live
+event log, exec briefings, goals, the company clock, wallets, voice, keys and settings.
+Details, route map and safety notes: [`apps/boardroom/README.md`](apps/boardroom/README.md).
+
+```bash
+pnpm dev:kernel        # :4000
+pnpm dev:orchestrator  # consumes work orders
+pnpm dev:boardroom     # http://localhost:5173 (proxies /v1 to KERNEL_URL, default :4000)
+```
+
 ## What exists
 
 | Package | Purpose |

@@ -40,11 +40,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Store['toasts']>([]);
   const [kernelOk, setKernelOk] = useState<boolean | null>(null);
   const seqRef = useRef(0);
+  const lastHandled = useRef(0);
   const toastId = useRef(1);
 
   const setVentureId = useCallback((id: string | null) => {
     if (id) localStorage.setItem(VENTURE_KEY, id); else localStorage.removeItem(VENTURE_KEY);
-    setEvents([]); seqRef.current = 0; setGates([]); setSettings(null); setVenture(null); setMeeting(null);
+    setEvents([]); seqRef.current = 0; lastHandled.current = 0; setGates([]); setSettings(null); setVenture(null); setMeeting(null); setWorkday('unknown');
     setVentureIdState(id);
   }, []);
 
@@ -125,7 +126,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [ventureId]);
 
   // Derive gates/settings/meeting/toasts from the stream.
-  const lastHandled = useRef(0);
   useEffect(() => {
     const fresh = events.filter((e) => e.seq > lastHandled.current);
     if (!fresh.length) return;

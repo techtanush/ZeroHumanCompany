@@ -310,7 +310,9 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
 
   app.get('/v1/ventures/:id/stream', async (req, reply) => {
     const { id } = req.params as { id: string };
-    const lastId = Number(req.headers['last-event-id'] ?? (req.query as any).after_seq ?? 0);
+    let lastId = Number(req.headers['last-event-id'] ?? (req.query as any).after_seq ?? 0);
+    // A fresh client (no cursor) gets the most recent 500, not the oldest 500.
+    if (!lastId) lastId = Math.max(0, (await kernel.events.latestSeq(id)) - 500);
 
     reply.raw.writeHead(200, {
       'Content-Type': 'text/event-stream',
@@ -618,6 +620,11 @@ async function parseLinqGateDecision(kernel: Kernel, body: any): Promise<({ gate
 
   const raw = String(body.text ?? body.message?.text ?? body.reaction ?? '').trim();
   const normalized = raw.toLowerCase();
+  // A delivery receipt / empty echo must never decide a gate; and when we know the
+  // founder's number, only that number may decide over the phone channel.
+  if (!normalized) return null;
+  const from = String(body.from ?? body.sender ?? body.message?.from ?? '').replace(/[^\d+]/g, '');
+  if (process.env.FOUNDER_PHONE && from && from !== process.env.FOUNDER_PHONE.replace(/[^\d+]/g, '')) return null;
   const decided_by = String(body.from ?? 'linq-founder');
   const rejectWords = new Set(['no', 'n', 'reject', 'stop', 'deny', '👎']);
   const approveWords = new Set(['yes', 'y', 'approve', 'approved', 'ok', 'okay', '👍']);

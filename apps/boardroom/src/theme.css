@@ -184,10 +184,12 @@ a { color: var(--filament-2); }
 .enter-cta { position: absolute; left: 50%; bottom: 11%; transform: translateX(-50%); text-align: center; z-index: 5; }
 .enter-cta .btn { font-size: 13px; padding: 16px 30px; }
 .hover-label { position: absolute; transform: translate(-50%, -100%); pointer-events: none; background: var(--paper); color: var(--ink); font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; padding: 6px 10px; border-radius: 2px; border: 1px solid var(--ink); white-space: nowrap; z-index: 6; }
-.zoom { position: absolute; right: 26px; bottom: 26px; display: flex; flex-direction: column; gap: 1px; z-index: 5; }
+/* Bottom-left (next to the dock): at bottom-right it sat underneath the room sidebar/panels, which open automatically on room entry. */
+.zoom { position: absolute; left: 96px; bottom: 44px; display: flex; flex-direction: column; gap: 1px; z-index: 5; }
 .zoom button { width: 38px; height: 32px; background: var(--void-2); color: var(--paper-on-void); border: 1px solid var(--bone-on-void); font-size: 15px; }
 .zoom .lbl { width: 38px; padding: 4px 0; text-align: center; font-family: var(--font-mono); font-size: 9px; color: var(--paper-on-void-2); background: var(--void-2); border-left: 1px solid var(--bone-on-void); border-right: 1px solid var(--bone-on-void); }
-.meeting-banner { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); z-index: 6; background: var(--filament); color: var(--void); padding: 8px 16px; border-radius: 3px; font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; display: flex; gap: 12px; align-items: center; animation: pop 220ms var(--ease); box-shadow: 0 8px 30px rgba(230,106,44,.35); }
+/* z-index above .panel (7): the panel used to cover the Join/End buttons. */
+.meeting-banner { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); z-index: 8; background: var(--filament); color: var(--void); padding: 8px 16px; border-radius: 3px; font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; display: flex; gap: 12px; align-items: center; animation: pop 220ms var(--ease); box-shadow: 0 8px 30px rgba(230,106,44,.35); }
 .meeting-banner .btn { padding: 4px 8px; font-size: 9px; background: var(--void); color: var(--paper-on-void); border-color: var(--void); }
 .exec-seat { display: grid; grid-template-columns: 40px 1fr; gap: 10px; align-items: start; padding: 10px; border: 1px solid var(--bone); border-radius: var(--r-2); background: #fff; }
 .exec-seat canvas { width: 40px; height: 40px; image-rendering: pixelated; background: var(--paper-2); border-radius: 3px; }

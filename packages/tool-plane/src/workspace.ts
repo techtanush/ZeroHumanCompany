@@ -18,7 +18,17 @@ const ALLOWED_BINARIES = new Set([
   'python', 'python3', 'pip', 'pip3', 'pytest', 'uv', 'go', 'cargo', 'rustc', 'make',
   'git',
 ]);
-const DENY_PATTERNS = [/\brm\s+-rf\s+\/(?!\S)/, /\bsudo\b/, /\bcurl\b.*\|\s*(ba)?sh/, /\bshutdown\b/, /\breboot\b/, /\bmkfs\b/, /\bdd\s+if=/];
+const DENY_PATTERNS = [
+  /\brm\s+-rf\s+\/(?!\S)/, /\bsudo\b/, /\bcurl\b.*\|\s*(ba)?sh/, /\bshutdown\b/, /\breboot\b/, /\bmkfs\b/, /\bdd\s+if=/,
+  /\$\(/, /`/,                                   // command substitution
+  /\b(node|bun)\s+(-e|--eval|-p)\b/,           // inline scripts bypass the allowlist
+  /\bpython3?\s+-c\b/,
+  /\b(pnpm|npm|npx|yarn|bun)\s+(exec|x)\b/,     // package-manager escape hatches
+  /\bfind\b.*\s-exec\b/,
+  /~\/\.(ssh|aws|gnupg|config)/, /\/etc\/(passwd|shadow)/,
+];
+/** Only these variables reach the agents' shell; every secret in process.env is scrubbed. */
+const SAFE_ENV = ['PATH', 'HOME', 'SHELL', 'LANG', 'LC_ALL', 'TMPDIR', 'TERM', 'USER', 'NODE_OPTIONS', 'npm_config_cache', 'PNPM_HOME', 'XDG_CACHE_HOME'];
 
 export class WorkspaceError extends Error {
   constructor(message: string) { super(message); this.name = 'WorkspaceError'; }
@@ -60,7 +70,7 @@ async function listTree(root: string, rel: string, depth: number): Promise<unkno
 export function checkCommand(command: string): void {
   for (const re of DENY_PATTERNS) if (re.test(command)) throw new WorkspaceError(`command refused by workspace policy: ${command}`);
   // First token of every pipeline segment must be an allowed binary.
-  const segments = command.split(/&&|\|\||\||;/).map((s) => s.trim()).filter(Boolean);
+  const segments = command.split(/&&|\|\||\||;|\n|\r/).map((s) => s.trim()).filter(Boolean);
   for (const seg of segments) {
     const first = seg.replace(/^[A-Z_]+=\S+\s+/g, '').split(/\s+/)[0] ?? '';
     const bin = path.basename(first);
@@ -71,12 +81,14 @@ export function checkCommand(command: string): void {
 async function exec(root: string, command: string, timeout_s: number): Promise<unknown> {
   checkCommand(command);
   return new Promise((resolve) => {
-    const child = spawn('/bin/sh', ['-c', command], { cwd: root, env: { ...process.env, CI: '1', FORCE_COLOR: '0' } });
+    const env: Record<string, string> = { CI: '1', FORCE_COLOR: '0' };
+    for (const k of SAFE_ENV) if (process.env[k]) env[k] = process.env[k]!;
+    const child = spawn('/bin/sh', ['-c', command], { cwd: root, env, detached: true });
     let stdout = '', stderr = '';
     const cap = (s: string) => (s.length > 40_000 ? s.slice(-40_000) : s);
     child.stdout.on('data', (d) => { stdout = cap(stdout + d.toString()); });
     child.stderr.on('data', (d) => { stderr = cap(stderr + d.toString()); });
-    const timer = setTimeout(() => { child.kill('SIGKILL'); }, timeout_s * 1000);
+    const timer = setTimeout(() => { try { process.kill(-child.pid!, 'SIGKILL'); } catch { child.kill('SIGKILL'); } }, timeout_s * 1000);
     child.on('close', (code, signal) => {
       clearTimeout(timer);
       resolve({ command, exit_code: code, signal, stdout, stderr, timed_out: signal === 'SIGKILL' });

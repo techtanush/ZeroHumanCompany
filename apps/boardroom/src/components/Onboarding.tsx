@@ -5,6 +5,7 @@ import { IntegrationsList } from './IntegrationsPanel';
 import { WorkspacePicker } from './WorkspacePicker';
 import { ConsentBox } from './VoicePanel';
 import { VoiceRecorder } from './VoiceRecorder';
+import { toE164 } from '../lib/phone';
 
 /**
  * Onboarding: founder → phone (Linq HELLO) → idea or autonomous → budget →
@@ -15,7 +16,12 @@ import { VoiceRecorder } from './VoiceRecorder';
 const STEPS = ['You', 'Phone', 'Idea', 'Budget', 'Workspace', 'Schedule', 'Integrations', 'Voice', 'Launch'] as const;
 const TZ_GUESS = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Los_Angeles';
 
-function toE164(raw: string): string { const d = raw.replace(/[^\d+]/g, ''); if (d.startsWith('+')) return d; if (d.length === 10) return `+1${d}`; if (d.length === 11 && d.startsWith('1')) return `+${d}`; return d ? `+${d}` : ''; }
+// Module-level so React keeps the same component identity across renders;
+// defining it inside Onboarding remounted every input on each keystroke
+// (focus jumped back to the autoFocus field, typed text landed in Name).
+
+/** Declared at module scope so typing never remounts the input (a component created inside render loses focus on every keystroke). */
+function Field({ label, children }: { label: string; children: React.ReactNode }) { return <label className="field"><span className="spec muted">{label}</span>{children}</label>; }
 
 export function Onboarding({ onDone }: { onDone: () => void }) {
   const { setVentureId, ventureId, toast, kernelOk } = useStore();
@@ -70,13 +76,13 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
       if (voice.agree) { log('Recording voice consent…'); await api.voiceConsent(r.venture_id, { accepted: true, display_name: f.display_name }); if (voice.sample) { log('Cloning voice…'); const c = await api.voiceClone(r.venture_id, { audio_base64: voice.sample.audio_base64, mime_type: voice.sample.mime_type, duration_s: voice.sample.duration_s, name: `${f.display_name} voice` }).catch((e) => ({ voice_id: '', driver: 'error', degraded: e.message })); log(`Voice: ${c.voice_id ? `cloned (${c.driver})` : c.degraded}`); } }
       if (linq.sent) await api.linqConfirm(r.venture_id, linq.confirmed).catch(() => undefined);
       log('Opening the HQ. The SSE stream connects on entry.');
-      setVentureId(r.venture_id);
-      setTimeout(onDone, 900);
+      // App switches to the HQ the moment the venture id is set, so set it inside
+      // the delay — otherwise the launch log / "Venture created" card never shows.
+      setTimeout(() => { setVentureId(r.venture_id); onDone(); }, 1500);
     } catch (e: any) { log(`Error: ${e.message}`); toast(e.message, 'error'); }
     finally { setBusy(false); }
   };
 
-  const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (<label className="field"><span className="spec muted">{label}</span>{children}</label>);
   const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
   return (

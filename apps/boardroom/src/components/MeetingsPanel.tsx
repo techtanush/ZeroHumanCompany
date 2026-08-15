@@ -6,6 +6,13 @@ import { Panel } from './Panel';
 const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const TZS = ['America/Los_Angeles', 'America/Denver', 'America/Chicago', 'America/New_York', 'Europe/London', 'Europe/Berlin', 'Asia/Kolkata', 'Asia/Singapore', 'Asia/Tokyo', 'Australia/Sydney', 'UTC'];
 
+// Module-level so the input keeps its identity across renders; defined inside the
+// panel it remounted on every render (the HQ re-renders per animation frame), so
+// the time fields could not be focused or typed into.
+function T({ k, label, m, setM }: { k: string; label: string; m: any; setM: (m: any) => void }) {
+  return (<label className="field"><span className="spec muted">{label}</span><input className="input" type="time" value={m[k]} onChange={(e) => setM({ ...m, [k]: e.target.value })} /></label>);
+}
+
 /** When the company works and meets. Also the manual triggers ("start now"). */
 export function MeetingsPanel({ onClose }: { onClose: () => void }) {
   const { ventureId, settings, refreshSettings, meeting, workday, toast } = useStore();
@@ -15,7 +22,6 @@ export function MeetingsPanel({ onClose }: { onClose: () => void }) {
   if (!m) return <Panel title="Company clock" onClose={onClose}>…</Panel>;
   const save = async () => { if (!ventureId) return; setBusy(true); try { await api.updateSettings(ventureId, { meetings: m }); await refreshSettings(); toast('Schedule saved', 'ok'); } catch (e: any) { toast(e.message, 'error'); } finally { setBusy(false); } };
   const fire = async (kind: string) => { if (!ventureId) return; try { await api.startMeeting(ventureId, kind); toast(`${kind.replace('_', ' ')} started`, 'meeting'); } catch (e: any) { toast(e.message, 'error'); } };
-  const T = ({ k, label }: { k: string; label: string }) => (<label className="field"><span className="spec muted">{label}</span><input className="input" type="time" value={m[k]} onChange={(e) => setM({ ...m, [k]: e.target.value })} /></label>);
   return (
     <Panel title="Company clock" size="wide" onClose={onClose} sub={<span>{workday === 'night' ? 'After hours' : workday === 'day' ? 'Workday' : 'Waiting for the first tick'} · {meeting ? `${meeting} meeting running` : 'no meeting running'}</span>}
       foot={<><button className="btn primary" onClick={save} disabled={busy}>Save schedule</button><span className="muted small">Times are in {m.timezone}. The kernel checks every minute.</span></>}>
@@ -25,10 +31,10 @@ export function MeetingsPanel({ onClose }: { onClose: () => void }) {
       <div className="grid2">
         <label className="field"><span className="spec muted">Timezone</span><select className="select" value={m.timezone} onChange={(e) => setM({ ...m, timezone: e.target.value })}>{[m.timezone, ...TZS.filter((t) => t !== m.timezone)].map((t) => <option key={t}>{t}</option>)}</select></label>
         <div className="field"><span className="spec muted">Days</span><div className="row wrap" style={{ gap: 6 }}>{DAYS.map((d) => <button key={d} className={`btn sm ${m.days.includes(d) ? 'primary' : ''}`} onClick={() => setM({ ...m, days: m.days.includes(d) ? m.days.filter((x: string) => x !== d) : [...m.days, d] })}>{d}</button>)}</div></div>
-        <T k="work_start" label="Workday starts" /><T k="work_end" label="Workday ends" />
-        <T k="exec_meeting_time" label="Executive meeting (heads + CEO)" /><label className="field"><span className="spec muted">Exec meeting length (min)</span><input className="input" type="number" min={5} max={180} value={m.exec_meeting_minutes} onChange={(e) => setM({ ...m, exec_meeting_minutes: Number(e.target.value) })} /></label>
-        <T k="all_hands_time" label="All-hands (whole company)" /><label className="field"><span className="spec muted">All-hands length (min)</span><input className="input" type="number" min={5} max={120} value={m.all_hands_minutes} onChange={(e) => setM({ ...m, all_hands_minutes: Number(e.target.value) })} /></label>
-        <T k="improvement_time" label="Improvement branch runs" />
+        <T k="work_start" label="Workday starts" m={m} setM={setM} /><T k="work_end" label="Workday ends" m={m} setM={setM} />
+        <T k="exec_meeting_time" label="Executive meeting (heads + CEO)" m={m} setM={setM} /><label className="field"><span className="spec muted">Exec meeting length (min)</span><input className="input" type="number" min={5} max={180} value={m.exec_meeting_minutes} onChange={(e) => setM({ ...m, exec_meeting_minutes: Number(e.target.value) })} /></label>
+        <T k="all_hands_time" label="All-hands (whole company)" m={m} setM={setM} /><label className="field"><span className="spec muted">All-hands length (min)</span><input className="input" type="number" min={5} max={120} value={m.all_hands_minutes} onChange={(e) => setM({ ...m, all_hands_minutes: Number(e.target.value) })} /></label>
+        <T k="improvement_time" label="Improvement branch runs" m={m} setM={setM} />
       </div>
       <div className="spec muted">Run now</div>
       <div className="row wrap" style={{ gap: 8 }}>

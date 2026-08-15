@@ -23,7 +23,8 @@ export function DeptSidebar({ room, agents, selected, scene, onClose }: { room: 
   const deptKey = room.id;
 
   useEffect(() => { setLog([]); setFacts(null); setTab('ask'); }, [room.id]);
-  useEffect(() => { if (!ventureId) return; api.facts(ventureId, deptKey).then((r) => setFacts(r.facts)).catch(() => undefined); }, [ventureId, deptKey, events.length]);
+  const factsTick = Math.floor(events.length / 8);
+  useEffect(() => { if (!ventureId) return; api.facts(ventureId, deptKey).then((r) => setFacts(r.facts)).catch(() => undefined); }, [ventureId, deptKey, factsTick]);
   useEffect(() => { logRef.current?.scrollTo({ top: 1e6, behavior: 'smooth' }); }, [log]);
   useEffect(() => { if (selected?.persona) setTab('team'); }, [selected]);
 

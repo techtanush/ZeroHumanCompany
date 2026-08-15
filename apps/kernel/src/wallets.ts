@@ -73,7 +73,8 @@ export class Wallets {
   async fund(venture_id: string, amount_usd: number, rail: string, external_id?: string): Promise<void> {
     const trace = await this.db.query<{ trace_id: string }>('SELECT trace_id FROM ventures WHERE id = $1', [venture_id]);
     if (!trace.rows[0]) return;
-    await this.events.append({ venture_id, type: 'money.wallet_funded', actor_kind: 'founder', actor_id: 'founder', payload: { amount_usd, rail, external_id }, trace_id: trace.rows[0].trace_id, idempotency_key: external_id ? `fund:${rail}:${external_id}` : undefined });
+    const e = await this.events.append({ venture_id, type: 'money.wallet_funded', actor_kind: 'founder', actor_id: 'founder', payload: { amount_usd, rail, external_id }, trace_id: trace.rows[0].trace_id, idempotency_key: external_id ? `fund:${rail}:${external_id}` : undefined });
+    if (e.replayed) return; // webhook redelivery: already credited
     const budgets = await this.meter.budgets(venture_id);
     if (!budgets.length) return;
     const per = amount_usd / budgets.length;

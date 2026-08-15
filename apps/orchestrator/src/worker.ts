@@ -2,7 +2,7 @@ import { runHead, createLlmClient, type LlmClient } from '@zeroth/agent-kit';
 import type { ArtifactType, DepartmentManifest } from '@zeroth/contracts';
 import { getManifest, loadManifests } from '@zeroth/manifests';
 import { ToolPlane, type Tool, type ToolCtx } from '@zeroth/tool-plane';
-import type { Kernel } from '@zeroth/kernel';
+import { sendLinqText, type Kernel } from '@zeroth/kernel';
 
 export interface WorkerOptions {
   kernel: Kernel;
@@ -23,12 +23,40 @@ export class Orchestrator {
   private llm: LlmClient;
   private tools: ToolPlane;
   private running = false;
+  /** vendors we've already asked the founder about, per venture — one text per missing key. */
+  private askedForKey = new Set<string>();
 
   constructor(private opts: WorkerOptions) {
     this.llm = opts.llm ?? createLlmClient();
     this.tools = new ToolPlane({
       driver: opts.toolDriver ?? (process.env.ZEROTH_TOOLS === 'real' ? 'real' : 'mock'),
+      onCall: (ev) => { if (ev.type === 'degraded') void this.onDegraded(ev.tool_name, ev.reason); },
     });
+  }
+
+  private currentWo: any = null;
+
+  /**
+   * A department reached for an integration the founder hasn't connected yet
+   * (e.g. Composio for Gmail, Render for deploys). The mock keeps the work
+   * moving; the founder gets ONE Linq text per venture+vendor asking for the key,
+   * and the Boardroom sees a human.notified event.
+   */
+  private async onDegraded(tool_name: string, reason: string): Promise<void> {
+    const wo = this.currentWo; if (!wo) return;
+    const vendor = tool_name.split('.')[0];
+    const key = `${wo.venture_id}:${vendor}`;
+    if (this.askedForKey.has(key)) return;
+    this.askedForKey.add(key);
+    const kernel = this.opts.kernel;
+    const text = `${wo.to_dept} needs ${vendor} for "${wo.intent}" (${reason}). Add the key in the Boardroom → keys, and the next run will use it for real. Until then it runs on the mock.`;
+    const r = process.env.FOUNDER_PHONE ? await sendLinqText(process.env.FOUNDER_PHONE, text, { kind: 'integration_needed', vendor, venture_id: wo.venture_id }) : { ok: false, detail: 'no FOUNDER_PHONE', degraded: 'missing FOUNDER_PHONE' as string | undefined };
+    await kernel.events.append({
+      venture_id: wo.venture_id, type: 'human.notified', actor_kind: 'system', actor_id: 'orchestrator.integrations', department_id: wo.to_dept,
+      payload: { channel: 'linq', kind: 'integration_needed', vendor, tool_name, reason, delivered: r.ok, degraded: r.degraded, text },
+      trace_id: wo.trace_id, correlation_id: wo.id, idempotency_key: `integration_needed:${key}`,
+    }).catch(() => undefined);
+    await this.chat(wo, `${wo.to_dept}.head`, `Heads up: we don't have ${vendor} connected yet — running on the mock and asked the founder for the key.`);
   }
 
   async init(): Promise<void> {
@@ -52,6 +80,7 @@ export class Orchestrator {
   async execute(wo: any): Promise<void> {
     const kernel = this.opts.kernel;
     const manifest = this.manifests.get(wo.to_dept);
+    this.currentWo = wo;
 
     if (await kernel.isHalted(wo.venture_id)) {
       await kernel.db.query(`UPDATE work_orders SET status='cancelled' WHERE id=$1`, [wo.id]);

@@ -10,7 +10,7 @@ export function GoalsView({ onClose }: { onClose: () => void }) {
   const { ventureId, events, gates } = useStore();
   const [g, setG] = useState<any | null>(null);
   const [tab, setTab] = useState<'overview' | 'roadmap' | 'achievements' | 'improvement'>('overview');
-  const tick = useMemo(() => events.filter((e) => e.type.startsWith('artifact.') || e.type.startsWith('dept.work') || e.type.startsWith('venture.') || e.type.startsWith('cos.')).length, [events]);
+  const tick = useMemo(() => Math.floor(events.filter((e) => e.type.startsWith('artifact.') || e.type.startsWith('dept.work') || e.type.startsWith('venture.') || e.type.startsWith('cos.')).length / 4), [events]);
   useEffect(() => { if (ventureId) api.goals(ventureId).then(setG).catch(() => undefined); }, [ventureId, tick]);
   if (!g) return <Panel title="Goals & achievements" onClose={onClose}><Empty>Loading…</Empty></Panel>;
   const done = g.milestones.filter((m: any) => m.done).length;

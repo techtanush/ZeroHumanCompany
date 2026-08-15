@@ -37,6 +37,7 @@ export class McpClient {
   private sessionId: string | null = null;
   private initialized = false;
   private toolCache: McpToolInfo[] | null = null;
+  private recovering = false;
 
   constructor(private readonly opts: McpClientOptions) {}
 
@@ -99,11 +100,16 @@ export class McpClient {
         accept: 'application/json, text/event-stream',
       };
       if (this.opts.bearer) headers.authorization = `Bearer ${this.opts.bearer}`;
-      if (this.sessionId) headers['mcp-session-id'] = this.sessionId;
+      if (this.sessionId) { headers['mcp-session-id'] = this.sessionId; headers['mcp-protocol-version'] = '2025-06-18'; }
       const res = await fetch(this.opts.url, { method: 'POST', headers, body: JSON.stringify(payload), signal: ac.signal });
       const sid = res.headers.get('mcp-session-id');
       if (sid) this.sessionId = sid;
       const text = await res.text();
+      if (res.status === 404 && this.sessionId && !this.recovering) {
+        // Server forgot our session: re-initialize once and retry this call.
+        this.sessionId = null; this.initialized = false; this.toolCache = null; this.recovering = true;
+        try { await this.initialize(); return await this.post(payload); } finally { this.recovering = false; }
+      }
       if (!res.ok) {
         const safe = this.opts.bearer ? text.split(this.opts.bearer).join('[redacted]') : text;
         throw new McpError(`mcp ${res.status}: ${safe.slice(0, 200)}`, res.status);

@@ -117,6 +117,8 @@ export class Kernel {
       const gate = await this.gates.get(String((e.payload as any).gate_id));
       if (!gate || gate.gate_type !== 'new_department' || gate.action?.tool !== 'kernel.issue_work_order') return;
       const args = gate.action.args as any;
+      const claimed = await this.db.query(`INSERT INTO processed_messages (consumer, message_id, result_ref) VALUES ('improvement_wo', $1, $1) ON CONFLICT DO NOTHING`, [gate.id]);
+      if ((claimed as any).rowCount === 0) return; // already issued for this gate
       const s = await this.settings.get(e.venture_id);
       await this.issueWorkOrder({
         venture_id: e.venture_id, from: 'D13', to: String(args.to ?? 'D07'), intent: String(args.intent ?? 'implement_capability'), budget_usd: 6,

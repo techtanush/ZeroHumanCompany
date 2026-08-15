@@ -225,7 +225,14 @@ export class HqScene {
   private boxFromCorners(id: string, name: string, pts: Pt[]) { let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity; for (const p of pts) { minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x); minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y); } return { id, name, x: minX, y: minY, w: maxX - minX, h: maxY - minY }; }
   private drawBuilding(ctx: CanvasRenderingContext2D, w: number, h: number, now: number, dt: number) {
     ctx.fillStyle = '#0A0E1A'; ctx.fillRect(0, 0, w, h);
-    const bw = Math.min(w * 0.86, 1180); const x0 = w / 2 - bw / 2, x1 = w / 2 + bw / 2; const shx = FLOOR_SHX, shy = FLOOR_SHY; const n = FLOOR_LAYOUT.length; const floorStep = WALL_H + 16; const contentH = (n - 1) * floorStep + WALL_H + 40; const roofY = Math.max(64, (h - contentH) / 2); const baseY = roofY + contentH;
+    const shx = FLOOR_SHX, shy = FLOOR_SHY; const n = FLOOR_LAYOUT.length; const floorStep = WALL_H + 16; const contentH = (n - 1) * floorStep + WALL_H + 40;
+    // Fit the cutaway to short viewports (laptop screens ~900px tall): the whole
+    // building is ~930px, so the bottom floor used to render below the fold. Scale
+    // about the horizontal centre; room hit boxes are mapped back to screen space below.
+    const HUD_TOP = 64, HUD_BOT = 60; const k = Math.min(1, (h - HUD_TOP - HUD_BOT) / contentH);
+    const bw = Math.min(w * 0.86, 1180) / k; const x0 = w / 2 - bw / 2, x1 = w / 2 + bw / 2;
+    const roofY = k < 1 ? HUD_TOP : Math.max(HUD_TOP, (h - contentH) / 2); const baseY = roofY + contentH;
+    const ox = (w / 2) * (1 - k), oy = roofY * (1 - k); ctx.save(); ctx.translate(ox, oy); ctx.scale(k, k);
     const meeting = this.live.meeting; const night = this.live.workday === 'night';
     this.lastRoomBoxes = [];
     FLOOR_LAYOUT.forEach((floorIds, fi) => {
@@ -260,6 +267,8 @@ export class HqScene {
       });
     });
     const rp = [{ x: x0, y: roofY }, { x: x1, y: roofY }, shear(x1, roofY, 1, shx, shy), shear(x0, roofY, 1, shx, shy)]; ctx.fillStyle = '#3a4256'; quadPath(ctx, rp[0], rp[1], rp[2], rp[3]); ctx.fill(); ctx.strokeStyle = '#2a3350'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.restore();
+    if (k < 1) this.lastRoomBoxes = this.lastRoomBoxes.map((b) => ({ ...b, x: ox + b.x * k, y: oy + b.y * k, w: b.w * k, h: b.h * k }));
     if (night) { ctx.fillStyle = 'rgba(5,7,15,0.28)'; ctx.fillRect(0, 0, w, h); }
   }
 
@@ -324,7 +333,9 @@ export class HqScene {
     void workingLive;
     const props = [{ wx: 60, wy: 300, kind: 'plant' }, { wx: 1340, wy: 300, kind: 'plant' }, { wx: 78, wy: 470, kind: 'cooler' }, { wx: 1325, wy: 480, kind: 'printer' }, { wx: 790, wy: 210, kind: 'meeting' }];
     for (const p of props) { const sp = worldToPersp(p.wx, p.wy); items.push({ y: p.wy, draw: () => this.drawPropCluster(ctx, sp.x, sp.y, sp.scale, p.kind, room, now) }); }
-    const agents = (this.roomAgents[room.id] || []).filter((a) => !emptyRoom && !(meeting === 'executive' && a.isHead) && !(this.live.workday === 'night' && !a.live?.current && (a.seed % 3 !== 0)));
+    const all = this.roomAgents[room.id] || [];
+    const agents = all.filter((a) => !emptyRoom && !(meeting === 'executive' && a.isHead) && !(this.live.workday === 'night' && !a.live?.current && (a.seed % 3 !== 0)));
+    for (const a of all) if (!agents.includes(a)) this.lastAgentScreens[a.seed] = { x: -9999, y: -9999 };
     for (const { a, sp } of this.updateAgents(agents, dt, this.deskRects(room))) items.push({ y: a.y, draw: () => this.drawAgentSprite(ctx, a, sp, now) });
     items.sort((p, q) => p.y - q.y); for (const it of items) it.draw();
     if (emptyRoom) { ctx.fillStyle = withAlpha('#F4A661', 0.9); ctx.font = "600 16px 'Inter Tight', sans-serif"; ctx.textAlign = 'center'; ctx.fillText('Everyone is at the all-hands in the Executive Meeting Room ↑', CENTER_X, 640); }

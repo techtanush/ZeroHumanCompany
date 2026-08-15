@@ -35,7 +35,8 @@ export function Hq({ onReonboard }: { onReonboard: () => void }) {
   }, []);
 
   // Live agents: refresh on agent events + every 15s.
-  const agentTick = useMemo(() => events.filter((e) => e.type.startsWith('agent.') || e.type.startsWith('dept.work')).length, [events]);
+  // Coarse tick: refetch at most every 5 relevant events (plus the 15s poll) so a busy run doesn't hammer the kernel.
+  const agentTick = useMemo(() => Math.floor(events.filter((e) => e.type.startsWith('agent.') || e.type.startsWith('dept.work')).length / 5), [events]);
   useEffect(() => {
     if (!ventureId) return;
     let alive = true;

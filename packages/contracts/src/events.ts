@@ -5,10 +5,10 @@ import { ArtifactRef, ArtifactType } from './artifacts.js';
 /** Event type taxonomy: <domain>.<verb_past_tense>. This list is exhaustive and enforced. */
 export const EventType = z.enum([
   'venture.created', 'venture.mode_set', 'venture.autonomy_changed', 'venture.killed',
-  'venture.resumed', 'venture.milestone_reached',
+  'venture.resumed', 'venture.milestone_reached', 'venture.settings_updated',
 
   'dept.work_order_issued', 'dept.work_started', 'dept.work_completed', 'dept.work_failed',
-  'dept.frozen', 'dept.unfrozen',
+  'dept.frozen', 'dept.unfrozen', 'dept.chat_posted', 'dept.question_answered',
 
   'agent.started', 'agent.tool_used', 'agent.tool_failed', 'agent.finished',
   'agent.retried', 'agent.budget_exceeded',
@@ -19,13 +19,13 @@ export const EventType = z.enum([
   'gate.timed_out', 'gate.auto_approved',
 
   'human.notified', 'human.replied', 'human.call_placed', 'human.call_completed',
-  'human.consent_recorded', 'human.dnc_added',
+  'human.consent_recorded', 'human.consent_revoked', 'human.dnc_added',
 
   'terac.requisition_filed', 'terac.hire_posted', 'terac.worker_matched',
   'terac.work_delivered', 'terac.paid',
 
   'money.metered', 'money.budget_allocated', 'money.budget_exceeded', 'money.budget_degraded',
-  'money.revenue_received', 'money.refunded', 'money.payout',
+  'money.revenue_received', 'money.refunded', 'money.payout', 'money.wallet_funded',
 
   'build.repo_created', 'build.commit_pushed', 'build.qa_started', 'build.qa_failed',
   'build.qa_passed', 'build.deployed', 'build.rolled_back',
@@ -36,6 +36,8 @@ export const EventType = z.enum([
   'support.ticket_opened', 'support.ticket_resolved', 'support.signal_filed',
 
   'ops.daily_briefing_started', 'ops.daily_briefing_published',
+  'ops.meeting_started', 'ops.meeting_ended', 'ops.workday_started', 'ops.workday_ended',
+  'ops.improvement_run_started',
 
   'cos.gap_detected', 'cos.department_designed', 'cos.shadow_test_run', 'cos.department_deployed',
 
@@ -131,6 +133,27 @@ export const EVENT_PAYLOADS = {
     message_id: z.string().optional(),
   }),
   'cos.gap_detected': z.object({ taxonomy: z.string(), summary: z.string() }),
+  'ops.meeting_started': z.object({
+    kind: z.enum(['executive', 'all_hands', 'department']),
+    room: z.string().default('exec'),
+    scheduled_for: z.string().optional(),
+    department_id: DepartmentId.optional(),
+  }),
+  'ops.meeting_ended': z.object({ kind: z.enum(['executive', 'all_hands', 'department']), room: z.string().default('exec') }),
+  'ops.workday_started': z.object({ local_time: z.string(), timezone: z.string() }),
+  'ops.workday_ended': z.object({ local_time: z.string(), timezone: z.string() }),
+  'ops.improvement_run_started': z.object({ work_order_id: Uuid.optional(), trigger: z.enum(['scheduled', 'manual']) }),
+  'dept.chat_posted': z.object({
+    room: z.string(),
+    author: z.string(),
+    text: z.string(),
+    transport: z.enum(['band', 'local']).default('local'),
+    message_id: z.string().optional(),
+  }),
+  'dept.question_answered': z.object({ department_id: z.string(), question: z.string(), answer: z.string(), source: z.enum(['llm', 'facts']) }),
+  'venture.settings_updated': z.object({ keys: z.array(z.string()) }),
+  'human.consent_revoked': z.object({ kind: z.string(), voice_id: z.string().optional() }),
+  'money.wallet_funded': z.object({ amount_usd: Usd, rail: z.string(), external_id: z.string().optional(), department_id: DepartmentId.optional() }),
 } as const;
 
 export function eventPayloadSchema(type: EventType): z.ZodTypeAny {

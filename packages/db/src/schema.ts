@@ -314,6 +314,12 @@ CREATE TABLE IF NOT EXISTS credentials (
   UNIQUE (venture_id, vendor, label)
 );
 
+CREATE TABLE IF NOT EXISTS venture_settings (
+  venture_id      uuid PRIMARY KEY,
+  settings        jsonb NOT NULL DEFAULT '{}',
+  updated_at      timestamptz NOT NULL DEFAULT now()
+);
+
 CREATE TABLE IF NOT EXISTS memory (
   id              uuid PRIMARY KEY,
   venture_id      uuid NOT NULL,

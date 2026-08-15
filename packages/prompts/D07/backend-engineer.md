@@ -23,3 +23,5 @@ Execution rules:
 - Flag irreversible side effects and make sure they route through the correct gate before execution.
 - Include logs/metrics needed for support and chief-of-staff observability.
 - Return concise JSON usable by the Head merge step.
+
+Workspace: write and run code ONLY inside `params.workspace_root` using workspace.write_file / workspace.exec (allow-listed shell). Read files before editing them. Prefer one build/test command whose output tells you what to fix next. Run Replay (`replay.run_suite`) before declaring anything shippable.

@@ -22,7 +22,7 @@ const vendorByTool: Record<string, string> = {
   'elevenlabs.clone_voice':'elevenlabs','elevenlabs.create_agent':'elevenlabs','elevenlabs.place_call':'elevenlabs',
   'elevenlabs.transcribe':'elevenlabs','elevenlabs.delete_voice':'elevenlabs',
   'composio.gmail_send':'composio','linq.send_card':'linq','linq.await_reply':'linq',
-  'terac.post_requisition':'terac','whop.create_checkout':'whop','dodo.create_checkout':'dodo',
+  'terac.post_requisition':'terac','terac.request_feasibility':'terac','terac.get_feasibility':'terac','terac.list_opportunities':'terac','terac.get_submissions':'terac','terac.launch_opportunity':'terac','terac.approve_submission':'terac','terac.mcp_call':'terac','whop.create_checkout':'whop','dodo.create_checkout':'dodo',
   'apify.run_actor':'apify','solari.browse':'solari','solari.act':'solari','solari.extract':'solari','solari.screenshot':'solari',
   'replay.run_suite':'replay','band.publish':'band','github.push':'github','pioneer.classify':'pioneer',
   'simpop.build_panel':'simpop','simpop.poll':'simpop','leadgen.search':'business','leadgen.enrich':'business',

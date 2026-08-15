@@ -11,6 +11,12 @@ export * from './meter.js';
 export * from './routing.js';
 export * from './vault.js';
 export * from './util.js';
+export * from './settings.js';
+export * from './insight.js';
+export * from './scheduler.js';
+export * from './integrations.js';
+export * from './voice.js';
+export * from './wallets.js';
 
 /** Boot a kernel with routing rules loaded from packages/manifests. */
 export async function bootKernel(): Promise<Kernel> {
@@ -20,7 +26,7 @@ export async function bootKernel(): Promise<Kernel> {
   } catch (e) {
     console.warn('[kernel] routing.yaml unavailable, starting with empty routing table:', String(e));
   }
-  const kernel = await Kernel.create({ routing });
+  const kernel = await Kernel.create({ routing, clock: process.env.ZEROTH_CLOCK !== 'off' });
   kernel.gates.startSweeper();
   return kernel;
 }

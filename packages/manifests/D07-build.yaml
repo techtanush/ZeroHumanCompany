@@ -6,6 +6,10 @@ head:
   model: opus
   system_prompt_ref: prompts/D07/head.md
   tools:
+    - workspace.list
+    - workspace.read_file
+    - workspace.write_file
+    - workspace.exec
     - github.push
     - render.deploy
     - replay.run_suite
@@ -35,6 +39,10 @@ workers:
     replicas: 1
     system_prompt_ref: prompts/D07/implementer.md
     tools:
+      - workspace.list
+      - workspace.read_file
+      - workspace.write_file
+      - workspace.exec
       - github.push
       - replay.run_suite
       - solari.act
@@ -47,6 +55,9 @@ workers:
     replicas: 1
     system_prompt_ref: prompts/D07/qa.md
     tools:
+      - workspace.list
+      - workspace.read_file
+      - workspace.exec
       - replay.run_suite
       - memory_read
       - memory_write
@@ -73,6 +84,10 @@ workers:
       - web_fetch
       - calc
       - memory_read
+      - workspace.list
+      - workspace.read_file
+      - workspace.write_file
+      - workspace.exec
       - replay.run_suite
     max_tokens_per_run: 60000
   - agent_id: build.backend-engineer

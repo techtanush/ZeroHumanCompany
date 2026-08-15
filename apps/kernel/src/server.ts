@@ -3,6 +3,9 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import { Kernel } from './kernel.js';
 import { KernelError, type StoredEvent } from './event-store.js';
 import { nowIso, uuid } from './util.js';
+import { integrationStatus, probe, sendLinqText, setIntegrationVar, INTEGRATIONS } from './integrations.js';
+import { VOICE_CONSENT_TEXT_V1 } from './voice.js';
+import { resolveDepartments } from './insight.js';
 
 export interface ServerOptions {
   kernel: Kernel;
@@ -71,6 +74,17 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
       spend_cap_usd: b.spend_cap_usd,
       terac_cap_usd: b.terac_cap_usd,
     });
+
+    // Founder-chosen settings (workspace folder, meeting schedule, voice consent, acks) travel with the venture.
+    if (b.settings && typeof b.settings === 'object') {
+      await kernel.settings.update(created.venture_id, b.settings, created.founder_id);
+    }
+    if (b.workspace_root || b.agency_workspace_path) {
+      await kernel.settings.update(created.venture_id, { workspace: { workspace_root: b.workspace_root ?? b.agency_workspace_path, source: b.workspace_source ?? 'typed', granted_at: nowIso() } }, created.founder_id);
+    }
+    if (b.founder_profile?.phone_e164 && !process.env.FOUNDER_PHONE) {
+      await setIntegrationVar('FOUNDER_PHONE', String(b.founder_profile.phone_e164)).catch(() => undefined);
+    }
 
     let first_work_order_id: string | null = null;
     if (b.idea_seed) {
@@ -300,6 +314,145 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
     return reply;
   });
 
+  /* ── Settings, insight, meetings, voice, wallets, integrations ───────────── */
+
+  app.get('/v1/ventures/:id/settings', async (req) => {
+    const { id } = req.params as { id: string };
+    return { settings: await kernel.settings.get(id) };
+  });
+  app.put('/v1/ventures/:id/settings', async (req) => {
+    const { id } = req.params as { id: string };
+    return { settings: await kernel.settings.update(id, (req.body ?? {}) as Record<string, unknown>) };
+  });
+  app.post('/v1/ventures/:id/workspace', async (req) => {
+    const { id } = req.params as { id: string };
+    const b = (req.body ?? {}) as { workspace_root?: string; agency_workspace_path?: string; source?: string };
+    const root = b.workspace_root ?? b.agency_workspace_path;
+    if (!root) throw new KernelError('bad_request', 'workspace_root is required', false, 400);
+    const settings = await kernel.settings.update(id, { workspace: { workspace_root: root, source: b.source ?? 'typed', granted_at: nowIso() } });
+    return { settings, workspace_root: settings.workspace.workspace_root };
+  });
+
+  app.get('/v1/ventures/:id/departments/:dept/facts', async (req) => {
+    const { id, dept } = req.params as { id: string; dept: string };
+    const depts = resolveDepartments(dept);
+    return { department_ids: depts, facts: await kernel.insight.facts(id, depts) };
+  });
+  app.post('/v1/ventures/:id/departments/:dept/ask', async (req) => {
+    const { id, dept } = req.params as { id: string; dept: string };
+    const b = (req.body ?? {}) as { question?: string; actor?: string };
+    if (!b.question?.trim()) throw new KernelError('bad_request', 'question is required', false, 400);
+    const trace_id = await kernel.traceFor(id);
+    return kernel.insight.ask(id, dept, b.question.trim(), { trace_id, actor: b.actor });
+  });
+  app.get('/v1/ventures/:id/agents', async (req) => {
+    const { id } = req.params as { id: string };
+    const q = req.query as { department?: string };
+    return { agents: await kernel.insight.agents(id, q.department) };
+  });
+  app.get('/v1/ventures/:id/goals', async (req) => {
+    const { id } = req.params as { id: string };
+    return kernel.insight.goals(id);
+  });
+  app.get('/v1/ventures/:id/briefing/latest', async (req) => {
+    const { id } = req.params as { id: string };
+    return { briefing: await kernel.insight.latestBriefing(id) };
+  });
+
+  app.post('/v1/ventures/:id/meetings/:kind/start', async (req, reply) => {
+    const { id, kind } = req.params as { id: string; kind: string };
+    const allowed = ['executive', 'all_hands', 'improvement', 'workday_start', 'workday_end'];
+    if (!allowed.includes(kind)) throw new KernelError('bad_request', `kind must be one of ${allowed.join(', ')}`, false, 400);
+    const r = await kernel.clock.fire(id, kind as any, { scheduled: false });
+    reply.code(201);
+    return r;
+  });
+  app.post('/v1/ventures/:id/meetings/:kind/end', async (req) => {
+    const { id, kind } = req.params as { id: string; kind: string };
+    await kernel.clock.endMeeting(id, kind as any);
+    return { ended: true };
+  });
+  app.post('/v1/ventures/:id/chat', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const b = (req.body ?? {}) as { room?: string; author?: string; text?: string; department_id?: string };
+    if (!b.text?.trim()) throw new KernelError('bad_request', 'text is required', false, 400);
+    const e = await kernel.events.append({
+      venture_id: id, type: 'dept.chat_posted', actor_kind: 'founder', actor_id: b.author ?? 'founder',
+      department_id: b.department_id as any,
+      payload: { room: b.room ?? 'general', author: b.author ?? 'founder', text: b.text.trim(), transport: 'local' },
+      trace_id: await kernel.traceFor(id),
+    });
+    reply.code(201);
+    return { event: e };
+  });
+
+  app.get('/v1/voice/consent-text', async () => ({ version: 'v1', text: VOICE_CONSENT_TEXT_V1 }));
+  app.post('/v1/ventures/:id/voice/consent', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const r = await kernel.voice.consent(id, (req.body ?? {}) as any);
+    reply.code(201);
+    return r;
+  });
+  app.post('/v1/ventures/:id/voice/clone', { bodyLimit: 30 * 1024 * 1024 }, async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const r = await kernel.voice.clone(id, (req.body ?? {}) as any);
+    reply.code(201);
+    return r;
+  });
+  app.post('/v1/ventures/:id/voice/revoke', async (req) => {
+    const { id } = req.params as { id: string };
+    return kernel.voice.revoke(id, (req.body as any)?.reason);
+  });
+
+  app.get('/v1/ventures/:id/wallets', async (req) => {
+    const { id } = req.params as { id: string };
+    return kernel.wallets.list(id);
+  });
+  app.post('/v1/ventures/:id/wallets/topup', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const b = (req.body ?? {}) as { amount_usd?: number; success_url?: string; cancel_url?: string };
+    const amount = Number(b.amount_usd ?? 0);
+    if (!(amount > 0 && amount <= 10_000)) throw new KernelError('bad_request', 'amount_usd must be between 0 and 10000', false, 400);
+    const origin = String(req.headers.origin ?? 'http://localhost:5173');
+    const r = await kernel.wallets.createTopUp(id, amount, b.success_url ?? `${origin}/?topup=success`, b.cancel_url ?? `${origin}/?topup=cancel`);
+    reply.code(201);
+    return r;
+  });
+
+  app.get('/v1/integrations', async () => ({ integrations: integrationStatus(), tools_driver: process.env.ZEROTH_TOOLS === 'real' ? 'real' : 'mock', llm_driver: process.env.ANTHROPIC_API_KEY && process.env.ZEROTH_LLM !== 'mock' ? 'anthropic' : 'mock' }));
+  app.get('/v1/integrations/catalog', async () => ({ integrations: INTEGRATIONS.map((i) => ({ ...i, vars: i.vars.map((v) => ({ ...v, secret: v.secret !== false })) })) }));
+  app.post('/v1/integrations/:id/probe', async (req) => {
+    const { id } = req.params as { id: string };
+    return { id, ...(await probe(id)) };
+  });
+  app.put('/v1/integrations/vars/:env', async (req) => {
+    const { env } = req.params as { env: string };
+    const b = (req.body ?? {}) as { value?: string };
+    try {
+      const r = await setIntegrationVar(env, String(b.value ?? ''));
+      return { env: r.env, configured: r.configured };
+    } catch (e) {
+      throw new KernelError('bad_request', e instanceof Error ? e.message : String(e), false, 400);
+    }
+  });
+  app.post('/v1/integrations/linq/test-message', async (req) => {
+    const b = (req.body ?? {}) as { to?: string; text?: string; venture_id?: string };
+    const to = b.to ?? process.env.FOUNDER_PHONE ?? '';
+    const r = await sendLinqText(to, b.text ?? 'HELLO from Zeroth 👋 — your AI company can reach you here. Reply YES to confirm.', { kind: 'onboarding_test', venture_id: b.venture_id });
+    if (b.venture_id) {
+      await kernel.settings.update(b.venture_id, { linq_test_message: { sent_at: nowIso(), delivered: r.ok, degraded: r.degraded } }).catch(() => undefined);
+      await kernel.events.append({ venture_id: b.venture_id, type: 'human.notified', actor_kind: 'system', actor_id: 'kernel.integrations', payload: { channel: 'linq', kind: 'onboarding_test', delivered: r.ok, degraded: r.degraded }, trace_id: await kernel.traceFor(b.venture_id) }).catch(() => undefined);
+    }
+    return { to, ...r };
+  });
+  app.post('/v1/integrations/linq/confirm', async (req) => {
+    const b = (req.body ?? {}) as { venture_id?: string; confirmed?: boolean };
+    if (!b.venture_id) throw new KernelError('bad_request', 'venture_id required', false, 400);
+    const cur = await kernel.settings.get(b.venture_id);
+    const settings = await kernel.settings.update(b.venture_id, { linq_test_message: { ...(cur.linq_test_message ?? { sent_at: nowIso(), delivered: false }), confirmed_by_founder: Boolean(b.confirmed) } });
+    return { settings };
+  });
+
   /* ── Webhooks ─────────────────────────────────────────────────────────── */
 
   const vendors = ['stripe', 'composio', 'linq', 'terac', 'replay', 'render', 'whop', 'dodo'] as const;
@@ -332,6 +485,9 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
         trace_id: await kernel.traceFor(venture_id),
         idempotency_key: `wh:${vendor}:${body.id ?? uuid()}`,
       });
+      if (mapped.type === 'money.wallet_funded') {
+        await kernel.wallets.fund(venture_id, Number((mapped.payload as any).amount_usd ?? 0), 'stripe', `${String((mapped.payload as any).external_id ?? '')}:apply`).catch(() => undefined);
+      }
       if (vendor === 'linq') {
         const decision = await parseLinqGateDecision(kernel, body);
         if (decision) {
@@ -382,6 +538,10 @@ export function mapWebhook(vendor: string, body: any): { type: string; payload: 
   switch (vendor) {
     case 'stripe': {
       const t = body.type as string | undefined;
+      if (t === 'checkout.session.completed' && body.data?.object?.metadata?.kind === 'wallet_topup') {
+        const amount = Number(body.data?.object?.amount_total ?? 0) / 100;
+        return { type: 'money.wallet_funded', payload: { amount_usd: amount, rail: 'stripe', external_id: String(body.data?.object?.id ?? body.id ?? '') } };
+      }
       if (t === 'checkout.session.completed' || t === 'invoice.paid') {
         const amount = Number(body.data?.object?.amount_total ?? body.data?.object?.amount_paid ?? 0) / 100;
         return {

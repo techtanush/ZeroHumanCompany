@@ -8,6 +8,11 @@ import { Meter } from './meter.js';
 import { reduce, ventureProjection } from './projections.js';
 import { Router } from './routing.js';
 import { Vault } from './vault.js';
+import { SettingsStore } from './settings.js';
+import { Insight } from './insight.js';
+import { CompanyClock } from './scheduler.js';
+import { VoiceService } from './voice.js';
+import { Wallets } from './wallets.js';
 import { nowIso, slugify, uuid } from './util.js';
 
 export interface KernelOptions {
@@ -17,6 +22,8 @@ export interface KernelOptions {
   routing?: RoutingTable;
   /** Default per-department budget envelope used when a venture is created. */
   defaultEnvelopeUsd?: number;
+  /** Start the company clock (meetings/workday/improvement). Off in tests unless asked. */
+  clock?: boolean;
 }
 
 /**
@@ -31,6 +38,11 @@ export class Kernel {
   readonly meter: Meter;
   readonly router: Router;
   readonly vault: Vault;
+  readonly settings: SettingsStore;
+  readonly insight: Insight;
+  readonly clock: CompanyClock;
+  readonly voice: VoiceService;
+  readonly wallets: Wallets;
 
   private constructor(db: Db, opts: KernelOptions) {
     this.db = db;
@@ -41,6 +53,12 @@ export class Kernel {
     this.router = new Router(db, this.events, opts.routing ?? []);
     this.vault = new Vault(db);
     this.router.setGateEngine(this.gates);
+    this.settings = new SettingsStore(db, this.events);
+    this.insight = new Insight(db, this.events, this.artifacts);
+    this.clock = new CompanyClock(this, db, this.events, this.settings);
+    this.voice = new VoiceService(this.events, this.settings, this.gates, (v) => this.traceFor(v), () => (process.env.ZEROTH_TOOLS === 'real' ? 'real' : 'mock'));
+    this.wallets = new Wallets(db, this.events, this.meter);
+    if (opts.clock) this.clock.start();
 
     // Projections run inside the append transaction; routing runs after commit.
     this.events.addReducer(async (e, tx) => {
@@ -65,7 +83,48 @@ export class Kernel {
       void this.router.handle(e).catch((err) => {
         console.error('[kernel] routing failed', { type: e.type, error: String(err) });
       });
+      void this.onImprovementEvents(e).catch((err) => {
+        console.error('[kernel] improvement flow failed', { type: e.type, error: String(err) });
+      });
     });
+  }
+
+  /**
+   * Improvement branch: when D13 signs a CapabilityGap, the founder is texted
+   * (Linq gate) and nothing is built until they approve. Approval issues the
+   * build work order into the granted workspace.
+   */
+  private async onImprovementEvents(e: StoredEvent): Promise<void> {
+    if (e.type === 'artifact.signed' && (e.payload as any)?.artifact?.type === 'CapabilityGap') {
+      const ref = (e.payload as any).artifact;
+      const art = await this.artifacts.get(ref.id);
+      const body = (art?.body ?? {}) as any;
+      const summary = String(body.summary ?? body.taxonomy ?? 'new capability');
+      await this.gates.open({
+        venture_id: e.venture_id, gate_type: 'new_department', requested_by: 'chief.head', department_id: 'D13',
+        action: { tool: 'kernel.issue_work_order', args: { to: 'D07', intent: 'implement_capability', gap_artifact_id: ref.id } },
+        preview: { title: 'Improvement branch found something to build', summary: `${summary} (${String(body.taxonomy ?? 'gap')}). Approve to let Build implement it in your workspace.` , gap: body },
+        options: [
+          { id: 'approve', label: 'Build it', consequence: 'D07 implements the capability in the granted workspace' },
+          { id: 'reject', label: 'Not now', consequence: 'the gap stays logged; nothing is built' },
+        ],
+        suggested_option_id: 'approve', risk: 'medium', reversible: true, channel: 'linq', timeout_s: 6 * 3600, on_timeout: 'hold',
+        idempotency_key: `improvement:${ref.id}`, trace_id: e.trace_id,
+      } as any).catch(() => undefined);
+      return;
+    }
+    if (e.type === 'gate.approved') {
+      const gate = await this.gates.get(String((e.payload as any).gate_id));
+      if (!gate || gate.gate_type !== 'new_department' || gate.action?.tool !== 'kernel.issue_work_order') return;
+      const args = gate.action.args as any;
+      const s = await this.settings.get(e.venture_id);
+      await this.issueWorkOrder({
+        venture_id: e.venture_id, from: 'D13', to: String(args.to ?? 'D07'), intent: String(args.intent ?? 'implement_capability'), budget_usd: 6,
+        input_artifacts: args.gap_artifact_id ? [{ type: 'CapabilityGap', id: args.gap_artifact_id, version: 1, hash: '' }] : [],
+        params: { approved_gate_id: gate.id, workspace_root: s.workspace.workspace_root, use_replay_before_deploy: true },
+        trace_id: e.trace_id,
+      });
+    }
   }
 
   static async create(opts: KernelOptions = {}): Promise<Kernel> {
@@ -158,12 +217,18 @@ export class Kernel {
   }): Promise<string> {
     const id = uuid();
     const trace_id = input.trace_id ?? (await this.traceFor(input.venture_id));
+    // Every department knows the one folder the founder granted; Build depends on it.
+    const params: Record<string, unknown> = { ...(input.params ?? {}) };
+    if (params.workspace_root == null) {
+      const s = await this.settings.get(input.venture_id).catch(() => null);
+      if (s?.workspace.workspace_root) { params.workspace_root = s.workspace.workspace_root; params.agency_workspace_path = s.workspace.workspace_root; }
+    }
     await this.db.query(
       `INSERT INTO work_orders (id, venture_id, from_dept, to_dept, intent, input_artifacts,
                                 params, budget_usd, success_criteria, status, trace_id, created_at)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'queued',$10,$11)`,
       [id, input.venture_id, input.from ?? 'kernel', input.to, input.intent,
-       JSON.stringify(input.input_artifacts ?? []), JSON.stringify(input.params ?? {}),
+       JSON.stringify(input.input_artifacts ?? []), JSON.stringify(params),
        input.budget_usd, JSON.stringify(input.success_criteria ?? []), trace_id, nowIso()],
     );
     await this.events.append({
@@ -234,6 +299,7 @@ export class Kernel {
   }
 
   async close(): Promise<void> {
+    this.clock.stop();
     this.gates.stopSweeper();
     await this.db.close();
   }

@@ -13,6 +13,13 @@ head:
     - whop.create_checkout
     - dodo.create_checkout
     - terac.post_requisition
+    - terac.request_feasibility
+    - terac.get_feasibility
+    - terac.list_opportunities
+    - terac.get_submissions
+    - terac.launch_opportunity
+    - terac.approve_submission
+    - terac.mcp_call
     - crm.upsert
     - metrics.record_signal
   max_tokens_per_run: 90000
@@ -31,6 +38,13 @@ workers:
       - whop.create_checkout
       - dodo.create_checkout
       - terac.post_requisition
+      - terac.request_feasibility
+      - terac.get_feasibility
+      - terac.list_opportunities
+      - terac.get_submissions
+      - terac.launch_opportunity
+      - terac.approve_submission
+      - terac.mcp_call
       - calc
       - crm.upsert
       - metrics.record_signal
@@ -46,6 +60,13 @@ workers:
       - whop.create_checkout
       - dodo.create_checkout
       - terac.post_requisition
+      - terac.request_feasibility
+      - terac.get_feasibility
+      - terac.list_opportunities
+      - terac.get_submissions
+      - terac.launch_opportunity
+      - terac.approve_submission
+      - terac.mcp_call
       - calc
       - crm.upsert
       - metrics.record_signal
@@ -61,6 +82,13 @@ workers:
       - whop.create_checkout
       - dodo.create_checkout
       - terac.post_requisition
+      - terac.request_feasibility
+      - terac.get_feasibility
+      - terac.list_opportunities
+      - terac.get_submissions
+      - terac.launch_opportunity
+      - terac.approve_submission
+      - terac.mcp_call
       - calc
       - crm.upsert
       - metrics.record_signal
@@ -128,6 +156,13 @@ workers:
       - memory_read
       - memory_write
       - terac.post_requisition
+      - terac.request_feasibility
+      - terac.get_feasibility
+      - terac.list_opportunities
+      - terac.get_submissions
+      - terac.launch_opportunity
+      - terac.approve_submission
+      - terac.mcp_call
       - crm.upsert
       - pioneer.classify
       - metrics.record_signal

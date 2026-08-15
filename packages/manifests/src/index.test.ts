@@ -2,18 +2,10 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadManifests, loadRouting, getManifest } from './index';
+import { toolNames } from '@zeroth/tool-plane';
 
 const promptRoot = resolve(process.cwd(), '../prompts');
-const knownTools = new Set([
-  'web_search','web_fetch','calc','memory_read','memory_write','apify.run_actor','solari.browse',
-  'solari.act','solari.extract','solari.screenshot',
-  'composio.gmail_send','stripe.create_payment_link','whop.create_checkout','dodo.create_checkout',
-  'terac.post_requisition','elevenlabs.tts','elevenlabs.clone_voice','elevenlabs.create_agent',
-  'elevenlabs.place_call','elevenlabs.transcribe','elevenlabs.delete_voice',
-  'render.deploy','replay.run_suite','linq.send_card','linq.await_reply',
-  'band.publish','pioneer.classify','simpop.build_panel','simpop.poll',
-  'leadgen.search','leadgen.enrich','crm.upsert','support.upsert_ticket','metrics.record_signal','github.push',
-]);
+const knownTools = new Set<string>(toolNames);
 
 function promptExists(ref: string) {
   return existsSync(resolve(promptRoot, ref.replace(/^prompts\//, '')));

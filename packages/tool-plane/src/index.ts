@@ -1,6 +1,7 @@
 import type { ZodTypeAny } from 'zod';
 import { calculate } from './calc.js';
-import { toolDefs, type ToolName } from './definitions.js';
+import { toolDefs, toolNames, type ToolName } from './definitions.js';
+export { toolNames, type ToolName };
 import { runRealTool } from './drivers/real/index.js';
 import { stableHash } from './mock.js';
 
@@ -21,6 +22,8 @@ export interface ToolCtx {
   department_id: string;
   agent_id: string;
   work_order_id?: string;
+  /** Absolute folder the founder granted the agency; workspace.* tools are confined to it. */
+  workspace_root?: string;
   budget: { record(cost_usd: number, unit: string, resource: string): void };
   requestGate?(req: GateRequest): Promise<boolean>;
 }
@@ -94,6 +97,9 @@ export class ToolPlane {
         const args = def.input_schema.parse(raw);
         await this.ensureGate(def.name, def.gate, def.sideEffecting, args, runCtx);
         this.recordUsage(def, runCtx);
+
+        // workspace.* is the founder's own disk: same code path in mock and real.
+        if (def.name.startsWith('workspace.')) return def.mock(args, runCtx);
 
         if (this.opts.driver === 'real') {
           return runRealTool(

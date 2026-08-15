@@ -23,7 +23,14 @@ const sampleArgs: Record<string, unknown> = {
   'stripe.create_payment_link': { name: 'Plan', amount_cents: 1000, currency: 'usd' },
   'whop.create_checkout': { product_id: 'prod_1' },
   'dodo.create_checkout': { product_id: 'prod_1' },
-  'terac.post_requisition': { kind: 'expert_verification' },
+  'terac.post_requisition': { role: 'Sales development rep', task: 'Book 5 discovery calls with dental clinic owners', count: 1 },
+  'terac.request_feasibility': { task: 'Interview 5 dental office managers', panel: 'US dental office managers', count: 5 },
+  'terac.get_feasibility': { request_id: 'feas_1' },
+  'terac.list_opportunities': { status: 'active' },
+  'terac.get_submissions': { opportunity_id: 'opp_1' },
+  'terac.launch_opportunity': { opportunity_id: 'opp_1' },
+  'terac.approve_submission': { submission_id: 'sub_1' },
+  'terac.mcp_call': { tool: 'terac_get_context', args: {} },
   'elevenlabs.tts': { text: 'Hello world', voice_id: 'voice_1' },
   'elevenlabs.clone_voice': { name: 'Founder voice', consent_event_id: 'consent_1', audio_base64: Buffer.from('fake audio').toString('base64') },
   'elevenlabs.create_agent': { name: 'Discovery caller', voice_id: 'voice_1', system_prompt: 'Disclose AI and ask questions.', first_message: 'Hi, this is an AI assistant.' },
@@ -67,7 +74,14 @@ const outputShapes: Record<string, z.ZodTypeAny> = {
   'elevenlabs.place_call': z.object({ call_id: z.string(), status: z.string(), disclosure: z.literal(true) }),
   'elevenlabs.transcribe': z.object({ transcript_id: z.string(), text: z.string(), language_code: z.string() }),
   'elevenlabs.delete_voice': z.object({ voice_id: z.string(), deleted: z.boolean() }),
-  'terac.post_requisition': z.object({ requisition_id: z.string(), status: z.string() }),
+  'terac.post_requisition': z.object({ surface: z.string(), requisition_id: z.string(), launched: z.literal(false) }),
+  'terac.request_feasibility': z.object({ requestId: z.string(), status: z.string() }),
+  'terac.get_feasibility': z.object({ requestId: z.string(), status: z.string(), costPerParticipant: z.number() }),
+  'terac.list_opportunities': z.object({ data: z.array(z.object({ id: z.string(), status: z.string() })) }),
+  'terac.get_submissions': z.object({ data: z.array(z.object({ id: z.string(), status: z.string() })) }),
+  'terac.launch_opportunity': z.object({ id: z.string(), launched: z.literal(true) }),
+  'terac.approve_submission': z.object({ id: z.string(), status: z.literal('approved') }),
+  'terac.mcp_call': z.object({ tool: z.string(), result: z.record(z.unknown()) }),
   'linq.send_card': z.object({ message_id: z.string(), delivered: z.boolean() }),
   'linq.await_reply': z.object({ gate_id: z.string().optional(), status: z.string(), replies: z.array(z.unknown()) }),
   'pioneer.classify': z.object({ label: z.string(), confidence: z.number() }),
@@ -115,7 +129,7 @@ describe('ToolPlane', () => {
     await expect(tool.run({ expression: 'process.exit()' }, ctx())).rejects.toThrow();
   });
 
-  it.each(toolNames)('mock output for %s is deterministic and shaped', async (name) => {
+  it.each(toolNames.filter((n) => !n.startsWith('workspace.')))('mock output for %s is deterministic and shaped', async (name) => {
     const tool = new ToolPlane({ driver: 'mock' }).build([name], ctx({ requestGate: async () => true }))[0]!;
     const a = await tool.run(sampleArgs[name], ctx({ requestGate: async () => true }));
     const b = await tool.run(sampleArgs[name], ctx({ requestGate: async () => true }));

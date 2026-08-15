@@ -1,8 +1,8 @@
 # ZEROTH — backend
 
 The kernel, agent runtime, and orchestrator for an autonomous company.
-**Backend only.** The Boardroom frontend is being designed separately; do not add
-`apps/boardroom` here yet.
+The Boardroom frontend lives in `apps/boardroom` (Vite + React): onboarding, the
+pixel-art HQ, gates, department Q&A, briefings, wallets, integrations.
 
 Architecture lives in [`architecture_files/`](architecture_files/); start with
 [`BUILD-TUTORIAL.md`](architecture_files/BUILD-TUTORIAL.md).
@@ -21,9 +21,27 @@ on the real code path; only the outside world is simulated.
 
 ```bash
 pnpm dev:kernel        # http://localhost:4000
-pnpm dev:simpop        # http://localhost:8080, optional for real simpop tools
 pnpm dev:orchestrator  # consumes work orders
+pnpm dev:boardroom     # http://localhost:5173 — onboarding + HQ (proxies /v1 to the kernel)
+pnpm dev:simpop        # http://localhost:8080, optional for real simpop tools
 ```
+
+## Boardroom API (added for the frontend)
+
+| Route | Purpose |
+|---|---|
+| `GET/PUT /v1/ventures/:id/settings`, `POST …/workspace` | Founder settings: granted workspace folder, meeting schedule, voice consent, acks |
+| `POST /v1/ventures/:id/departments/:dept/ask`, `GET …/facts` | Live Q&A with a department (or `exec` for the whole company); LLM narrates facts, facts-only without a key |
+| `GET /v1/ventures/:id/agents`, `GET …/goals`, `GET …/briefing/latest` | Per-agent live report, goals/roadmap/achievements, latest DailyBriefing |
+| `POST /v1/ventures/:id/meetings/{executive,all_hands,improvement,workday_start,workday_end}/start`, `…/end` | Manual triggers for the company clock (also fired automatically per the schedule) |
+| `POST /v1/ventures/:id/voice/{consent,clone,revoke}`, `GET /v1/voice/consent-text` | Consent-first ElevenLabs cloning; voice_id stored, audio never |
+| `GET /v1/ventures/:id/wallets`, `POST …/wallets/topup` | Department wallets (budget envelopes) + Stripe Checkout top-up |
+| `GET /v1/integrations`, `POST /v1/integrations/:id/probe`, `PUT /v1/integrations/vars/:ENV`, `POST /v1/integrations/linq/test-message` | Key status (never values), live probes, write keys to `.env`, HELLO text |
+| `POST /v1/ventures/:id/chat` | Post into a department room (Band when keyed) |
+
+Terac is **MCP-first**: `terac.*` tools call `https://terac.com/api/mcp` with `TERAC_API_KEY` as
+bearer (feasibility → draft → launch → submissions); REST is the fallback. Build agents work only
+inside the founder-granted folder via `workspace.*` tools, and Replay runs before any push/deploy.
 
 ## What exists
 

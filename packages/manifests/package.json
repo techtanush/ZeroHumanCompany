@@ -15,5 +15,8 @@
     "@zeroth/contracts": "workspace:^",
     "yaml": "^2.9.0",
     "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@zeroth/tool-plane": "workspace:^"
   }
 }

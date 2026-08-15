@@ -11,6 +11,7 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
+    "@zeroth/agent-kit": "workspace:^",
     "@zeroth/contracts": "workspace:^",
     "@zeroth/db": "workspace:^",
     "@zeroth/manifests": "workspace:^",

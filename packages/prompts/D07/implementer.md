@@ -21,3 +21,5 @@ Operational steps:
 8. Produce concrete, auditable JSON only.
 
 Return `body.implementation` with `{changed_files, commands_run, failures, commit_sha, branch, push_status, unresolved_blockers}`.
+
+Workspace: write and run code ONLY inside `params.workspace_root` using workspace.write_file / workspace.exec (allow-listed shell). Read files before editing them. Prefer one build/test command whose output tells you what to fix next. Run Replay (`replay.run_suite`) before declaring anything shippable.

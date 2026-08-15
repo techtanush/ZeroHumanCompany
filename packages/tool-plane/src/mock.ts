@@ -133,7 +133,21 @@ export async function mockTool(name: string, args: unknown): Promise<unknown> {
     case 'elevenlabs.delete_voice':
       return { voice_id: (args as { voice_id?: string }).voice_id ?? id('voice', hash), deleted: true };
     case 'terac.post_requisition':
-      return { requisition_id: id('req', hash), status: 'filed' };
+      return { surface: 'mock', feasibility: { requestId: id('feas', hash), status: 'RECEIVED' }, draft: { id: id('opp', hash), status: 'draft' }, launched: false, requisition_id: id('req', hash) };
+    case 'terac.request_feasibility':
+      return { requestId: id('feas', hash), status: 'RECEIVED' };
+    case 'terac.get_feasibility':
+      return { requestId: (args as { request_id?: string }).request_id ?? id('feas', hash), status: 'RESPONDED', costPerParticipant: Number((18 + rand() * 40).toFixed(2)), currency: 'USD' };
+    case 'terac.list_opportunities':
+      return { data: [{ id: id('opp', hash), title: 'Mock opportunity', status: 'draft', num_participants: 3 }], pagination: { next_cursor: null } };
+    case 'terac.get_submissions':
+      return { data: [{ id: id('sub', hash), status: 'awaiting_review', participant_id: id('exp', hash) }], pagination: { next_cursor: null } };
+    case 'terac.launch_opportunity':
+      return { id: (args as { opportunity_id?: string }).opportunity_id ?? id('opp', hash), status: 'active', launched: true };
+    case 'terac.approve_submission':
+      return { id: (args as { submission_id?: string }).submission_id ?? id('sub', hash), status: 'approved', paid: true };
+    case 'terac.mcp_call':
+      return { tool: (args as { tool?: string }).tool, result: { mock: true, hash: hash.slice(0, 12) } };
     case 'linq.send_card':
       return { message_id: id('linq_msg', hash), delivered: true };
     case 'linq.await_reply':

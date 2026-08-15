@@ -87,11 +87,15 @@ export class Orchestrator {
 
     try {
       const inputs = await this.loadInputs(wo);
+      const settings = await kernel.settings.get(wo.venture_id).catch(() => null);
+      const workspace_root: string | undefined = wo.params?.workspace_root ?? settings?.workspace.workspace_root ?? undefined;
+      await this.chat(wo, `${wo.to_dept}.head`, `Picking up "${wo.intent}" (budget $${Number(wo.budget_usd).toFixed(2)}). ${manifest.workers.length} teammates on it.`);
       const toolCtx: ToolCtx = {
         venture_id: wo.venture_id,
         department_id: wo.to_dept,
         agent_id: `${wo.to_dept}.head`,
         work_order_id: wo.id,
+        workspace_root,
         budget: {
           record: (cost_usd, unit, resource) => {
             void kernel.meter.record({
@@ -165,9 +169,11 @@ export class Orchestrator {
 
       if (outcome.outputs.length === 0) {
         await this.escalate(wo, 'needs_capability', outcome.gaps.join('; ') || 'no output produced');
+        await this.chat(wo, `${wo.to_dept}.head`, `Blocked on "${wo.intent}": ${(outcome.gaps[0] ?? 'no output').slice(0, 140)}. Filing this with the improvement branch.`);
         await this.fail(wo, 'department produced no artifact');
         return;
       }
+      await this.chat(wo, `${wo.to_dept}.head`, `Finished "${wo.intent}" → ${outcome.outputs.length} ${outcome.type} (${outcome.quality}).${outcome.gaps.length ? ` Gaps: ${outcome.gaps.slice(0, 2).join('; ').slice(0, 160)}` : ''}`);
 
       // Persist every output; sign only what passed evidence checks.
       let lastRef: any = null;
@@ -233,6 +239,29 @@ export class Orchestrator {
     } finally {
       if (reservation) await this.opts.kernel.meter.release(reservation).catch(() => undefined);
     }
+  }
+
+  /**
+   * Department group chat: every department has a room where the head narrates
+   * plans and outcomes. Delivered to Band when BAND_API_KEY exists (best effort),
+   * always recorded as a dept.chat_posted event so the Boardroom shows the thread.
+   */
+  private async chat(wo: any, author: string, text: string): Promise<void> {
+    const kernel = this.opts.kernel;
+    const room = `dept-${String(wo.to_dept).toLowerCase()}`;
+    let transport: 'band' | 'local' = 'local';
+    let message_id: string | undefined;
+    if (process.env.BAND_API_KEY && process.env.ZEROTH_TOOLS === 'real') {
+      try {
+        const [tool] = this.tools.build(['band.publish'], { venture_id: wo.venture_id, department_id: wo.to_dept, agent_id: author, work_order_id: wo.id, budget: { record() {} }, requestGate: async () => true });
+        const r = (await tool.run({ room, text, author }, { venture_id: wo.venture_id, department_id: wo.to_dept, agent_id: author, work_order_id: wo.id, budget: { record() {} }, requestGate: async () => true })) as any;
+        transport = 'band'; message_id = r?.message_id ?? r?.id;
+      } catch { transport = 'local'; }
+    }
+    await kernel.events.append({
+      venture_id: wo.venture_id, type: 'dept.chat_posted', actor_kind: 'agent', actor_id: author, department_id: wo.to_dept,
+      payload: { room, author, text: text.slice(0, 1000), transport, message_id }, trace_id: wo.trace_id, correlation_id: wo.id,
+    }).catch(() => undefined);
   }
 
   private async loadInputs(wo: any): Promise<unknown[]> {

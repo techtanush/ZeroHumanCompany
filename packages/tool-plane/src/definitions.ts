@@ -2,6 +2,7 @@ import { z, type ZodTypeAny } from 'zod';
 import type { GateType, ToolCtx } from './index.js';
 import { calculate } from './calc.js';
 import { mockTool } from './mock.js';
+import { workspaceTool } from './workspace.js';
 
 export const toolNames = [
   'web_search',
@@ -19,6 +20,17 @@ export const toolNames = [
   'whop.create_checkout',
   'dodo.create_checkout',
   'terac.post_requisition',
+  'terac.request_feasibility',
+  'terac.get_feasibility',
+  'terac.list_opportunities',
+  'terac.get_submissions',
+  'terac.launch_opportunity',
+  'terac.approve_submission',
+  'terac.mcp_call',
+  'workspace.list',
+  'workspace.read_file',
+  'workspace.write_file',
+  'workspace.exec',
   'elevenlabs.tts',
   'elevenlabs.clone_voice',
   'elevenlabs.create_agent',
@@ -82,7 +94,30 @@ const schemas: Record<ToolName, ZodTypeAny> = {
   'stripe.create_payment_link': z.object({ name: z.string().min(1), amount_cents: z.number().int().positive(), currency: z.string().default('usd'), price: z.string().optional() }),
   'whop.create_checkout': looseObject,
   'dodo.create_checkout': looseObject,
-  'terac.post_requisition': looseObject,
+  'terac.post_requisition': z.object({
+    role: z.string().min(1),
+    task: z.string().min(1),
+    panel: z.string().optional(),
+    count: z.number().int().positive().default(1),
+    timeline_hours: z.number().int().positive().default(72),
+    title: z.string().optional(),
+    project_id: z.string().optional(),
+    venture_id: z.string().optional(),
+    create_draft: z.boolean().default(true),
+    budget_usd: z.number().nonnegative().optional(),
+  }),
+  'terac.request_feasibility': z.object({ task: z.string().min(1), panel: z.string().min(1), count: z.number().int().positive().optional(), timeline_hours: z.number().int().positive().optional() }),
+  'terac.get_feasibility': z.object({ request_id: z.string().min(1) }),
+  'terac.list_opportunities': z.object({ status: z.string().optional(), projectId: z.string().optional(), limit: z.number().int().positive().max(100).optional() }),
+  'terac.get_submissions': z.object({ opportunity_id: z.string().min(1), status: z.string().optional() }),
+  'terac.launch_opportunity': z.object({ opportunity_id: z.string().min(1), amount_usd: z.number().nonnegative().optional() }),
+  'terac.approve_submission': z.object({ submission_id: z.string().min(1) }),
+  /** Read-only / drafting Terac MCP tools by name; launching/approving/stopping is refused here. */
+  'terac.mcp_call': z.object({ tool: z.string().regex(/^terac_/), args: z.record(z.unknown()).default({}) }),
+  'workspace.list': z.object({ path: z.string().default('.'), depth: z.number().int().min(1).max(4).default(2) }),
+  'workspace.read_file': z.object({ path: z.string().min(1), max_bytes: z.number().int().positive().max(200_000).default(60_000) }),
+  'workspace.write_file': z.object({ path: z.string().min(1), content: z.string(), mkdirs: z.boolean().default(true) }),
+  'workspace.exec': z.object({ command: z.string().min(1), timeout_s: z.number().int().positive().max(600).default(120) }),
   'elevenlabs.tts': z.object({ text: z.string().min(1), voice_id: z.string().optional(), model_id: z.string().optional() }),
   'elevenlabs.clone_voice': z.object({
     name: z.string().min(1),
@@ -132,6 +167,8 @@ const gates: Partial<Record<ToolName, GateType>> = {
   'linq.send_card': 'outbound_to_real_person',
   'stripe.create_payment_link': 'money_out',
   'terac.post_requisition': 'money_out',
+  'terac.launch_opportunity': 'money_out',
+  'terac.approve_submission': 'money_out',
   'solari.act': 'account_creation',
   'elevenlabs.clone_voice': 'voice_clone_consent',
   'elevenlabs.place_call': 'outbound_to_real_person',
@@ -145,21 +182,52 @@ const nonSideEffecting = new Set<ToolName>([
   'simpop.build_panel', 'simpop.poll', 'leadgen.search', 'leadgen.enrich',
   'solari.browse', 'solari.extract', 'solari.screenshot', 'linq.await_reply',
   'elevenlabs.transcribe',
+  'terac.get_feasibility', 'terac.list_opportunities', 'terac.get_submissions', 'terac.mcp_call',
+  'workspace.list', 'workspace.read_file',
 ]);
+
+const WORKSPACE_TOOLS = new Set<ToolName>(['workspace.list', 'workspace.read_file', 'workspace.write_file', 'workspace.exec']);
+
+const DESCRIPTIONS: Partial<Record<ToolName, string>> = {
+  'terac.post_requisition': 'Ask Terac (human-labor MCP) for real humans: submits a feasibility request and drafts an opportunity. Spends nothing until terac.launch_opportunity.',
+  'terac.request_feasibility': 'Terac MCP: can a panel be sourced for this task/audience, and at what cost per participant? Poll with terac.get_feasibility.',
+  'terac.get_feasibility': 'Terac MCP: fetch a feasibility request; when status is RESPONDED, costPerParticipant is the confirmed price.',
+  'terac.list_opportunities': 'Terac MCP: list our opportunities with status, pricing and timeline.',
+  'terac.get_submissions': 'Terac MCP: list expert submissions for an opportunity (screen_passed, in_progress, awaiting_review, approved...).',
+  'terac.launch_opportunity': 'Terac MCP: launch a DRAFT opportunity. COMMITS REAL MONEY and starts recruiting humans; requires the money_out gate.',
+  'terac.approve_submission': 'Terac MCP: approve an awaiting_review submission, which pays the expert (money_out gate).',
+  'terac.mcp_call': 'Call any read-only or drafting Terac MCP tool by name (terac_get_context, terac_list_filters, terac_create_project, ...).',
+  'workspace.list': 'List files in the folder the founder granted the agency (the build workspace).',
+  'workspace.read_file': 'Read a file inside the granted workspace.',
+  'workspace.write_file': 'Create or overwrite a file inside the granted workspace. Use for generated code, configs, and docs.',
+  'workspace.exec': 'Run an allow-listed shell command (npm/pnpm/node/git/tests/build) inside the granted workspace and return stdout/stderr.',
+  'replay.run_suite': 'Run the Replay QA suite against the built product; returns pass/fail with a time-travel recording for failures. Run before any deploy.',
+  'github.push': 'Push the workspace to the venture repository (deploy gate).',
+  'render.deploy': 'Deploy the built product to Render (deploy gate).',
+  'linq.send_card': 'Send the founder an iMessage card via Linq (outbound_to_real_person gate).',
+  'composio.gmail_send': 'Send an email from the company Gmail via Composio (outbound_to_real_person gate).',
+  'elevenlabs.place_call': 'Place a phone call in the founder\'s cloned voice; must disclose AI in the first utterance (outbound_to_real_person gate).',
+  'band.publish': 'Post a message to a Band group chat room (the department planning channel).',
+};
 
 export const toolDefs = Object.fromEntries(
   toolNames.map((name) => [
     name,
     {
       name,
-      description: `Run ${name}`,
+      description: DESCRIPTIONS[name] ?? `Run ${name}`,
       input_schema: schemas[name],
       sideEffecting: !nonSideEffecting.has(name),
       gate: gates[name],
       cost_usd: name === 'calc' ? 0.00001 : 0.001,
       unit: 'call',
       resource: name,
-      mock: async (args: unknown) => (name === 'calc' ? { result: calculate((args as { expression: string }).expression) } : mockTool(name, args)),
+      mock: async (args: unknown, ctx: ToolCtx) =>
+        name === 'calc'
+          ? { result: calculate((args as { expression: string }).expression) }
+          : WORKSPACE_TOOLS.has(name)
+            ? workspaceTool(name, args, ctx)
+            : mockTool(name, args),
     } satisfies ToolDef,
   ]),
 ) as unknown as Record<ToolName, ToolDef>;

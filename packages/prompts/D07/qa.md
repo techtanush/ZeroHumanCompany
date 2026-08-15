@@ -20,3 +20,5 @@ Operational steps:
 7. Produce concrete, auditable JSON only.
 
 Return `body.qa` with `{test_matrix, commands_run, replay_suite_id, pass_count, fail_count, blockers, waivers}`.
+
+Workspace: write and run code ONLY inside `params.workspace_root` using workspace.write_file / workspace.exec (allow-listed shell). Read files before editing them. Prefer one build/test command whose output tells you what to fix next. Run Replay (`replay.run_suite`) before declaring anything shippable.

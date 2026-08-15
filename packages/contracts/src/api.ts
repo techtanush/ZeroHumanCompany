@@ -15,6 +15,68 @@ export const ApiError = z.object({
 });
 export type ApiError = z.infer<typeof ApiError>;
 
+/* ── Venture settings (founder-editable, persisted per venture) ───────────── */
+
+const HHMM = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'expected HH:MM');
+
+/** When the company works and meets, in the founder's timezone. */
+export const MeetingSchedule = z.object({
+  timezone: z.string().default('America/Los_Angeles'),
+  /** Agents work between these local times; outside them the floors are dark. */
+  work_start: HHMM.default('09:00'),
+  work_end: HHMM.default('17:00'),
+  /** Department heads meet the CEO/executives to align on goals. */
+  exec_meeting_time: HHMM.default('07:00'),
+  exec_meeting_minutes: z.number().int().min(5).max(180).default(30),
+  /** Whole-company meeting where the leads address every agent (all rooms empty into the exec room). */
+  all_hands_time: HHMM.default('09:00'),
+  all_hands_minutes: z.number().int().min(5).max(120).default(15),
+  /** After the workday: the improvement branch mines gaps and proposes new capabilities. */
+  improvement_time: HHMM.default('17:30'),
+  days: z.array(z.enum(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'])).default(['mon', 'tue', 'wed', 'thu', 'fri']),
+});
+export type MeetingSchedule = z.infer<typeof MeetingSchedule>;
+
+export const VoiceSettings = z.object({
+  consent_given: z.boolean().default(false),
+  consent_at: z.string().optional(),
+  consent_event_id: z.string().optional(),
+  consent_text_version: z.string().default('v1'),
+  voice_id: z.string().optional(),
+  voice_name: z.string().optional(),
+  status: z.enum(['none', 'consented', 'sample_uploaded', 'cloned', 'revoked']).default('none'),
+  sample_meta: z.object({
+    mime_type: z.string(),
+    bytes: z.number().int(),
+    duration_s: z.number().optional(),
+    uploaded_at: z.string(),
+  }).optional(),
+  revoked_at: z.string().optional(),
+});
+export type VoiceSettings = z.infer<typeof VoiceSettings>;
+
+export const WorkspaceSettings = z.object({
+  /** Absolute local path the agency (D07 Build) is allowed to work inside. */
+  workspace_root: z.string().optional(),
+  /** Same value under the alias the architecture docs use. */
+  agency_workspace_path: z.string().optional(),
+  source: z.enum(['typed', 'picker', 'none']).default('none'),
+  granted_at: z.string().optional(),
+  permissions: z.array(z.enum(['generated_code', 'build_artifacts', 'repo_work'])).default(['generated_code', 'build_artifacts', 'repo_work']),
+});
+export type WorkspaceSettings = z.infer<typeof WorkspaceSettings>;
+
+export const VentureSettings = z.object({
+  workspace: WorkspaceSettings.default({}),
+  meetings: MeetingSchedule.default({}),
+  voice: VoiceSettings.default({}),
+  /** Which integrations the founder acknowledged during onboarding (status only, never secrets). */
+  integrations_ack: z.array(z.string()).default([]),
+  linq_test_message: z.object({ sent_at: z.string(), delivered: z.boolean(), confirmed_by_founder: z.boolean().default(false), degraded: z.string().optional() }).optional(),
+  founder_notes: z.string().default(''),
+});
+export type VentureSettings = z.infer<typeof VentureSettings>;
+
 export const CreateVentureRequest = z.object({
   mode: VentureMode,
   name: z.string().min(1).optional(),
@@ -23,6 +85,7 @@ export const CreateVentureRequest = z.object({
   autonomy_level: AutonomyLevel.default('supervised'),
   spend_cap_usd: z.number().min(0).max(10_000).default(50),
   terac_cap_usd: z.number().min(0).max(10_000).default(200),
+  settings: VentureSettings.partial().optional(),
 });
 export type CreateVentureRequest = z.infer<typeof CreateVentureRequest>;
 

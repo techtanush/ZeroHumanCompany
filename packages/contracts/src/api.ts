@@ -74,6 +74,11 @@ export const VentureSettings = z.object({
   integrations_ack: z.array(z.string()).default([]),
   linq_test_message: z.object({ sent_at: z.string(), delivered: z.boolean(), confirmed_by_founder: z.boolean().default(false), degraded: z.string().optional() }).optional(),
   founder_notes: z.string().default(''),
+  /** Founder-set ceilings on Stripe-funded spend. `monthly_usd: 0` = no monthly ceiling. */
+  spend_limits: z.object({
+    total_usd: z.number().min(0).max(100_000).default(50),
+    monthly_usd: z.number().min(0).max(100_000).default(0),
+  }).default({}),
 });
 export type VentureSettings = z.infer<typeof VentureSettings>;
 

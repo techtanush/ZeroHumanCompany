@@ -90,6 +90,8 @@ export interface AgentReport {
 }
 export interface IntegrationStatus {
   id: string; name: string; tier: string; purpose: string; powers: string; ready: boolean;
+  /** Where the founder authorizes this vendor / collects its key. */
+  connect_url?: string;
   vars: Array<{ env: string; label: string; required: boolean; configured: boolean; secret: boolean; hint?: string; masked?: string }>;
 }
 export interface VentureSettings {

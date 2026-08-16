@@ -24,6 +24,11 @@ export function IntegrationsList({ compact, filter }: { compact?: boolean; filte
           <div key={i.id} className={`integ ${i.ready ? 'ready' : ''}`}>
             <div><div className="name">{i.name} <span className="chip">{i.tier}</span> {i.ready ? <span className="chip ok">ready</span> : <span className="chip warn">missing keys</span>}</div>{!compact && <div className="small muted">{i.purpose}</div>}<div className="tiny muted">powers: {i.powers}</div></div>
             <div className="col" style={{ gap: 4, alignItems: 'flex-end' }}>
+              {i.connect_url && (
+                <a className="btn sm" href={i.connect_url} target="_blank" rel="noreferrer noopener" title={`Connect ${i.name} — opens ${i.connect_url}`}>
+                  Connect <span aria-hidden="true">↗</span>
+                </a>
+              )}
               <button className="btn sm" onClick={() => probe(i.id)} disabled={busy === i.id}>Test</button>
               {pr && <span className={`chip ${pr.ok ? 'ok' : 'err'}`} title={pr.degraded}>{pr.detail}</span>}
               {pr?.extra?.tools && <span className="tiny muted">{pr.extra.tools.length} MCP tools</span>}

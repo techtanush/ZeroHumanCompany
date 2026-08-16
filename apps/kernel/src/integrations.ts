@@ -27,70 +27,72 @@ export interface IntegrationSpec {
   tier: 'core' | 'sponsor' | 'optional';
   vars: IntegrationVar[];
   docs?: string;
+  /** Where the founder goes to authorize/collect this vendor's credentials. */
+  connect_url?: string;
 }
 
 export const INTEGRATIONS: IntegrationSpec[] = [
-  { id: 'anthropic', name: 'Anthropic Claude', tier: 'core', purpose: 'The brains of every department head, worker and critic.', powers: 'All agents (Sonnet only)',
+  { id: 'anthropic', name: 'Anthropic Claude', tier: 'core', purpose: 'The brains of every department head, worker and critic.', connect_url: 'https://console.anthropic.com/settings/keys', powers: 'All agents (Sonnet only)',
     vars: [{ env: 'ANTHROPIC_API_KEY', label: 'API key', required: true, hint: 'console.anthropic.com → API keys' }] },
-  { id: 'linq', name: 'Linq', tier: 'sponsor', purpose: 'Founder phone approvals: gates and alerts arrive as iMessage cards you can reply to.', powers: 'Gates with channel=linq, HELLO test, new-capability approvals',
+  { id: 'linq', name: 'Linq', tier: 'sponsor', purpose: 'Founder phone approvals: gates and alerts arrive as iMessage cards you can reply to.', connect_url: 'https://app.linqapp.com/settings/api', powers: 'Gates with channel=linq, HELLO test, new-capability approvals',
     vars: [
       { env: 'LINQ_API_KEY', label: 'API key', required: true },
       { env: 'FOUNDER_PHONE', label: 'Founder phone (E.164)', required: true, secret: false, hint: '+16505551234' },
       { env: 'LINQ_FROM_NUMBER', label: 'Linq sender number', required: false, secret: false },
       { env: 'LINQ_WEBHOOK_SECRET', label: 'Webhook secret', required: false },
     ] },
-  { id: 'terac', name: 'Terac (MCP)', tier: 'sponsor', purpose: 'The human-labor layer: when agents hit a wall the company hires real experts. MCP-first, REST fallback.', powers: 'D11 HR requisitions, feasibility, launches, submissions',
+  { id: 'terac', name: 'Terac (MCP)', tier: 'sponsor', purpose: 'The human-labor layer: when agents hit a wall the company hires real experts. MCP-first, REST fallback.', connect_url: 'https://terac.com/dashboard', powers: 'D11 HR requisitions, feasibility, launches, submissions',
     vars: [
       { env: 'TERAC_API_KEY', label: 'API key (also the MCP bearer)', required: true },
       { env: 'TERAC_MCP_URL', label: 'MCP URL', required: false, secret: false, hint: 'defaults to https://terac.com/api/mcp' },
       { env: 'TERAC_BASE_URL', label: 'REST base URL (fallback)', required: false, secret: false },
     ] },
-  { id: 'stripe', name: 'Stripe', tier: 'sponsor', purpose: 'Money in: payment links + webhooks; wallet top-ups for the agents\' budget.', powers: 'D10 Sales, D11 Treasury, agent wallets',
+  { id: 'stripe', name: 'Stripe', tier: 'sponsor', purpose: 'Money in: payment links + webhooks; wallet top-ups for the agents\' budget.', connect_url: 'https://dashboard.stripe.com/test/apikeys', powers: 'D10 Sales, D11 Treasury, agent wallets',
     vars: [
       { env: 'STRIPE_SECRET_KEY', label: 'Secret key (test mode)', required: true, hint: 'sk_test_…' },
       { env: 'STRIPE_PUBLISHABLE_KEY', label: 'Publishable key', required: false, secret: false },
       { env: 'STRIPE_WEBHOOK_SECRET', label: 'Webhook secret', required: false, hint: 'stripe listen --forward-to localhost:4000/v1/webhooks/stripe' },
     ] },
-  { id: 'composio', name: 'Composio', tier: 'sponsor', purpose: 'Gmail / Calendar / GitHub / Vercel / other SaaS on behalf of the company. Outbound email, repo pushes and deploys stay behind gates.', powers: 'gmail, calendar, github, vercel through Composio connected accounts',
+  { id: 'composio', name: 'Composio', tier: 'sponsor', purpose: 'Gmail / Calendar / GitHub / Vercel / other SaaS on behalf of the company. Outbound email, repo pushes and deploys stay behind gates.', connect_url: 'https://app.composio.dev/developers', powers: 'gmail, calendar, github, vercel through Composio connected accounts',
     vars: [
       { env: 'COMPOSIO_API_KEY', label: 'API key', required: true, hint: 'app.composio.dev' },
       { env: 'COMPOSIO_ENTITY_ID', label: 'Entity ID (per founder)', required: false, secret: false, hint: 'created when you connect Gmail' },
     ] },
-  { id: 'elevenlabs', name: 'ElevenLabs', tier: 'sponsor', purpose: 'Voice: consented founder voice clone, phone calls with AI disclosure, transcription.', powers: 'D04 discovery calls, D10 sales calls',
+  { id: 'elevenlabs', name: 'ElevenLabs', tier: 'sponsor', purpose: 'Voice: consented founder voice clone, phone calls with AI disclosure, transcription.', connect_url: 'https://elevenlabs.io/app/settings/api-keys', powers: 'D04 discovery calls, D10 sales calls',
     vars: [
       { env: 'ELEVENLABS_API_KEY', label: 'API key', required: true },
       { env: 'ELEVENLABS_VOICE_ID', label: 'Cloned voice ID', required: false, secret: false, hint: 'set after consent + clone' },
       { env: 'ELEVENLABS_AGENT_ID', label: 'Conversational agent ID', required: false, secret: false },
       { env: 'ELEVENLABS_PHONE_NUMBER_ID', label: 'Phone number ID', required: false, secret: false },
     ] },
-  { id: 'solari', name: 'Solari (Pinetree)', tier: 'sponsor', purpose: 'Computer/browser use: the company\'s hands for account creation, forms, and web tasks. Stops at 2FA/CAPTCHA/ToS/payment walls and asks you.', powers: 'solari.browse/act/extract/screenshot',
+  { id: 'solari', name: 'Solari (Pinetree)', tier: 'sponsor', purpose: 'Computer/browser use: the company\'s hands for account creation, forms, and web tasks. Stops at 2FA/CAPTCHA/ToS/payment walls and asks you.', connect_url: 'https://pinetree-research.com', powers: 'solari.browse/act/extract/screenshot',
     vars: [
       { env: 'SOLARI_API_KEY', label: 'API key', required: true },
       { env: 'SOLARI_BASE_URL', label: 'Base URL', required: false, secret: false },
     ] },
-  { id: 'band', name: 'Band', tier: 'sponsor', purpose: 'Group chats per department where agents plan; the executive-briefing room.', powers: 'band.publish, dept chat rooms',
+  { id: 'band', name: 'Band', tier: 'sponsor', purpose: 'Group chats per department where agents plan; the executive-briefing room.', connect_url: 'https://www.band.ai', powers: 'band.publish, dept chat rooms',
     vars: [
       { env: 'BAND_API_KEY', label: 'API key', required: true },
       { env: 'BAND_BASE_URL', label: 'Base URL', required: false, secret: false },
       { env: 'BAND_WORKSPACE_ID', label: 'Workspace ID', required: false, secret: false },
     ] },
-  { id: 'render', name: 'Render', tier: 'sponsor', purpose: 'Deploy the built product (deploy gate).', powers: 'render.deploy',
+  { id: 'render', name: 'Render', tier: 'sponsor', purpose: 'Deploy the built product (deploy gate).', connect_url: 'https://dashboard.render.com/u/settings#api-keys', powers: 'render.deploy',
     vars: [{ env: 'RENDER_API_KEY', label: 'API key', required: true }, { env: 'RENDER_OWNER_ID', label: 'Owner ID', required: false, secret: false }] },
-  { id: 'vercel', name: 'Vercel', tier: 'sponsor', purpose: 'Frontend hosting for the venture. Prefer Composio-connected Vercel; direct token is supported for deployment status/config.', powers: 'vercel.deploy, production frontend URLs',
+  { id: 'vercel', name: 'Vercel', tier: 'sponsor', purpose: 'Frontend hosting for the venture. Prefer Composio-connected Vercel; direct token is supported for deployment status/config.', connect_url: 'https://vercel.com/account/settings/tokens', powers: 'vercel.deploy, production frontend URLs',
     vars: [
       { env: 'VERCEL_TOKEN', label: 'Vercel token', required: false },
       { env: 'VERCEL_TEAM_ID', label: 'Team ID', required: false, secret: false },
       { env: 'VERCEL_PROJECT_ID', label: 'Project ID', required: false, secret: false },
     ] },
-  { id: 'replay', name: 'Replay', tier: 'sponsor', purpose: 'Autonomous QA with time-travel recordings; runs before every deploy so buggy code never ships.', powers: 'replay.run_suite',
+  { id: 'replay', name: 'Replay', tier: 'sponsor', purpose: 'Autonomous QA with time-travel recordings; runs before every deploy so buggy code never ships.', connect_url: 'https://app.replay.io', powers: 'replay.run_suite',
     vars: [{ env: 'REPLAY_API_KEY', label: 'API key', required: true }] },
-  { id: 'github', name: 'GitHub', tier: 'core', purpose: 'Repo work for the venture the company builds.', powers: 'github.push',
+  { id: 'github', name: 'GitHub', tier: 'core', purpose: 'Repo work for the venture the company builds.', connect_url: 'https://github.com/settings/tokens', powers: 'github.push',
     vars: [{ env: 'GITHUB_TOKEN', label: 'Personal access token', required: true }, { env: 'GITHUB_ORG', label: 'Org / owner', required: false, secret: false }] },
-  { id: 'business_tools', name: 'Business tools gateway', tier: 'optional', purpose: 'Leadgen / CRM / support / metrics gateway.', powers: 'leadgen.*, crm.upsert, support.upsert_ticket, metrics.record_signal',
+  { id: 'business_tools', name: 'Business tools gateway', tier: 'optional', purpose: 'Leadgen / CRM / support / metrics gateway.', connect_url: 'https://app.composio.dev/apps', powers: 'leadgen.*, crm.upsert, support.upsert_ticket, metrics.record_signal',
     vars: [{ env: 'BUSINESS_TOOLS_URL', label: 'Gateway URL', required: true, secret: false }, { env: 'BUSINESS_TOOLS_API_KEY', label: 'Gateway key', required: false }] },
-  { id: 'whop', name: 'Whop', tier: 'optional', purpose: 'Consumer/community revenue rail.', powers: 'whop.create_checkout',
+  { id: 'whop', name: 'Whop', tier: 'optional', purpose: 'Consumer/community revenue rail.', connect_url: 'https://whop.com/dashboard/developer', powers: 'whop.create_checkout',
     vars: [{ env: 'WHOP_API_KEY', label: 'API key', required: true }, { env: 'WHOP_COMPANY_ID', label: 'Company ID', required: false, secret: false }] },
-  { id: 'dodo', name: 'Dodo Payments', tier: 'optional', purpose: 'Merchant-of-record for non-US ventures.', powers: 'dodo.create_checkout',
+  { id: 'dodo', name: 'Dodo Payments', tier: 'optional', purpose: 'Merchant-of-record for non-US ventures.', connect_url: 'https://app.dodopayments.com/developer/api-keys', powers: 'dodo.create_checkout',
     vars: [{ env: 'DODO_API_KEY', label: 'API key', required: true }] },
 ];
 
@@ -119,7 +121,7 @@ export function integrationStatus(): IntegrationStatus[] {
       const secret = v.secret !== false;
       return { env: v.env, label: v.label, required: v.required, configured, secret, hint: v.hint, masked: configured ? (secret ? mask(val!) : val) : undefined };
     });
-    return { id: i.id, name: i.name, tier: i.tier, purpose: i.purpose, powers: i.powers, ready: vars.filter((v) => v.required).every((v) => v.configured), vars };
+    return { id: i.id, name: i.name, tier: i.tier, purpose: i.purpose, powers: i.powers, connect_url: i.connect_url, ready: vars.filter((v) => v.required).every((v) => v.configured), vars };
   });
 }
 
@@ -172,13 +174,14 @@ export async function probeComposio(): Promise<ProbeResult> {
   if (!key) return { ok: false, detail: 'not configured', degraded: 'missing COMPOSIO_API_KEY' };
   const entity = process.env.COMPOSIO_ENTITY_ID;
   try {
-    const url = new URL('https://backend.composio.dev/api/v1/connectedAccounts');
-    if (entity) url.searchParams.set('user_uuid', entity);
+    // v3 is the current API; v1 now answers 410 "please upgrade to v3".
+    const url = new URL('https://backend.composio.dev/api/v3/connected_accounts');
+    if (entity) url.searchParams.set('user_ids', entity);
     const res = await fetch(url, { headers: { 'x-api-key': key } });
     if (!res.ok) return { ok: false, detail: `composio ${res.status}`, degraded: (await res.text()).slice(0, 160) };
     const j = (await res.json()) as any;
     const items: any[] = j.items ?? j.connectedAccounts ?? j.data ?? [];
-    const apps = items.map((i) => String(i.appName ?? i.appUniqueId ?? i.integrationId ?? '').toLowerCase());
+    const apps = items.map((i) => String(i.toolkit?.slug ?? i.appName ?? i.appUniqueId ?? i.integrationId ?? '').toLowerCase());
     return { ok: true, detail: `${items.length} connected account(s)`, extra: { apps, gmail: apps.some((a) => a.includes('gmail')), calendar: apps.some((a) => a.includes('calendar')), github: apps.some((a) => a.includes('github')), vercel: apps.some((a) => a.includes('vercel')), entity_id: entity ?? null } };
   } catch (e) {
     return { ok: false, detail: 'network error', degraded: e instanceof Error ? e.message : String(e) };

@@ -69,10 +69,44 @@ export class Wallets {
     return { url: j.url, session_id: j.id, driver: 'stripe' };
   }
 
+  /** Founder's monthly Stripe top-up ceiling from venture settings; 0 = unlimited. */
+  private async monthlyLimit(venture_id: string): Promise<number> {
+    const r = await this.db.query<{ settings: any }>('SELECT settings FROM venture_settings WHERE venture_id = $1', [venture_id]).catch(() => null);
+    const s = r?.rows[0]?.settings;
+    const raw = typeof s === 'string' ? JSON.parse(s) : s;
+    return Number(raw?.spend_limits?.monthly_usd ?? 0) || 0;
+  }
+
+  /** Sum of successful top-ups since the start of the current UTC month. */
+  private async fundedThisMonth(venture_id: string): Promise<number> {
+    const r = await this.db.query<{ total: string }>(
+      `SELECT COALESCE(SUM((payload->>'amount_usd')::numeric), 0) AS total
+         FROM events
+        WHERE venture_id = $1 AND type = 'money.wallet_funded'
+          AND ts >= date_trunc('month', now() AT TIME ZONE 'utc')`,
+      [venture_id],
+    ).catch(() => null);
+    return Number(r?.rows[0]?.total ?? 0) || 0;
+  }
+
   /** Records a top-up and grows every department envelope proportionally. */
   async fund(venture_id: string, amount_usd: number, rail: string, external_id?: string): Promise<void> {
     const trace = await this.db.query<{ trace_id: string }>('SELECT trace_id FROM ventures WHERE id = $1', [venture_id]);
     if (!trace.rows[0]) return;
+    // Founder-set monthly ceiling on Stripe-funded top-ups. Enforced before the
+    // credit event so a blocked top-up leaves no money behind.
+    const limit = await this.monthlyLimit(venture_id);
+    if (limit > 0) {
+      const used = await this.fundedThisMonth(venture_id);
+      if (used + amount_usd > limit) {
+        await this.events.append({
+          venture_id, type: 'money.budget_exceeded', actor_kind: 'system', actor_id: 'kernel.wallets',
+          payload: { reason: 'monthly_spend_limit', limit_usd: limit, funded_this_month_usd: used, attempted_usd: amount_usd, rail, external_id },
+          trace_id: trace.rows[0].trace_id,
+        });
+        return;
+      }
+    }
     const e = await this.events.append({ venture_id, type: 'money.wallet_funded', actor_kind: 'founder', actor_id: 'founder', payload: { amount_usd, rail, external_id }, trace_id: trace.rows[0].trace_id, idempotency_key: external_id ? `fund:${rail}:${external_id}` : undefined });
     if (e.replayed) return; // webhook redelivery: already credited
     const budgets = await this.meter.budgets(venture_id);

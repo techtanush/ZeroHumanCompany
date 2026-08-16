@@ -1,4 +1,45 @@
 services:
+  # Drains the work queue: without this, work orders sit queued and no
+  # department ever runs. Free plan has no background workers, so it runs as a
+  # web service with a health port.
+  - type: web
+    name: ycbf-orchestrator
+    runtime: node
+    plan: free
+    autoDeploy: true
+    buildCommand: corepack pnpm@9.15.4 install --frozen-lockfile --prod=false
+    startCommand: corepack pnpm@9.15.4 -F @zeroth/orchestrator start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: ZEROTH_ENV
+        value: prod
+      - key: ZEROTH_TOOLS
+        value: real
+      - key: ZEROTH_LLM
+        value: real
+      - key: DATABASE_URL
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: KERNEL_SIGNING_KEY
+        sync: false
+      - key: KERNEL_VAULT_KEY
+        sync: false
+      - key: LINQ_API_KEY
+        sync: false
+      - key: FOUNDER_PHONE
+        sync: false
+      - key: COMPOSIO_API_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: TERAC_API_KEY
+        sync: false
+      - key: ELEVENLABS_API_KEY
+        sync: false
+
   - type: web
     name: ycbf-kernel
     runtime: node

@@ -79,6 +79,14 @@ export const VentureSettings = z.object({
     total_usd: z.number().min(0).max(100_000).default(50),
     monthly_usd: z.number().min(0).max(100_000).default(0),
   }).default({}),
+  /** OpenAI's read on the idea right after onboarding: what it is, which departments matter, what Market Research should chase. */
+  openai_brief: z.object({
+    summary: z.string(),
+    recommended_departments: z.array(z.string()),
+    market_research_notes: z.string(),
+  }).optional(),
+  /** Per-toolkit usage plan, generated once a Composio connection completes. Keyed by toolkit slug. */
+  integration_strategies: z.record(z.string()).default({}),
 });
 export type VentureSettings = z.infer<typeof VentureSettings>;
 

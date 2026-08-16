@@ -221,8 +221,7 @@ export function Onboarding({ onDone, initialProfile }: { onDone: () => void; ini
           </>)}
           {step === 5 && (<>
             <h1>Connect the company's tools.</h1>
-            <p className="lede">Keys are stored in <span className="kbd">.env</span> on this machine and never displayed again. Anything missing degrades to a mock — the company still runs.</p>
-            <div className="card small"><b>Composio:</b> add the API key here, connect Gmail/Calendar plus GitHub and Vercel at app.composio.dev, then paste the entity id. If GitHub or Vercel is missing at build/deploy time, the dashboard and Linq will ask you to connect it before D07 continues.</div>
+            <p className="lede">Gmail, LinkedIn, GitHub, Vercel and more connect with a real sign-in — no key to paste. Once launched, open Setup → Integrations to connect them; each department that owns a tool figures out how to use it for this specific product. Anything not connected degrades to a mock — the company still runs.</p>
             <IntegrationsList compact />
           </>)}
           {step === 6 && (<>

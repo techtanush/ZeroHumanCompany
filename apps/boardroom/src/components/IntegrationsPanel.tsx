@@ -55,14 +55,72 @@ export function IntegrationsList({ compact, filter }: { compact?: boolean; filte
   );
 }
 
+/**
+ * Real OAuth connect grid — one button per business toolkit (Gmail, LinkedIn,
+ * GitHub, Vercel, …). No API key is ever shown to the founder: clicking
+ * "Connect" opens Composio's hosted authorization page for that toolkit,
+ * scoped to this venture, and control returns here already connected.
+ * Departments then read `connected` to decide whether a channel is usable —
+ * see IntegrationsPanel's strategy note below.
+ */
+function ComposioToolkits() {
+  const { ventureId, toast } = useStore();
+  const [toolkits, setToolkits] = useState<Array<{ slug: string; name: string; department: string; connected: boolean }>>([]);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [degraded, setDegraded] = useState<string | undefined>();
+  const load = () => {
+    if (!ventureId) return;
+    api.composioToolkits(ventureId).then((r) => { setToolkits(r.toolkits); setDegraded(r.degraded); }).catch(() => undefined);
+  };
+  useEffect(() => { load(); }, [ventureId]);
+  useEffect(() => {
+    const p = new URLSearchParams(location.search);
+    const connected = p.get('composio_connected');
+    if (connected && ventureId) {
+      toast(`${connected} connected`, 'ok');
+      load();
+      api.composioStrategy(ventureId, connected).catch(() => undefined);
+      history.replaceState({}, '', location.pathname);
+    }
+  }, [ventureId]);
+  const connect = async (slug: string) => {
+    if (!ventureId) { toast('Launch the company first, then connect tools', 'warn'); return; }
+    setBusy(slug);
+    try {
+      const r = await api.composioConnect(ventureId, slug);
+      window.open(r.redirect_url, '_blank', 'noopener');
+      toast(`Finish authorizing ${slug} in the new tab`, 'ok');
+    } catch (e: any) {
+      toast(e?.message?.length > 100 ? 'Composio: could not start the connection' : (e?.message ?? 'connect failed'), 'error');
+    } finally { setBusy(null); }
+  };
+  if (!ventureId) return <div className="small muted">Connect real tools (Gmail, LinkedIn, GitHub, Vercel…) once the company has launched — each connection is scoped to this venture.</div>;
+  return (
+    <div className="col" style={{ gap: 8 }}>
+      <div className="small muted">Agents reason about how to use each connected tool for its department's work — e.g. LinkedIn connected → D04/D09 plan cold outreach and warm-connection leverage automatically.</div>
+      {degraded && <div className="small muted">({degraded})</div>}
+      <div className="grid2" style={{ gap: 8 }}>
+        {toolkits.map((t) => (
+          <div key={t.slug} className={`integ ${t.connected ? 'ready' : ''}`}>
+            <div><div className="name">{t.name} {t.connected ? <span className="chip ok">connected</span> : <span className="chip warn">not connected</span>}</div><div className="tiny muted">{t.department}</div></div>
+            <button className="btn sm primary" disabled={busy === t.slug} onClick={() => connect(t.slug)}>{busy === t.slug ? 'Opening…' : t.connected ? 'Reconnect' : 'Connect'}</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function IntegrationsPanel({ onClose }: { onClose: () => void }) {
   const { toast } = useStore();
   const [linqBusy, setLinqBusy] = useState(false);
   const linq = async () => { setLinqBusy(true); try { const r = await api.linqTest({}); toast(r.ok ? `HELLO sent to ${r.to}` : `Linq: ${r.degraded ?? r.detail}`, r.ok ? 'ok' : 'error'); } finally { setLinqBusy(false); } };
   return (
-    <Panel title="Integrations" size="wide" onClose={onClose} sub="Keys are written to .env on this machine and never shown again. Test = live probe."
-      foot={<><button className="btn" onClick={linq} disabled={linqBusy}>Send HELLO to my phone (Linq)</button><span className="muted small">Composio: connect Gmail/Calendar/GitHub/Vercel at app.composio.dev, then paste the entity id.</span></>}>
-      <IntegrationsList />
+    <Panel title="Integrations" size="wide" onClose={onClose} sub="Connect real tools with OAuth below. Vendor API keys further down are for the company's own accounts (Stripe, Terac, etc.), not shown to anyone else."
+      foot={<><button className="btn" onClick={linq} disabled={linqBusy}>Send HELLO to my phone (Linq)</button></>}>
+      <ComposioToolkits />
+      <div className="hr" style={{ margin: '14px 0' }} />
+      <IntegrationsList filter={(i) => i.id !== 'composio'} />
     </Panel>
   );
 }

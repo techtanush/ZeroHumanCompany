@@ -4,7 +4,8 @@ import { Kernel } from './kernel.js';
 import { KernelError, type StoredEvent } from './event-store.js';
 import { sendFounderText } from './founder-channel.js';
 import { nowIso, uuid } from './util.js';
-import { integrationStatus, probe, sendLinqText, setIntegrationVar, INTEGRATIONS } from './integrations.js';
+import { integrationStatus, probe, sendLinqText, setIntegrationVar, INTEGRATIONS, COMPOSIO_TOOLKITS, composioInitiateConnect, composioConnectedToolkits, postToBandRoom } from './integrations.js';
+import { briefVenture, integrationStrategy, chatText } from './openai.js';
 import { VOICE_CONSENT_TEXT_V1 } from './voice.js';
 import { resolveDepartments } from './insight.js';
 
@@ -101,6 +102,16 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
     }
     if (b.founder_profile?.phone_e164 && !process.env.FOUNDER_PHONE) {
       await setIntegrationVar('FOUNDER_PHONE', String(b.founder_profile.phone_e164)).catch(() => undefined);
+    }
+
+    // OpenAI reads the raw idea right after onboarding and decides what the
+    // company should focus on. Fire-and-forget: it lands in settings.openai_brief
+    // well before D03 (Market Research) actually starts, and issueWorkOrder
+    // attaches its market_research_notes to D03's params automatically.
+    if (b.idea_seed?.raw_statement) {
+      void briefVenture({ raw_statement: b.idea_seed.raw_statement, normalized: b.idea_seed.normalized })
+        .then((brief) => kernel.settings.update(created.venture_id, { openai_brief: brief }, created.founder_id))
+        .catch((e) => console.error('[openai] venture brief failed', e instanceof Error ? e.message : String(e)));
     }
 
     let first_work_order_id: string | null = null;
@@ -399,6 +410,40 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
     const q = req.query as { department?: string };
     return { agents: await kernel.insight.agents(id, q.department) };
   });
+  /**
+   * "What are you doing?" — grounded in this agent's actual current/last work
+   * order and the venture's OpenAI brief, so the answer names the real task
+   * and the real department goal, not a generic line. Falls back across
+   * OpenAI -> Anthropic -> Groq so one vendor outage never breaks the button.
+   * Also tags the agent in the department's Band room, if connected.
+   */
+  app.post('/v1/ventures/:id/agents/:agentId/ask', async (req) => {
+    const { id, agentId } = req.params as { id: string; agentId: string };
+    const agents = await kernel.insight.agents(id);
+    const agent = agents.find((a: any) => a.agent_id === agentId);
+    if (!agent) throw new KernelError('not_found', `no agent ${agentId} on this venture`, false, 404);
+    const settings = await kernel.settings.get(id);
+    const brief = settings.openai_brief;
+    const task = agent.current?.task ?? agent.history?.[0]?.task ?? 'waiting for its next work order';
+    const system =
+      "You are the agent speaking in first person, inside an AI-run company's dashboard. A founder just clicked " +
+      'your card and asked what you are doing. Answer in the exact shape: "I am doing <specific task>, with the goal of ' +
+      '<how it serves the department and the company>." One or two sentences, concrete, no filler, grounded only in the ' +
+      'facts given — never invent a task you were not given.';
+    const user = [
+      `Company idea: ${brief?.summary ?? settings.founder_notes ?? '(not yet briefed)'}`,
+      `Your department: ${agent.department_id}`,
+      `Your role: ${agent.role ?? agent.agent_id}`,
+      `Your current/last task: ${task}`,
+      `Your status: ${agent.status}`,
+    ].join('\n');
+    const reply = await chatText(system, user, `I am doing ${task}, with the goal of moving ${agent.department_id}'s current work forward.`);
+
+    // Tag the agent in its department's Band room; never let this block the reply.
+    void postToBandRoom(agent.department_id, `@${agentId}: ${reply}`).catch(() => undefined);
+    return { agent_id: agentId, department_id: agent.department_id, task, reply };
+  });
+
   app.get('/v1/ventures/:id/goals', async (req) => {
     const { id } = req.params as { id: string };
     return kernel.insight.goals(id);
@@ -494,6 +539,34 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
     }
     return { to, ...r };
   });
+  /* ── Composio toolkit connect: real OAuth per venture, no pasted API key ── */
+  app.get('/v1/ventures/:id/composio/toolkits', async (req) => {
+    const { id } = req.params as { id: string };
+    const connected = await composioConnectedToolkits(id);
+    return { toolkits: COMPOSIO_TOOLKITS.map((t) => ({ ...t, connected: connected.connected.includes(t.slug) })), degraded: connected.degraded };
+  });
+  app.post('/v1/ventures/:id/composio/:toolkit/connect', async (req) => {
+    const { id, toolkit } = req.params as { id: string; toolkit: string };
+    const origin = String(req.headers.origin ?? 'https://ycbf.vercel.app');
+    const r = await composioInitiateConnect(id, toolkit, `${origin}/?composio_connected=${encodeURIComponent(toolkit)}&venture=${id}`);
+    if (!r.ok) throw new KernelError('bad_request', r.detail, true, 502);
+    await kernel.events.append({ venture_id: id, type: 'human.notified', actor_kind: 'system', actor_id: 'kernel.integrations', payload: { channel: 'composio', kind: 'connect_initiated', toolkit }, trace_id: await kernel.traceFor(id) }).catch(() => undefined);
+    return { redirect_url: r.redirect_url, connection_id: r.connection_id };
+  });
+  /** Once a toolkit connects, OpenAI turns it into a concrete usage plan for the department that owns it. */
+  app.post('/v1/ventures/:id/composio/:toolkit/strategy', async (req) => {
+    const { id, toolkit } = req.params as { id: string; toolkit: string };
+    const tk = COMPOSIO_TOOLKITS.find((t) => t.slug === toolkit);
+    const settings = await kernel.settings.get(id);
+    const ideaSummary = settings.openai_brief?.summary ?? settings.founder_notes ?? '';
+    const plan = await integrationStrategy(toolkit, tk?.department ?? 'the relevant department', ideaSummary);
+    if (plan) {
+      const next = { ...(settings.integration_strategies ?? {}), [toolkit]: plan };
+      await kernel.settings.update(id, { integration_strategies: next });
+    }
+    return { toolkit, plan };
+  });
+
   app.post('/v1/integrations/linq/confirm', async (req) => {
     const b = unwrapBody(req.body) as { venture_id?: string; confirmed?: boolean };
     if (!b.venture_id) throw new KernelError('bad_request', 'venture_id required', false, 400);

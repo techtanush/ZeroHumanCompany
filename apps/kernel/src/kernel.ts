@@ -234,6 +234,10 @@ export class Kernel {
     if (params.workspace_root == null) {
       const s = await this.settings.get(input.venture_id).catch(() => null);
       if (s?.workspace.workspace_root) { params.workspace_root = s.workspace.workspace_root; params.agency_workspace_path = s.workspace.workspace_root; }
+      // Market Research gets OpenAI's read on the idea as a head start, once it has landed.
+      if (input.to === 'D03' && s?.openai_brief?.market_research_notes && params.openai_market_notes == null) {
+        params.openai_market_notes = s.openai_brief.market_research_notes;
+      }
     }
     await this.db.query(
       `INSERT INTO work_orders (id, venture_id, from_dept, to_dept, intent, input_artifacts,

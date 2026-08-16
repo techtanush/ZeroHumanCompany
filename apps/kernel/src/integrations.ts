@@ -169,6 +169,25 @@ export async function sendLinqText(to: string, text: string, meta: Record<string
   }
 }
 
+/** Post a line into a department's Band room. Best-effort — never throws into a caller's happy path. */
+export async function postToBandRoom(room: string, text: string): Promise<ProbeResult> {
+  const key = process.env.BAND_API_KEY;
+  if (!key) return { ok: false, detail: 'not configured', degraded: 'missing BAND_API_KEY' };
+  const baseUrl = process.env.BAND_BASE_URL ?? 'https://api.band.dev';
+  const workspace_id = process.env.BAND_WORKSPACE_ID;
+  try {
+    const res = await fetch(`${baseUrl}/v1/rooms/messages`, {
+      method: 'POST',
+      headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
+      body: JSON.stringify({ room, text, ...(workspace_id ? { workspace_id } : {}) }),
+    });
+    if (!res.ok) return { ok: false, detail: `band ${res.status}`, degraded: (await res.text()).slice(0, 160) };
+    return { ok: true, detail: 'posted' };
+  } catch (e) {
+    return { ok: false, detail: 'network error', degraded: e instanceof Error ? e.message : String(e) };
+  }
+}
+
 export async function probeComposio(): Promise<ProbeResult> {
   const key = process.env.COMPOSIO_API_KEY;
   if (!key) return { ok: false, detail: 'not configured', degraded: 'missing COMPOSIO_API_KEY' };
@@ -186,6 +205,93 @@ export async function probeComposio(): Promise<ProbeResult> {
   } catch (e) {
     return { ok: false, detail: 'network error', degraded: e instanceof Error ? e.message : String(e) };
   }
+}
+
+/* ── Composio toolkit connect (real OAuth, not a pasted key) ────────────────
+ * The founder never sees a Composio API key. They click "Connect" on a
+ * toolkit (Gmail, LinkedIn, GitHub, Vercel, …), we ask Composio for a hosted
+ * OAuth link scoped to this founder's entity, they authorize in a new tab,
+ * Composio redirects back here, and from then on every department's Composio
+ * tool calls run as that connected account. */
+
+export interface ToolkitSpec { slug: string; name: string; department: string; }
+
+/** The toolkits Zeroth's departments actually use — the connect list, not Composio's full catalog. */
+export const COMPOSIO_TOOLKITS: ToolkitSpec[] = [
+  { slug: 'gmail', name: 'Gmail', department: 'D04 Outreach, D12 Support — email' },
+  { slug: 'googlecalendar', name: 'Google Calendar', department: 'D04 Outreach — booking calls' },
+  { slug: 'linkedin', name: 'LinkedIn', department: 'D04 Outreach, D09 Leads — sourcing & DMs' },
+  { slug: 'github', name: 'GitHub', department: 'D07 Build — repo, commits, PRs' },
+  { slug: 'vercel', name: 'Vercel', department: 'D07 Build — deploys' },
+  { slug: 'slack', name: 'Slack', department: 'D12 Support, D13 Chief of Staff' },
+  { slug: 'notion', name: 'Notion', department: 'D08 Strategy — docs & specs' },
+];
+
+function composioEntityId(venture_id: string): string {
+  return `zeroth-${venture_id}`;
+}
+
+/** Cache of toolkit slug -> auth_config id for this process, so we don't refetch every click. */
+const authConfigCache = new Map<string, string>();
+
+async function findAuthConfigId(key: string, slug: string): Promise<string | null> {
+  if (authConfigCache.has(slug)) return authConfigCache.get(slug)!;
+  const res = await fetch(`https://backend.composio.dev/api/v3/auth_configs?toolkit_slug=${encodeURIComponent(slug)}&limit=1`, { headers: { 'x-api-key': key } });
+  if (!res.ok) return null;
+  const j = (await res.json()) as any;
+  const id = j.items?.[0]?.id as string | undefined;
+  if (id) authConfigCache.set(slug, id);
+  return id ?? null;
+}
+
+/** Start a hosted OAuth connection for one toolkit and return the link to send the founder to. */
+export async function composioInitiateConnect(venture_id: string, toolkitSlug: string, callbackUrl: string): Promise<
+  { ok: true; redirect_url: string; connection_id: string } | { ok: false; detail: string; degraded: string }
+> {
+  const key = process.env.COMPOSIO_API_KEY;
+  if (!key) return { ok: false, detail: 'not configured', degraded: 'missing COMPOSIO_API_KEY' };
+  const toolkit = COMPOSIO_TOOLKITS.find((t) => t.slug === toolkitSlug);
+  if (!toolkit) return { ok: false, detail: 'unknown toolkit', degraded: `${toolkitSlug} is not in the connect list` };
+
+  const auth_config_id = await findAuthConfigId(key, toolkitSlug);
+  const body: any = {
+    connection: { user_id: composioEntityId(venture_id), callback_url: callbackUrl },
+  };
+  if (auth_config_id) body.auth_config = { id: auth_config_id };
+  else body.auth_config = { toolkit_slug: toolkitSlug };
+
+  const res = await fetch('https://backend.composio.dev/api/v3/connected_accounts', {
+    method: 'POST', headers: { 'x-api-key': key, 'content-type': 'application/json' }, body: JSON.stringify(body),
+  });
+  const raw = await res.text();
+  if (!res.ok) {
+    let detail = `composio ${res.status}`;
+    try {
+      const j = JSON.parse(raw);
+      if (j?.error?.code === 812) detail = 'Composio key needs write access — grant "connected_accounts" and "auth_configs" write in the Composio dashboard, then retry';
+      else detail = j?.error?.message ?? detail;
+    } catch { /* not json */ }
+    return { ok: false, detail, degraded: raw.slice(0, 300) };
+  }
+  const j = JSON.parse(raw) as any;
+  const redirect_url = j.connectionData?.redirectUrl ?? j.redirect_url ?? j.redirectUrl;
+  const connection_id = j.id ?? j.connectionId;
+  if (!redirect_url) return { ok: false, detail: 'composio: no redirect url', degraded: raw.slice(0, 300) };
+  return { ok: true, redirect_url, connection_id };
+}
+
+/** Which toolkits are connected for this venture's Composio entity, right now. */
+export async function composioConnectedToolkits(venture_id: string): Promise<{ ok: boolean; connected: string[]; degraded?: string }> {
+  const key = process.env.COMPOSIO_API_KEY;
+  if (!key) return { ok: false, connected: [], degraded: 'missing COMPOSIO_API_KEY' };
+  const url = new URL('https://backend.composio.dev/api/v3/connected_accounts');
+  url.searchParams.set('user_ids', composioEntityId(venture_id));
+  url.searchParams.set('statuses', 'ACTIVE');
+  const res = await fetch(url, { headers: { 'x-api-key': key } });
+  if (!res.ok) return { ok: false, connected: [], degraded: `composio ${res.status}` };
+  const j = (await res.json()) as any;
+  const items: any[] = j.items ?? [];
+  return { ok: true, connected: items.map((i) => String(i.toolkit?.slug ?? '').toLowerCase()).filter(Boolean) };
 }
 
 export async function probeTeracMcp(): Promise<ProbeResult> {

@@ -8,12 +8,12 @@ import { VoiceRecorder } from './VoiceRecorder';
 import { toE164 } from '../lib/phone';
 
 /**
- * Onboarding: founder → phone (Linq HELLO) → idea or autonomous → budget →
+ * Onboarding: founder → idea or autonomous → budget →
  * workspace folder → schedule → integrations (Composio etc.) → voice consent →
  * launch. Everything lands in POST /v1/ventures (+ settings) and the HQ opens
  * with the SSE stream live.
  */
-const STEPS = ['You', 'Phone', 'Idea', 'Budget', 'Workspace', 'Schedule', 'Integrations', 'Voice', 'Launch'] as const;
+const STEPS = ['You', 'Idea', 'Budget', 'Workspace', 'Schedule', 'Integrations', 'Voice', 'Launch'] as const;
 const TZ_GUESS = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Los_Angeles';
 const ALL_DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -24,23 +24,6 @@ const ALL_DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 /** Declared at module scope so typing never remounts the input (a component created inside render loses focus on every keystroke). */
 function Field({ label, children }: { label: string; children: React.ReactNode }) { return <label className="field"><span className="spec muted">{label}</span>{children}</label>; }
 
-/**
- * Vendor errors arrive as raw JSON blobs. Never show those to a founder — map
- * the ones we know to plain English and truncate anything else.
- */
-function friendlyLinqError(raw?: string): string {
-  if (!raw) return 'could not send';
-  let msg = raw;
-  try {
-    const j = JSON.parse(raw.slice(raw.indexOf('{')));
-    msg = String(j?.error?.message ?? j?.message ?? raw);
-    const code = Number(j?.error?.code);
-    if (code === 2008) return 'that number isn’t approved on this Linq account yet — approvals will stay in the Boardroom';
-  } catch { /* not JSON, fall through */ }
-  if (/recipient not allowed/i.test(msg)) return 'that number isn’t approved on this Linq account yet — approvals will stay in the Boardroom';
-  if (/unauthor|forbidden|401|403/i.test(msg)) return 'Linq rejected the request — approvals will stay in the Boardroom';
-  return msg.length > 90 ? `${msg.slice(0, 90)}…` : msg;
-}
 
 /** Stripe's wordmark 'S' — inline so the button carries the brand with no asset fetch. */
 function StripeMark() {
@@ -115,67 +98,19 @@ export function Onboarding({ onDone, initialProfile }: { onDone: () => void; ini
   const [caps, setCaps] = useState({ spend_cap_usd: 50, monthly_cap_usd: 0, terac_cap_usd: 200, autonomy: 'supervised' as 'copilot' | 'supervised' | 'autonomous' });
   const [ws, setWs] = useState({ path: '', source: 'typed' as 'typed' | 'picker' });
   const [sched, setSched] = useState({ timezone: TZ_GUESS, work_start: '09:00', work_end: '17:00', exec_meeting_time: '07:00', exec_meeting_minutes: 30, all_hands_time: '09:00', all_hands_minutes: 15, improvement_time: '17:30', days: ['mon', 'tue', 'wed', 'thu', 'fri'] });
-  const [linq, setLinq] = useState<{ sent: boolean; ok: boolean; detail: string; confirmed: boolean; continueOnPhone: boolean }>({ sent: false, ok: false, detail: '', confirmed: false, continueOnPhone: false });
-  const [linqBusy, setLinqBusy] = useState(false);
-  // Which E.164 we have already auto-texted, so editing digits never re-fires for the same number.
-  const [autoSentTo, setAutoSentTo] = useState('');
   const [voice, setVoice] = useState<{ agree: boolean; text: string; sample: any | null }>({ agree: false, text: '', sample: null });
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<{ venture_id: string; first_work_order_id: string | null; trace_id: string } | null>(null);
   const [launchLog, setLaunchLog] = useState<string[]>([]);
-  const [transfer, setTransfer] = useState<{ busy: boolean; status: string }>({ busy: false, status: '' });
   const phoneE164 = useMemo(() => toE164(f.phone), [f.phone]);
   const phoneOk = /^\+[1-9]\d{6,14}$/.test(phoneE164);
   useEffect(() => { api.consentText().then((r) => setVoice((v) => ({ ...v, text: r.text }))).catch(() => undefined); }, []);
   useEffect(() => { setSched((s) => ({ ...s, timezone: f.timezone })); }, [f.timezone]);
 
-  const canNext = [f.display_name.trim().length > 1, true, mode === 'autonomous_origination' || idea.trim().length > 12, true, true, true, true, true, true][step];
+  const canNext = [f.display_name.trim().length > 1, mode === 'autonomous_origination' || idea.trim().length > 12, true, true, true, true, true, true][step];
 
-  const sendHello = async (auto = false) => {
-    setLinqBusy(true);
-    setAutoSentTo(phoneE164); // claim the number up-front so the debounce can't double-fire
-    try {
-      // FOUNDER_PHONE is written to .env so gates reach this phone from now on.
-      await api.setVar('FOUNDER_PHONE', phoneE164).catch(() => undefined);
-      const r = await api.linqTest({ to: phoneE164, text: `HELLO ${f.display_name || 'founder'} - this is YCBF, your AI company. Approvals and alerts will arrive here. Reply YES to confirm.` });
-      const why = r.ok ? '' : friendlyLinqError(r.degraded ?? r.detail);
-      setLinq((l) => ({ ...l, sent: true, ok: r.ok, detail: r.ok ? `Sent to ${r.to}` : why, confirmed: false }));
-      toast(r.ok ? 'HELLO sent — check your phone' : why, r.ok ? 'ok' : 'warn');
-      if (!r.ok) setAutoSentTo(''); // let a retry happen if the send failed
-    } catch (e: any) {
-      setAutoSentTo('');
-      setLinq((l) => ({ ...l, sent: true, ok: false, detail: e?.message ?? 'send failed' }));
-      if (!auto) toast(e?.message ?? 'Linq send failed', 'error');
-    } finally { setLinqBusy(false); }
-  };
 
-  // Step "Phone": the moment the number is a valid E.164, text it automatically.
-  // Debounced so a number is not fired at mid-typing, and guarded by autoSentTo
-  // so it sends exactly once per distinct number.
-  useEffect(() => {
-    if (step !== 1 || !phoneOk || linqBusy) return;
-    if (phoneE164 === autoSentTo) return;
-    const t = setTimeout(() => { void sendHello(true); }, 900);
-    return () => clearTimeout(t);
-  }, [step, phoneOk, phoneE164, autoSentTo, linqBusy]);
 
-  /** Opt in to finishing onboarding over iMessage. Texts now; the real handoff
-   *  event fires at launch once a venture_id exists. */
-  const continueOnPhone = async () => {
-    setLinqBusy(true);
-    try {
-      await api.setVar('FOUNDER_PHONE', phoneE164).catch(() => undefined);
-      const r = await api.linqTest({
-        to: phoneE164,
-        text: `${f.display_name || 'Founder'} - you can keep going from here. Once you launch, YCBF will pick the onboarding up in this thread and send approvals as cards. Reply STOP to pause.`,
-      });
-      setLinq((l) => ({ ...l, sent: true, ok: r.ok, detail: r.ok ? `Sent to ${r.to}` : friendlyLinqError(r.degraded ?? r.detail), continueOnPhone: r.ok }));
-      setAutoSentTo(phoneE164);
-      toast(r.ok ? 'Continuing on your phone after launch' : friendlyLinqError(r.degraded ?? r.detail), r.ok ? 'ok' : 'warn');
-    } catch (e: any) {
-      toast(e?.message ?? 'Linq send failed', 'error');
-    } finally { setLinqBusy(false); }
-  };
 
   const launch = async () => {
     setBusy(true); setLaunchLog([]);
@@ -195,39 +130,11 @@ export function Onboarding({ onDone, initialProfile }: { onDone: () => void; ini
       const r = await api.createVenture(body);
       setResult(r); log(`Venture ${r.venture_id.slice(0, 8)} · first work order ${r.first_work_order_id?.slice(0, 8) ?? '—'} → ${mode === 'founder_led' ? 'D01 normalize_idea' : 'D01 originate_opportunities'}`);
       if (voice.agree) { log('Recording voice consent…'); await api.voiceConsent(r.venture_id, { accepted: true, display_name: f.display_name }); if (voice.sample) { log('Cloning voice…'); const c = await api.voiceClone(r.venture_id, { audio_base64: voice.sample.audio_base64, mime_type: voice.sample.mime_type, duration_s: voice.sample.duration_s, name: `${f.display_name} voice` }).catch((e) => ({ voice_id: '', driver: 'error', degraded: e.message })); log(`Voice: ${c.voice_id ? `cloned (${c.driver})` : c.degraded}`); } }
-      if (linq.sent) await api.linqConfirm(r.venture_id, linq.confirmed).catch(() => undefined);
-      if (linq.continueOnPhone && phoneOk) {
-        log('Handing onboarding to your phone…');
-        const t = await api.transferOnboardingToPhone(r.venture_id, {
-          phone_e164: phoneE164,
-          step: 'launch',
-          text: "YCBF is live. Continuing here — approvals and next steps arrive in this thread.",
-          idempotency_key: `onboarding-transfer-${r.venture_id}-launch`,
-        }).catch((e) => ({ delivery: { delivered: false, degraded: e.message } } as any));
-        log(`Phone handoff: ${t.delivery.delivered ? 'sent' : (t.delivery.degraded ?? 'not delivered')}`);
-      }
       log('Ready. Open the HQ when you want the SSE stream to connect.');
     } catch (e: any) { log(`Error: ${e.message}`); toast(e.message, 'error'); }
     finally { setBusy(false); }
   };
 
-  const transferToPhone = async () => {
-    if (!result?.venture_id || !phoneOk) return;
-    setTransfer({ busy: true, status: 'sending...' });
-    try {
-      const r = await api.transferOnboardingToPhone(result.venture_id, {
-        phone_e164: phoneE164,
-        step: STEPS[step].toLowerCase(),
-        text: "Let's continue the onboarding process here. I'll ask the next question by text.",
-        idempotency_key: `onboarding-transfer-${result.venture_id}-${STEPS[step].toLowerCase()}`,
-      });
-      setTransfer({ busy: false, status: r.delivery.delivered ? 'sent to phone' : (r.delivery.degraded ?? 'not delivered') });
-      toast(r.delivery.delivered ? 'Onboarding transferred to phone' : `Phone transfer: ${r.delivery.degraded ?? 'not delivered'}`, r.delivery.delivered ? 'ok' : 'warn');
-    } catch (e: any) {
-      setTransfer({ busy: false, status: e.message });
-      toast(e.message, 'error');
-    }
-  };
   const openHq = () => {
     if (!result?.venture_id) return;
     setVentureId(result.venture_id);
@@ -257,37 +164,18 @@ export function Onboarding({ onDone, initialProfile }: { onDone: () => void; ini
               <Field label="Name"><input className="input" value={f.display_name} onChange={(e) => setF({ ...f, display_name: e.target.value })} placeholder="Ada Lovelace" autoFocus /></Field>
               <Field label="Email"><input className="input" type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} placeholder="ada@example.com" /></Field>
               <Field label="Timezone"><input className="input" value={f.timezone} onChange={(e) => setF({ ...f, timezone: e.target.value })} list="tzs" /><datalist id="tzs">{['America/Los_Angeles', 'America/Denver', 'America/Chicago', 'America/New_York', 'Europe/London', 'Europe/Berlin', 'Asia/Kolkata', 'Asia/Singapore', 'Asia/Tokyo', 'Australia/Sydney', 'UTC'].map((t) => <option key={t} value={t} />)}</datalist></Field>
+              <Field label="Mobile number (optional)"><input className="input" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} placeholder="+1 650 555 0123" /></Field>
               <Field label="Background (optional)"><input className="input" value={f.background} onChange={(e) => setF({ ...f, background: e.target.value })} placeholder="ex-nurse, sold B2B SaaS…" /></Field>
             </div>
           </>)}
           {step === 1 && (<>
-            <h1>Your phone is the approval channel.</h1>
-            <p className="lede">Anything that spends money, contacts a real person, deploys, or builds something new pauses for you. Those decisions arrive as iMessage cards via <b>Linq</b>; you reply to approve. Let's make sure it reaches you.</p>
-            <div className="grid2">
-              <Field label="Mobile number"><input className="input" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} placeholder="+1 650 555 0123" autoFocus /></Field>
-              <div className="field"><span className="spec muted">Normalized (E.164)</span><div className="pathbox">{phoneE164 || '—'} {phoneOk ? '✓' : ''}</div></div>
-            </div>
-            <div className="card">
-              <div className="row wrap" style={{ gap: 10 }}>
-                <button className="btn primary" disabled={!phoneOk || linqBusy} onClick={() => sendHello(false)}>{linqBusy ? 'Sending…' : linq.sent && linq.ok ? 'Resend HELLO' : 'Send me a HELLO text'}</button>
-                <button className="btn" disabled={!phoneOk || linqBusy || linq.continueOnPhone} onClick={continueOnPhone}>{linq.continueOnPhone ? 'Continuing on phone ✓' : 'Continue on my phone'}</button>
-                {linq.sent && <span className={`chip ${linq.ok ? 'ok' : 'err'}`}>{linq.detail}</span>}
-              </div>
-              {phoneOk && !linq.sent && <div className="small muted mt">Texting this number automatically…</div>}
-              {linq.continueOnPhone && <div className="small muted mt">After you launch, YCBF picks up the thread on your phone and sends approvals there.</div>}
-              {linq.sent && linq.ok && <label className="opt check on mt" style={{ cursor: 'pointer' }} onClick={() => setLinq({ ...linq, confirmed: !linq.confirmed })}><span className="rad" style={{ background: linq.confirmed ? 'var(--filament)' : 'transparent' }} /><span>I got the HELLO on my phone {linq.confirmed ? '✓' : ''}</span></label>}
-              {linq.sent && !linq.ok && <div className="small muted mt">Linq isn't configured yet (LINQ_API_KEY) — you can add it in the Integrations step; approvals still work in the Boardroom meanwhile.</div>}
-              <div className="small muted mt">Optional: skip phone for now. Money, outreach and deploy gates will stay in the Boardroom until Linq is connected.</div>
-            </div>
-          </>)}
-          {step === 2 && (<>
             <h1>Bring an idea — or none at all.</h1>
             <p className="lede">Founder-led: you describe the idea and Intake (D01) normalizes it, then Office Hours asks one sharp GStack-style question at a time. Autonomous: D01 originates opportunities, D02 stress-tests the generated idea, and you approve before market research starts.</p>
             <div className="opt" onClick={() => setMode('founder_led')}><span className={`rad ${mode === 'founder_led' ? '' : ''}`} style={{ background: mode === 'founder_led' ? 'radial-gradient(var(--filament) 45%, transparent 50%)' : 'transparent', borderColor: mode === 'founder_led' ? 'var(--filament)' : undefined }} /><div><b>I have an idea</b><div className="small muted">Even a rough one. The company sharpens it against evidence.</div></div></div>
             <div className="opt" onClick={() => setMode('autonomous_origination')}><span className="rad" style={{ background: mode === 'autonomous_origination' ? 'radial-gradient(var(--filament) 45%, transparent 50%)' : 'transparent', borderColor: mode === 'autonomous_origination' ? 'var(--filament)' : undefined }} /><div><b>Find one for me (autonomous origination)</b><div className="small muted">D01 mines pain signals and proposes candidates; you approve the niche.</div></div></div>
             {mode === 'founder_led' && <textarea className="textarea" placeholder="Dental clinics with 2–5 chairs lose patients between visits; I want an automatic recall-reminder service they can turn on in 10 minutes…" value={idea} onChange={(e) => setIdea(e.target.value)} autoFocus />}
           </>)}
-          {step === 3 && (<>
+          {step === 2 && (<>
             <h1>How much can the company spend?</h1>
             <p className="lede">Treasury splits the cap into a wallet per department; every token, tool call and human hire is metered. Departments downgrade models at 80% and freeze at 100%. Money out always asks you first.</p>
             <div className="grid3">
@@ -298,13 +186,13 @@ export function Onboarding({ onDone, initialProfile }: { onDone: () => void; ini
             <StripeConnect limits={{ total_usd: caps.spend_cap_usd, monthly_usd: caps.monthly_cap_usd }} onLimits={(l) => setCaps({ ...caps, spend_cap_usd: l.total_usd, monthly_cap_usd: l.monthly_usd })} />
             <div className="card small">Terac hires draft first and only launch (spend) behind a money gate.</div>
           </>)}
-          {step === 4 && (<>
+          {step === 3 && (<>
             <h1>Choose the workspace this AI company can build inside.</h1>
             <p className="lede">When the plan reaches Build (D07), engineers write real code with Claude — but only in one folder you grant. Replay runs before anything ships.</p>
             <WorkspacePicker value={ws.path} onChange={(p, s) => setWs({ path: p, source: s })} />
             <div className="small muted">You can change this later from Setup. Leave blank to decide when Build starts (Build will pause and ask).</div>
           </>)}
-          {step === 5 && (<>
+          {step === 4 && (<>
             <h1>When does the company work and meet?</h1>
             <p className="lede">Heads meet the CEO each morning to set goals; the leads address the whole company at the all-hands (every agent gathers in the boardroom); the improvement branch reviews the day after hours.</p>
             <div className="row wrap mb" style={{ gap: 8 }}>
@@ -331,22 +219,22 @@ export function Onboarding({ onDone, initialProfile }: { onDone: () => void; ini
             </div>
             <div className="field"><span className="spec muted">Days</span><div className="row wrap" style={{ gap: 6 }}>{ALL_DAYS.map((d) => <button key={d} className={`btn sm ${sched.days.includes(d) ? 'primary' : ''}`} onClick={() => setSched({ ...sched, days: sched.days.includes(d) ? sched.days.filter((x) => x !== d) : [...sched.days, d] })}>{d}</button>)}</div></div>
           </>)}
-          {step === 6 && (<>
+          {step === 5 && (<>
             <h1>Connect the company's tools.</h1>
-            <p className="lede">Keys are stored in <span className="kbd">.env</span> on this machine and never displayed again. Anything missing degrades to a mock — the company still runs. If a department later needs an integration you haven't connected, it texts you on Linq.</p>
+            <p className="lede">Keys are stored in <span className="kbd">.env</span> on this machine and never displayed again. Anything missing degrades to a mock — the company still runs.</p>
             <div className="card small"><b>Composio:</b> add the API key here, connect Gmail/Calendar plus GitHub and Vercel at app.composio.dev, then paste the entity id. If GitHub or Vercel is missing at build/deploy time, the dashboard and Linq will ask you to connect it before D07 continues.</div>
             <IntegrationsList compact />
           </>)}
-          {step === 7 && (<>
+          {step === 6 && (<>
             <h1>Lend the company your voice — with consent.</h1>
             <p className="lede">Outreach and Sales place discovery/sales calls in your cloned voice (ElevenLabs). Every call is a gate you approve and always discloses it's an AI. Optional — skip and set it up later.</p>
             <ConsentBox text={voice.text} name={f.display_name} checked={voice.agree} onChange={(v) => setVoice({ ...voice, agree: v })} />
             {voice.agree && <VoiceRecorder onSample={(s) => setVoice({ ...voice, sample: s })} />}
           </>)}
-          {step === 8 && (<>
+          {step === 7 && (<>
             <h1>Ready to open the doors.</h1>
             <div className="grid2">
-              <div className="card"><div className="spec muted">Founder</div><b>{f.display_name}</b><div className="small muted">{f.email || '—'} · {phoneE164} {linq.confirmed ? '(HELLO confirmed ✓)' : linq.ok ? '(HELLO sent)' : ''} · {f.timezone}</div></div>
+              <div className="card"><div className="spec muted">Founder</div><b>{f.display_name}</b><div className="small muted">{f.email || '—'} · {phoneE164}  · {f.timezone}</div></div>
               <div className="card"><div className="spec muted">Mode</div><b>{mode === 'founder_led' ? 'Founder-led' : 'Autonomous origination'}</b><div className="small muted">{mode === 'founder_led' ? idea.slice(0, 120) : 'D01 will originate opportunities'}</div></div>
               <div className="card"><div className="spec muted">Budget</div><b>${caps.spend_cap_usd}</b> spend{caps.monthly_cap_usd > 0 ? ` · $${caps.monthly_cap_usd}/mo cap` : ''} · ${caps.terac_cap_usd} Terac · {caps.autonomy}</div>
               <div className="card"><div className="spec muted">Workspace</div><span className="mono small">{ws.path || 'not granted yet'}</span></div>
@@ -357,17 +245,9 @@ export function Onboarding({ onDone, initialProfile }: { onDone: () => void; ini
             {result && <div className="card" style={{ borderColor: 'var(--ok)' }}><b>Venture created.</b> <span className="mono small">venture_id {result.venture_id} · first_work_order_id {result.first_work_order_id ?? '—'} · trace {result.trace_id}</span></div>}
           </>)}
         </div>
-        {result && phoneOk && (
-          <div className="phone-transfer">
-            <div className="bubble them">You can also transfer the onboarding process to phone.</div>
-            <button className="btn primary" onClick={transferToPhone} disabled={transfer.busy}>{transfer.busy ? 'Sending...' : 'Transfer to phone'}</button>
-            {transfer.status && <span className="chip">{transfer.status}</span>}
-          </div>
-        )}
         <div className="onboard-foot">
           <button className="btn ghost" onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0 || busy}>&larr; Back</button>
           <div className="row">
-            {step === 1 && <button className="btn ghost" onClick={() => setStep((s) => s + 1)}>Skip phone</button>}
             {step < STEPS.length - 1 ? <button className="btn primary" onClick={() => setStep((s) => s + 1)} disabled={!canNext}>Next &rarr;</button> : result ? <button className="btn primary pulse" onClick={openHq}>Open HQ &rarr;</button> : <button className="btn primary pulse" onClick={launch} disabled={busy}>{busy ? 'Launching…' : 'Launch the company'}</button>}
           </div>
         </div>

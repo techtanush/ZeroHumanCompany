@@ -24,6 +24,24 @@ const ALL_DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 /** Declared at module scope so typing never remounts the input (a component created inside render loses focus on every keystroke). */
 function Field({ label, children }: { label: string; children: React.ReactNode }) { return <label className="field"><span className="spec muted">{label}</span>{children}</label>; }
 
+/**
+ * Vendor errors arrive as raw JSON blobs. Never show those to a founder — map
+ * the ones we know to plain English and truncate anything else.
+ */
+function friendlyLinqError(raw?: string): string {
+  if (!raw) return 'could not send';
+  let msg = raw;
+  try {
+    const j = JSON.parse(raw.slice(raw.indexOf('{')));
+    msg = String(j?.error?.message ?? j?.message ?? raw);
+    const code = Number(j?.error?.code);
+    if (code === 2008) return 'that number isn’t approved on this Linq account yet — approvals will stay in the Boardroom';
+  } catch { /* not JSON, fall through */ }
+  if (/recipient not allowed/i.test(msg)) return 'that number isn’t approved on this Linq account yet — approvals will stay in the Boardroom';
+  if (/unauthor|forbidden|401|403/i.test(msg)) return 'Linq rejected the request — approvals will stay in the Boardroom';
+  return msg.length > 90 ? `${msg.slice(0, 90)}…` : msg;
+}
+
 /** Stripe's wordmark 'S' — inline so the button carries the brand with no asset fetch. */
 function StripeMark() {
   return (
@@ -120,8 +138,9 @@ export function Onboarding({ onDone, initialProfile }: { onDone: () => void; ini
       // FOUNDER_PHONE is written to .env so gates reach this phone from now on.
       await api.setVar('FOUNDER_PHONE', phoneE164).catch(() => undefined);
       const r = await api.linqTest({ to: phoneE164, text: `HELLO ${f.display_name || 'founder'} - this is YCBF, your AI company. Approvals and alerts will arrive here. Reply YES to confirm.` });
-      setLinq((l) => ({ ...l, sent: true, ok: r.ok, detail: r.ok ? `Sent to ${r.to}` : (r.degraded ?? r.detail), confirmed: false }));
-      toast(r.ok ? 'HELLO sent — check your phone' : `Linq: ${r.degraded ?? r.detail}`, r.ok ? 'ok' : 'warn');
+      const why = r.ok ? '' : friendlyLinqError(r.degraded ?? r.detail);
+      setLinq((l) => ({ ...l, sent: true, ok: r.ok, detail: r.ok ? `Sent to ${r.to}` : why, confirmed: false }));
+      toast(r.ok ? 'HELLO sent — check your phone' : why, r.ok ? 'ok' : 'warn');
       if (!r.ok) setAutoSentTo(''); // let a retry happen if the send failed
     } catch (e: any) {
       setAutoSentTo('');
@@ -150,9 +169,9 @@ export function Onboarding({ onDone, initialProfile }: { onDone: () => void; ini
         to: phoneE164,
         text: `${f.display_name || 'Founder'} - you can keep going from here. Once you launch, YCBF will pick the onboarding up in this thread and send approvals as cards. Reply STOP to pause.`,
       });
-      setLinq((l) => ({ ...l, sent: true, ok: r.ok, detail: r.ok ? `Sent to ${r.to}` : (r.degraded ?? r.detail), continueOnPhone: r.ok }));
+      setLinq((l) => ({ ...l, sent: true, ok: r.ok, detail: r.ok ? `Sent to ${r.to}` : friendlyLinqError(r.degraded ?? r.detail), continueOnPhone: r.ok }));
       setAutoSentTo(phoneE164);
-      toast(r.ok ? 'Continuing on your phone after launch' : `Linq: ${r.degraded ?? r.detail}`, r.ok ? 'ok' : 'warn');
+      toast(r.ok ? 'Continuing on your phone after launch' : friendlyLinqError(r.degraded ?? r.detail), r.ok ? 'ok' : 'warn');
     } catch (e: any) {
       toast(e?.message ?? 'Linq send failed', 'error');
     } finally { setLinqBusy(false); }

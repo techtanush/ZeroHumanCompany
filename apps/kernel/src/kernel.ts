@@ -149,17 +149,27 @@ export class Kernel {
     const name = input.name ?? 'Untitled Venture';
     const email = input.founder.email ?? `${slugify(input.founder.display_name)}@founder.local`;
 
-    await this.db.query(
+    // A founder can start several ventures, so email collides on the 2nd launch.
+    // Upsert instead: refresh their profile/caps and reuse the existing row.
+    const upserted = await this.db.query<{ id: string }>(
       `INSERT INTO founders (id, email, phone_e164, display_name, timezone, spend_cap_usd, terac_cap_usd)
-       VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+       VALUES ($1,$2,$3,$4,$5,$6,$7)
+       ON CONFLICT (email) DO UPDATE SET
+         phone_e164    = COALESCE(EXCLUDED.phone_e164, founders.phone_e164),
+         display_name  = EXCLUDED.display_name,
+         timezone      = EXCLUDED.timezone,
+         spend_cap_usd = EXCLUDED.spend_cap_usd,
+         terac_cap_usd = EXCLUDED.terac_cap_usd
+       RETURNING id`,
       [founder_id, email, input.founder.phone_e164 ?? null, input.founder.display_name,
        input.founder.timezone ?? 'America/Los_Angeles',
        input.spend_cap_usd ?? 50, input.terac_cap_usd ?? 200],
     );
+    const effective_founder_id = upserted.rows[0]?.id ?? founder_id;
     await this.db.query(
       `INSERT INTO ventures (id, founder_id, name, slug, mode, autonomy_level, trace_id)
        VALUES ($1,$2,$3,$4,$5,$6,$7)`,
-      [venture_id, founder_id, name, `${slugify(name)}-${venture_id.slice(0, 6)}`,
+      [venture_id, effective_founder_id, name, `${slugify(name)}-${venture_id.slice(0, 6)}`,
        input.mode, input.autonomy_level ?? 'supervised', trace_id],
     );
 
@@ -202,7 +212,7 @@ export class Kernel {
       trace_id,
     });
 
-    return { venture_id, founder_id, trace_id, cycle_id };
+    return { venture_id, founder_id: effective_founder_id, trace_id, cycle_id };
   }
 
   /** Issue a work order directly (the founder or a department asking for work). */

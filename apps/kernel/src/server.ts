@@ -549,7 +549,7 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
     const { id, toolkit } = req.params as { id: string; toolkit: string };
     const origin = String(req.headers.origin ?? 'https://ycbf.vercel.app');
     const r = await composioInitiateConnect(id, toolkit, `${origin}/?composio_connected=${encodeURIComponent(toolkit)}&venture=${id}`);
-    if (!r.ok) throw new KernelError('bad_request', r.detail, true, 502);
+    if (!r.ok) throw new KernelError('bad_request', `${r.detail} | raw: ${r.degraded}`, true, 502);
     await kernel.events.append({ venture_id: id, type: 'human.notified', actor_kind: 'system', actor_id: 'kernel.integrations', payload: { channel: 'composio', kind: 'connect_initiated', toolkit }, trace_id: await kernel.traceFor(id) }).catch(() => undefined);
     return { redirect_url: r.redirect_url, connection_id: r.connection_id };
   });

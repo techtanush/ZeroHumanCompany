@@ -20,21 +20,28 @@ export * from './wallets.js';
 
 /** Boot a kernel with routing rules loaded from packages/manifests. */
 export async function bootKernel(): Promise<Kernel> {
+  console.log('[kernel] boot: loading routing');
   let routing: any[] = [];
   try {
     routing = await loadRouting();
   } catch (e) {
     console.warn('[kernel] routing.yaml unavailable, starting with empty routing table:', String(e));
   }
+  console.log(`[kernel] boot: routing ready (${routing.length} rules)`);
+  console.log('[kernel] boot: opening db');
   const kernel = await Kernel.create({ routing, clock: process.env.ZEROTH_CLOCK !== 'off' });
+  console.log(`[kernel] boot: db ready (${kernel.db.driver})`);
   kernel.gates.startSweeper();
+  console.log('[kernel] boot: gate sweeper ready');
   return kernel;
 }
 
 export async function main(): Promise<void> {
+  const port = Number(process.env.PORT ?? 4000);
+  console.log(`[kernel] boot: starting on port ${port}`);
   const kernel = await bootKernel();
   const app = buildServer({ kernel, logger: true });
-  const port = Number(process.env.PORT ?? 4000);
+  console.log('[kernel] boot: fastify ready, binding');
   await app.listen({ port, host: '0.0.0.0' });
   console.log(`[kernel] listening on :${port} (db=${kernel.db.driver})`);
 }

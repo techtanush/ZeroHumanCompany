@@ -1,11 +1,15 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 import { DepartmentManifest, RoutingTable, type DepartmentManifest as DepartmentManifestType, type RoutingTable as RoutingTableType } from '@zeroth/contracts';
 import type { z, ZodIssue } from 'zod';
 
-const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const packageDir = [
+  resolve(dirname(fileURLToPath(import.meta.url)), '..'),
+  resolve(process.cwd(), 'packages/manifests'),
+  resolve(process.cwd(), '../../packages/manifests'),
+].find((dir) => existsSync(join(dir, 'routing.yaml'))) ?? resolve(dirname(fileURLToPath(import.meta.url)), '..');
 let manifestCache: DepartmentManifestType[] | undefined;
 
 function formatIssues(file: string, error: z.ZodError): string[] {

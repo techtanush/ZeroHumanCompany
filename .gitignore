@@ -29,3 +29,4 @@ secrets/
 .linq/
 .terac/
 *.local.json
+.vercel

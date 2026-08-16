@@ -2,7 +2,11 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, normalize, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const packageDir = [
+  resolve(dirname(fileURLToPath(import.meta.url)), '..'),
+  resolve(process.cwd(), 'packages/prompts'),
+  resolve(process.cwd(), '../../packages/prompts'),
+].find((dir) => existsSync(resolve(dir, '_shared/company-context.md'))) ?? resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const sharedRefs = [
   '_shared/company-context.md',
   '_shared/evidence-rules.md',

@@ -5,12 +5,14 @@
   "type": "module",
   "main": "./src/index.ts",
   "scripts": {
+    "build": "esbuild src/main.ts --bundle --platform=node --format=esm --target=node22 --external:fastify --external:@electric-sql/pglite --banner:js=\"import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);\" --outfile=dist/main.js",
     "dev": "tsx watch src/main.ts",
-    "start": "tsx src/main.ts",
+    "start": "node dist/main.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
+    "@electric-sql/pglite": "^0.5.5",
     "@zeroth/agent-kit": "workspace:^",
     "@zeroth/contracts": "workspace:^",
     "@zeroth/db": "workspace:^",

@@ -63,6 +63,11 @@ export async function runAgent(spec: AgentSpec, ctx: RunContext): Promise<AgentR
   const prompt_hash = createHash('sha256').update(`${system}::${model}`).digest('hex').slice(0, 16);
 
   const toolByName = new Map(ctx.tools.map((t) => [t.name, t]));
+  // Anthropic requires tool names to match ^[a-zA-Z0-9_-]{1,128}$, but ours are
+  // namespaced with dots ("web.search"). Send a sanitized name and map the
+  // model's reply back to the real tool.
+  const wireName = (n: string) => n.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 128);
+  const toolByWireName = new Map(ctx.tools.map((t) => [wireName(t.name), t]));
   const messages: LlmRequest['messages'] = [
     { role: 'user', content: String(ctx.vars.task ?? 'Perform your role and return the required JSON.') },
   ];
@@ -84,7 +89,7 @@ export async function runAgent(spec: AgentSpec, ctx: RunContext): Promise<AgentR
       messages,
       max_tokens: Math.min(spec.max_tokens_per_run, 8192),
       tools: ctx.tools.map((t) => ({
-        name: t.name,
+        name: wireName(t.name),
         description: t.description,
         input_schema: { type: 'object' },
       })),
@@ -109,7 +114,7 @@ export async function runAgent(spec: AgentSpec, ctx: RunContext): Promise<AgentR
     // is not in ctx.tools — the manifest allowlist is enforced by construction.
     const results: string[] = [];
     for (const use of res.tool_uses) {
-      const tool = toolByName.get(use.name);
+      const tool = toolByName.get(use.name) ?? toolByWireName.get(use.name);
       if (!tool) {
         tool_calls.push({ name: use.name, ok: false, error: 'tool not allowed' });
         results.push(`${use.name}: ERROR tool not allowed for this agent`);

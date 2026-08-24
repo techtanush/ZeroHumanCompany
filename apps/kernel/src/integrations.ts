@@ -227,7 +227,7 @@ export const COMPOSIO_TOOLKITS: ToolkitSpec[] = [
   { slug: 'notion', name: 'Notion', department: 'D08 Strategy — docs & specs' },
 ];
 
-function composioEntityId(venture_id: string): string {
+export function composioEntityId(venture_id: string): string {
   return `zeroth-${venture_id}`;
 }
 
@@ -244,8 +244,14 @@ async function findAuthConfigId(key: string, slug: string): Promise<string | nul
   return id ?? null;
 }
 
-/** Start a hosted OAuth connection for one toolkit and return the link to send the founder to. */
-export async function composioInitiateConnect(venture_id: string, toolkitSlug: string, callbackUrl: string): Promise<
+/**
+ * Start a hosted OAuth connection for one toolkit and return the link to send
+ * the founder to. `identity` is the Composio `user_id` this connection is
+ * filed under — usually `composioEntityId(venture_id)`, but onboarding uses a
+ * venture-less draft identity so GitHub etc. can be connected before the
+ * venture exists (see the /v1/onboarding/composio/* routes).
+ */
+export async function composioInitiateConnect(identity: string, toolkitSlug: string, callbackUrl: string): Promise<
   { ok: true; redirect_url: string; connection_id: string } | { ok: false; detail: string; degraded: string }
 > {
   const key = process.env.COMPOSIO_API_KEY;
@@ -255,7 +261,7 @@ export async function composioInitiateConnect(venture_id: string, toolkitSlug: s
 
   const auth_config_id = await findAuthConfigId(key, toolkitSlug);
   const body: any = {
-    connection: { user_id: composioEntityId(venture_id), callback_url: callbackUrl },
+    connection: { user_id: identity, callback_url: callbackUrl },
   };
   if (auth_config_id) body.auth_config = { id: auth_config_id };
   else body.auth_config = { toolkit_slug: toolkitSlug };
@@ -280,18 +286,51 @@ export async function composioInitiateConnect(venture_id: string, toolkitSlug: s
   return { ok: true, redirect_url, connection_id };
 }
 
-/** Which toolkits are connected for this venture's Composio entity, right now. */
-export async function composioConnectedToolkits(venture_id: string): Promise<{ ok: boolean; connected: string[]; degraded?: string }> {
+/** Which toolkits are connected under this Composio identity, right now. */
+export async function composioConnectedToolkits(identity: string): Promise<{ ok: boolean; connected: string[]; degraded?: string }> {
   const key = process.env.COMPOSIO_API_KEY;
   if (!key) return { ok: false, connected: [], degraded: 'missing COMPOSIO_API_KEY' };
   const url = new URL('https://backend.composio.dev/api/v3/connected_accounts');
-  url.searchParams.set('user_ids', composioEntityId(venture_id));
+  url.searchParams.set('user_ids', identity);
   url.searchParams.set('statuses', 'ACTIVE');
   const res = await fetch(url, { headers: { 'x-api-key': key } });
   if (!res.ok) return { ok: false, connected: [], degraded: `composio ${res.status}` };
   const j = (await res.json()) as any;
   const items: any[] = j.items ?? [];
   return { ok: true, connected: items.map((i) => String(i.toolkit?.slug ?? '').toLowerCase()).filter(Boolean) };
+}
+
+/** The Composio connected_account id (`ca_...`) for one toolkit under this identity, if active. Needed to execute tools (e.g. GitHub repo/file actions) on the founder's behalf. */
+export async function composioConnectedAccountId(identity: string, toolkitSlug: string): Promise<string | null> {
+  const key = process.env.COMPOSIO_API_KEY;
+  if (!key) return null;
+  const url = new URL('https://backend.composio.dev/api/v3/connected_accounts');
+  url.searchParams.set('user_ids', identity);
+  url.searchParams.set('toolkit_slugs', toolkitSlug);
+  url.searchParams.set('statuses', 'ACTIVE');
+  const res = await fetch(url, { headers: { 'x-api-key': key } });
+  if (!res.ok) return null;
+  const j = (await res.json()) as any;
+  return j.items?.[0]?.id ?? null;
+}
+
+/** Execute a Composio tool (e.g. a GitHub action) using the founder's connected account. */
+export async function composioExecuteTool(connectedAccountId: string, toolSlug: string, args: Record<string, unknown>): Promise<
+  { ok: true; data: unknown } | { ok: false; detail: string; degraded: string }
+> {
+  const key = process.env.COMPOSIO_API_KEY;
+  if (!key) return { ok: false, detail: 'not configured', degraded: 'missing COMPOSIO_API_KEY' };
+  const res = await fetch(`https://backend.composio.dev/api/v3/tools/execute/${encodeURIComponent(toolSlug)}`, {
+    method: 'POST',
+    headers: { 'x-api-key': key, 'content-type': 'application/json' },
+    body: JSON.stringify({ connected_account_id: connectedAccountId, arguments: args }),
+  });
+  const raw = await res.text();
+  if (!res.ok) return { ok: false, detail: `composio ${res.status}`, degraded: raw.slice(0, 400) };
+  let j: any;
+  try { j = JSON.parse(raw); } catch { return { ok: false, detail: 'composio: bad JSON response', degraded: raw.slice(0, 400) }; }
+  if (j.successful === false || j.error) return { ok: false, detail: 'tool execution failed', degraded: String(j.error ?? '').slice(0, 400) };
+  return { ok: true, data: j.data ?? j };
 }
 
 export async function probeTeracMcp(): Promise<ProbeResult> {

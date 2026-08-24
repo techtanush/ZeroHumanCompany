@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -13,6 +13,20 @@ import { factsAnswer, resolveDepartments } from './insight.js';
  * goals, meetings, voice consent, wallets, integrations. All in mock mode
  * (zero keys) — the same code path the founder's laptop runs before keys land.
  */
+
+// This file's whole premise is "mock mode — zero keys" (see file comment above).
+// That must hold regardless of what the invoking shell happens to have exported
+// (e.g. a founder who ran `source .env` before `pnpm test`), not just in a
+// pristine CI environment — otherwise the department-Q&A test flakes between
+// 'facts' and 'llm' depending on ambient state instead of test intent.
+const LLM_KEYS = ['OPENAI_API_KEY', 'ANTHROPIC_API_KEY', 'GROQ_API_KEY'] as const;
+const savedLlmKeys: Partial<Record<(typeof LLM_KEYS)[number], string>> = {};
+beforeEach(() => {
+  for (const k of LLM_KEYS) { if (process.env[k] !== undefined) { savedLlmKeys[k] = process.env[k]; delete process.env[k]; } }
+});
+afterEach(() => {
+  for (const k of LLM_KEYS) { if (savedLlmKeys[k] !== undefined) process.env[k] = savedLlmKeys[k]; }
+});
 
 const openKernels: Kernel[] = [];
 async function freshKernel() {

@@ -25,6 +25,65 @@ const ALL_DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 function Field({ label, children }: { label: string; children: React.ReactNode }) { return <label className="field"><span className="spec muted">{label}</span>{children}</label>; }
 
 
+const DRAFT_IDENTITY_KEY = 'zeroth.draft_composio_identity';
+
+/** GitHub's mark — inline so the button carries the brand with no asset fetch. */
+function GithubMark() {
+  return (
+    <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" fill="currentColor" style={{ flex: '0 0 auto' }}>
+      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+    </svg>
+  );
+}
+
+/**
+ * Connect GitHub before the venture even exists: OAuth against a client-generated
+ * draft identity (no venture_id yet), carried into the venture at launch via
+ * settings.composio_identity so the connection survives — the founder never
+ * has to reconnect. Lets auto-build push straight to their own GitHub.
+ */
+function GithubConnect({ identity }: { identity: string }) {
+  const { toast } = useStore();
+  const [state, setState] = useState<{ connected: boolean; busy: boolean; checked: boolean }>({ connected: false, busy: true, checked: false });
+  const check = async () => {
+    setState((s) => ({ ...s, busy: true }));
+    try {
+      const r = await api.onboardingComposioToolkits(identity);
+      const gh = r.toolkits.find((t) => t.slug === 'github');
+      setState({ connected: Boolean(gh?.connected), busy: false, checked: true });
+    } catch { setState((s) => ({ ...s, busy: false, checked: true })); }
+  };
+  useEffect(() => { void check(); }, [identity]);
+  useEffect(() => {
+    const p = new URLSearchParams(location.search);
+    if (p.get('composio_connected') === 'github') { toast('GitHub connected', 'ok'); void check(); history.replaceState({}, '', location.pathname); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const connect = async () => {
+    setState((s) => ({ ...s, busy: true }));
+    try {
+      const r = await api.onboardingComposioConnect(identity, 'github', `${location.origin}${location.pathname}?onboarding=1`);
+      window.open(r.redirect_url, '_blank', 'noopener');
+      toast('Finish authorizing GitHub in the new tab, then come back here', 'ok');
+    } catch (e: any) {
+      toast(e?.message?.length > 100 ? 'Composio: could not start the connection' : (e?.message ?? 'connect failed'), 'error');
+    } finally { setState((s) => ({ ...s, busy: false })); }
+  };
+  return (
+    <div className="card">
+      <div className="row wrap" style={{ gap: 10, alignItems: 'center' }}>
+        <GithubMark />
+        <b>GitHub</b>
+        {!state.checked ? <span className="chip">checking…</span> : <span className={`chip ${state.connected ? 'ok' : 'warn'}`}>{state.connected ? 'connected' : 'not connected'}</span>}
+        <span style={{ flex: 1 }} />
+        <button className="btn primary" onClick={connect} disabled={state.busy}>{state.busy ? '…' : state.connected ? 'Reconnect' : 'Connect GitHub'}</button>
+        <button className="btn sm ghost" onClick={check} disabled={state.busy}>Re-check</button>
+      </div>
+      <div className="small muted mt">When you bring an idea, Build (D07) auto-generates a first working version and pushes it here — to <b>your own</b> GitHub — as soon as it's ready. Skip this and it lands in the company's own GitHub instead.</div>
+    </div>
+  );
+}
+
 /** Stripe's wordmark 'S' — inline so the button carries the brand with no asset fetch. */
 function StripeMark() {
   return (
@@ -96,6 +155,15 @@ export function Onboarding({ onDone, initialProfile }: { onDone: () => void; ini
   const [mode, setMode] = useState<'founder_led' | 'autonomous_origination'>('founder_led');
   const [idea, setIdea] = useState('');
   const [caps, setCaps] = useState({ spend_cap_usd: 50, monthly_cap_usd: 0, terac_cap_usd: 200, autonomy: 'supervised' as 'copilot' | 'supervised' | 'autonomous' });
+  // Stable across the onboarding session so a toolkit connected pre-launch (GitHub, typically)
+  // is still there when the venture is created — carried over via settings.composio_identity.
+  const [draftIdentity] = useState(() => {
+    const existing = localStorage.getItem(DRAFT_IDENTITY_KEY);
+    if (existing) return existing;
+    const id = `zeroth-draft-${crypto.randomUUID()}`;
+    localStorage.setItem(DRAFT_IDENTITY_KEY, id);
+    return id;
+  });
   const [ws, setWs] = useState({ path: '', source: 'typed' as 'typed' | 'picker' });
   const [sched, setSched] = useState({ timezone: TZ_GUESS, work_start: '09:00', work_end: '17:00', exec_meeting_time: '07:00', exec_meeting_minutes: 30, all_hands_time: '09:00', all_hands_minutes: 15, improvement_time: '17:30', days: ['mon', 'tue', 'wed', 'thu', 'fri'] });
   const [voice, setVoice] = useState<{ agree: boolean; text: string; sample: any | null }>({ agree: false, text: '', sample: null });
@@ -120,7 +188,7 @@ export function Onboarding({ onDone, initialProfile }: { onDone: () => void; ini
       const body: any = {
         mode, founder_profile, autonomy_level: caps.autonomy, spend_cap_usd: caps.spend_cap_usd, terac_cap_usd: caps.terac_cap_usd,
         name: mode === 'founder_led' ? idea.trim().slice(0, 40) : `${f.display_name.split(' ')[0]}'s autonomous venture`,
-        settings: { meetings: sched, integrations_ack: [], founder_notes: '', spend_limits: { total_usd: caps.spend_cap_usd, monthly_usd: caps.monthly_cap_usd } },
+        settings: { meetings: sched, integrations_ack: [], founder_notes: '', spend_limits: { total_usd: caps.spend_cap_usd, monthly_usd: caps.monthly_cap_usd }, composio_identity: draftIdentity },
         workspace_root: ws.path.trim() || undefined, agency_workspace_path: ws.path.trim() || undefined, workspace_source: ws.source,
       };
       if (mode === 'founder_led') {
@@ -221,7 +289,8 @@ export function Onboarding({ onDone, initialProfile }: { onDone: () => void; ini
           </>)}
           {step === 5 && (<>
             <h1>Connect the company's tools.</h1>
-            <p className="lede">Gmail, LinkedIn, GitHub, Vercel and more connect with a real sign-in — no key to paste. Once launched, open Setup → Integrations to connect them; each department that owns a tool figures out how to use it for this specific product. Anything not connected degrades to a mock — the company still runs.</p>
+            <p className="lede">GitHub connects right now, before launch, so Build (D07) can push straight to it the moment it has something to ship. Gmail, LinkedIn, Vercel and more connect with a real sign-in too — once launched, open Setup → Integrations for those. Anything not connected degrades to a mock — the company still runs.</p>
+            <GithubConnect identity={draftIdentity} />
             <IntegrationsList compact />
           </>)}
           {step === 6 && (<>

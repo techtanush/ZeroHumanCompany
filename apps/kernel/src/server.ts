@@ -4,10 +4,11 @@ import { Kernel } from './kernel.js';
 import { KernelError, type StoredEvent } from './event-store.js';
 import { sendFounderText } from './founder-channel.js';
 import { nowIso, uuid } from './util.js';
-import { integrationStatus, probe, sendLinqText, setIntegrationVar, INTEGRATIONS, COMPOSIO_TOOLKITS, composioInitiateConnect, composioConnectedToolkits, postToBandRoom } from './integrations.js';
+import { integrationStatus, probe, sendLinqText, setIntegrationVar, INTEGRATIONS, COMPOSIO_TOOLKITS, composioInitiateConnect, composioConnectedToolkits, composioEntityId, postToBandRoom } from './integrations.js';
 import { briefVenture, integrationStrategy, chatText } from './openai.js';
 import { VOICE_CONSENT_TEXT_V1 } from './voice.js';
 import { resolveDepartments } from './insight.js';
+import { runAutoBuild } from './autobuild.js';
 
 export interface ServerOptions {
   kernel: Kernel;
@@ -112,6 +113,14 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
       void briefVenture({ raw_statement: b.idea_seed.raw_statement, normalized: b.idea_seed.normalized })
         .then((brief) => kernel.settings.update(created.venture_id, { openai_brief: brief }, created.founder_id))
         .catch((e) => console.error('[openai] venture brief failed', e instanceof Error ? e.message : String(e)));
+
+      // Auto-build: OpenAI turns the raw idea into a small real working product,
+      // pushes it to a new GitHub repo (the founder's own, if they connected one
+      // during onboarding), serves it locally, and reports back via
+      // settings.autobuild — the Boardroom shows this as a persistent HQ
+      // notification. Fire-and-forget so venture creation isn't blocked on it.
+      void runAutoBuild(kernel, created.venture_id, b.idea_seed.raw_statement)
+        .catch((e) => console.error('[autobuild] failed', e instanceof Error ? e.message : String(e)));
     }
 
     let first_work_order_id: string | null = null;
@@ -539,19 +548,58 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
     }
     return { to, ...r };
   });
-  /* ── Composio toolkit connect: real OAuth per venture, no pasted API key ── */
+  /* ── Composio toolkit connect: real OAuth per venture, no pasted API key ──
+   * A venture can carry a `composio_identity` in its settings — set when the
+   * founder connected a toolkit (e.g. GitHub) during onboarding, before the
+   * venture existed (see /v1/onboarding/composio/* below). When present, every
+   * venture-scoped composio call reuses that identity instead of the derived
+   * `zeroth-<venture_id>` one, so the pre-launch connection carries over. */
+  const composioIdentityFor = async (id: string): Promise<string> => {
+    const s = await kernel.settings.get(id);
+    return s.composio_identity || composioEntityId(id);
+  };
   app.get('/v1/ventures/:id/composio/toolkits', async (req) => {
     const { id } = req.params as { id: string };
-    const connected = await composioConnectedToolkits(id);
+    const connected = await composioConnectedToolkits(await composioIdentityFor(id));
     return { toolkits: COMPOSIO_TOOLKITS.map((t) => ({ ...t, connected: connected.connected.includes(t.slug) })), degraded: connected.degraded };
   });
   app.post('/v1/ventures/:id/composio/:toolkit/connect', async (req) => {
     const { id, toolkit } = req.params as { id: string; toolkit: string };
     const origin = String(req.headers.origin ?? 'https://ycbf.vercel.app');
-    const r = await composioInitiateConnect(id, toolkit, `${origin}/?composio_connected=${encodeURIComponent(toolkit)}&venture=${id}`);
+    const r = await composioInitiateConnect(await composioIdentityFor(id), toolkit, `${origin}/?composio_connected=${encodeURIComponent(toolkit)}&venture=${id}`);
     if (!r.ok) throw new KernelError('bad_request', `${r.detail} | raw: ${r.degraded}`, true, 502);
     await kernel.events.append({ venture_id: id, type: 'human.notified', actor_kind: 'system', actor_id: 'kernel.integrations', payload: { channel: 'composio', kind: 'connect_initiated', toolkit }, trace_id: await kernel.traceFor(id) }).catch(() => undefined);
     return { redirect_url: r.redirect_url, connection_id: r.connection_id };
+  });
+
+  /**
+   * Pre-launch Composio connect: the onboarding wizard doesn't have a
+   * venture_id yet, so it generates a draft identity client-side and connects
+   * toolkits (GitHub, most commonly) against that. `createVenture` is told
+   * this identity via `settings.composio_identity` so the connection carries
+   * over — the founder never has to reconnect after launch.
+   */
+  app.get('/v1/onboarding/composio/toolkits', async (req) => {
+    const q = req.query as { identity?: string };
+    if (!q.identity) throw new KernelError('bad_request', 'identity is required', false, 400);
+    const connected = await composioConnectedToolkits(q.identity);
+    return { toolkits: COMPOSIO_TOOLKITS.map((t) => ({ ...t, connected: connected.connected.includes(t.slug) })), degraded: connected.degraded };
+  });
+  app.post('/v1/onboarding/composio/:toolkit/connect', async (req) => {
+    const { toolkit } = req.params as { toolkit: string };
+    const b = unwrapBody(req.body) as { identity?: string; callback_url?: string };
+    if (!b.identity) throw new KernelError('bad_request', 'identity is required', false, 400);
+    const origin = String(req.headers.origin ?? 'https://ycbf.vercel.app');
+    const r = await composioInitiateConnect(b.identity, toolkit, b.callback_url ?? `${origin}/?onboarding=1&composio_connected=${encodeURIComponent(toolkit)}`);
+    if (!r.ok) throw new KernelError('bad_request', `${r.detail} | raw: ${r.degraded}`, true, 502);
+    return { redirect_url: r.redirect_url, connection_id: r.connection_id };
+  });
+
+  /** Current auto-build status for this venture (also streamed live via venture.settings_updated). */
+  app.get('/v1/ventures/:id/autobuild', async (req) => {
+    const { id } = req.params as { id: string };
+    const s = await kernel.settings.get(id);
+    return { autobuild: s.autobuild };
   });
   /** Once a toolkit connects, OpenAI turns it into a concrete usage plan for the department that owns it. */
   app.post('/v1/ventures/:id/composio/:toolkit/strategy', async (req) => {

@@ -85,6 +85,19 @@ export const VentureSettings = z.object({
     recommended_departments: z.array(z.string()),
     market_research_notes: z.string(),
   }).optional(),
+  /** Composio `user_id` this venture's tool connections are filed under. Set when a toolkit (usually GitHub) was connected during onboarding, before the venture existed — carries that connection forward instead of starting a fresh, disconnected identity. */
+  composio_identity: z.string().optional(),
+  /** D07's automatic idea → working product pipeline: OpenAI generates the code, pushes it to a new GitHub repo, and serves it locally. Surfaced as a persistent HQ notification. */
+  autobuild: z.object({
+    status: z.enum(['idle', 'generating', 'pushing', 'serving', 'ready', 'failed']).default('idle'),
+    idea_summary: z.string().optional(),
+    repo_url: z.string().optional(),
+    repo_owner: z.enum(['founder', 'company']).optional(),
+    local_url: z.string().optional(),
+    used_env: z.array(z.string()).default([]),
+    error: z.string().optional(),
+    updated_at: z.string().optional(),
+  }).default({}),
   /** Per-toolkit usage plan, generated once a Composio connection completes. Keyed by toolkit slug. */
   integration_strategies: z.record(z.string()).default({}),
 });

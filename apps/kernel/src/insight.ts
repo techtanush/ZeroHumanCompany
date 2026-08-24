@@ -3,6 +3,7 @@ import { DEPARTMENT_NAMES, type DepartmentId } from '@zeroth/contracts';
 import type { Db } from '@zeroth/db';
 import type { EventStore, StoredEvent } from './event-store.js';
 import type { ArtifactRegistry } from './artifacts.js';
+import { chatText } from './openai.js';
 
 /**
  * Insight: the read-side that powers "ask the department", the per-agent live
@@ -134,28 +135,17 @@ export class Insight {
     const depts = resolveDepartments(deptKey);
     const facts = await this.facts(venture_id, depts);
     const label = depts.length === DEPTS.length ? 'the whole company (CEO / executive team)' : depts.map((d) => `${d} ${DEPARTMENT_NAMES[d]}`).join(', ');
-    const llm = this.getLlm();
-    let answer: string;
-    let source: 'llm' | 'facts' = 'facts';
-    if (llm.kind === 'anthropic') {
-      const model = process.env.ANTHROPIC_MODEL_SONNET ?? 'claude-sonnet-4-6';
-      const res = await llm.complete({
-        model,
-        max_tokens: 700,
-        system: [
-          `You are the head of ${label} inside Zeroth, an AI-run company. Answer the founder's question in first person plural ("we"), concretely and briefly (<= 180 words).`,
-          'Use ONLY the facts below. If something is not in the facts, say so plainly rather than inventing it. Numbers must come from the facts.',
-          'Structure: what we are doing right now → what we have done → what we are trying to do next → our goals/blockers, but only the parts the question asks about.',
-          `FACTS (JSON): ${JSON.stringify(compact(facts)).slice(0, 14_000)}`,
-        ].join('\n\n'),
-        messages: [{ role: 'user', content: question }],
-        temperature: 0,
-      } as any);
-      answer = res.text.trim() || factsAnswer(facts, question);
-      source = 'llm';
-    } else {
-      answer = factsAnswer(facts, question);
-    }
+    // OpenAI first (falls back through Anthropic, then Groq internally), grounded
+    // only in real facts — never invented. Plain facts if every provider is down.
+    const system = [
+      `You are the head of ${label} inside Zeroth, an AI-run company. Answer the founder's question in first person plural ("we"), concretely and briefly (<= 180 words).`,
+      'Use ONLY the facts below. If something is not in the facts, say so plainly rather than inventing it. Numbers must come from the facts.',
+      'Structure: what we are doing right now → what we have done → what we are trying to do next → our goals/blockers, but only the parts the question asks about.',
+      `FACTS (JSON): ${JSON.stringify(compact(facts)).slice(0, 14_000)}`,
+    ].join('\n\n');
+    const factsFallback = factsAnswer(facts, question);
+    const answer = await chatText(system, question, factsFallback);
+    const source: 'llm' | 'facts' = answer === factsFallback ? 'facts' : 'llm';
     await this.events.append({
       venture_id,
       type: 'dept.question_answered',

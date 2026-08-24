@@ -19,6 +19,10 @@ function hasKey(): boolean {
  * slightly different formatting can't hard-fail the chain.
  */
 async function chatTextChain(system: string, user: string): Promise<string | null> {
+  // Same mock-mode convention as the agent runtime (packages/agent-kit/src/llm.ts)
+  // and the /v1/integrations driver flag: ZEROTH_LLM=mock means no live vendor
+  // calls, full stop — tests and offline demos depend on this being absolute.
+  if (process.env.ZEROTH_LLM === 'mock') return null;
   const attempts: Array<() => Promise<string | null>> = [
     async () => {
       if (!process.env.OPENAI_API_KEY) return null;

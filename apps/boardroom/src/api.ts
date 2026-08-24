@@ -78,6 +78,11 @@ export const api = {
   composioToolkits: (venture_id: string) => call<{ toolkits: Array<{ slug: string; name: string; department: string; connected: boolean }>; degraded?: string }>('GET', `/v1/ventures/${venture_id}/composio/toolkits`),
   composioConnect: (venture_id: string, toolkit: string) => call<{ redirect_url: string; connection_id: string }>('POST', `/v1/ventures/${venture_id}/composio/${toolkit}/connect`),
   composioStrategy: (venture_id: string, toolkit: string) => call<{ toolkit: string; plan: string }>('POST', `/v1/ventures/${venture_id}/composio/${toolkit}/strategy`),
+  // Pre-launch: connect a toolkit (GitHub, most commonly) before a venture exists, keyed by a
+  // client-generated draft identity. Carried into the venture at launch via settings.composio_identity.
+  onboardingComposioToolkits: (identity: string) => call<{ toolkits: Array<{ slug: string; name: string; department: string; connected: boolean }>; degraded?: string }>('GET', `/v1/onboarding/composio/toolkits?identity=${encodeURIComponent(identity)}`),
+  onboardingComposioConnect: (identity: string, toolkit: string, callback_url?: string) => call<{ redirect_url: string; connection_id: string }>('POST', `/v1/onboarding/composio/${toolkit}/connect`, { identity, callback_url }),
+  autobuild: (venture_id: string) => call<{ autobuild: { status: string; idea_summary?: string; repo_url?: string; repo_owner?: string; local_url?: string; used_env: string[]; error?: string; updated_at?: string } }>('GET', `/v1/ventures/${venture_id}/autobuild`),
   askAgent: (venture_id: string, agent_id: string) => call<{ agent_id: string; department_id: string; task: string; reply: string }>('POST', `/v1/ventures/${venture_id}/agents/${agent_id}/ask`),
   setVar: (env: string, value: string) => call<{ env: string; configured: boolean }>('PUT', `/v1/integrations/vars/${env}`, { value }),
   linqTest: (b: { to?: string; text?: string; venture_id?: string }) => call<{ ok: boolean; detail: string; degraded?: string; to: string }>('POST', '/v1/integrations/linq/test-message', b),
@@ -122,4 +127,6 @@ export interface VentureSettings {
   integrations_ack: string[];
   linq_test_message?: { sent_at: string; delivered: boolean; confirmed_by_founder: boolean; degraded?: string };
   founder_notes: string;
+  composio_identity?: string;
+  autobuild: { status: 'idle' | 'generating' | 'pushing' | 'serving' | 'ready' | 'failed'; idea_summary?: string; repo_url?: string; repo_owner?: 'founder' | 'company'; local_url?: string; used_env: string[]; error?: string; updated_at?: string };
 }

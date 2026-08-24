@@ -14,6 +14,7 @@ import { IntegrationsPanel } from '../components/IntegrationsPanel';
 import { VoicePanel } from '../components/VoicePanel';
 import { MeetingsPanel } from '../components/MeetingsPanel';
 import { SettingsPanel } from '../components/SettingsPanel';
+import { AutobuildNotice } from '../components/AutobuildNotice';
 
 type PanelId = 'gates' | 'timeline' | 'dept' | 'briefing' | 'goals' | 'wallets' | 'integrations' | 'voice' | 'meetings' | 'settings' | null;
 
@@ -158,6 +159,7 @@ export function Hq({ onReonboard }: { onReonboard: () => void }) {
       {panel === 'voice' && <VoicePanel onClose={() => setPanel(null)} />}
       {panel === 'meetings' && <MeetingsPanel onClose={() => setPanel(null)} />}
       {panel === 'settings' && <SettingsPanel onClose={() => setPanel(null)} onReonboard={onReonboard} settings={settings} />}
+      <AutobuildNotice />
     </div>
   );
 }

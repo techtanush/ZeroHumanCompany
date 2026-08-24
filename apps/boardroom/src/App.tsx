@@ -3,6 +3,7 @@ import { useStore } from './store';
 import { Onboarding } from './components/Onboarding';
 import { Hq } from './hq/HqCanvas';
 import { Landing, savedAccount } from './components/Landing';
+import { kernelBase } from './api';
 
 /**
  * Two worlds: onboarding (no venture yet, or the founder re-opens it) and the
@@ -24,7 +25,9 @@ export function App() {
           : <Onboarding initialProfile={profile} onDone={() => { setForceOnboarding(false); setShowLanding(false); history.replaceState(null, '', location.pathname); }} />}
       {kernelOk === false && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, background: 'var(--err)', color: '#fff', padding: '6px 14px', fontSize: 13, textAlign: 'center' }}>
-          Kernel unreachable at <span className="kbd">/v1</span>. Start it with <span className="kbd">pnpm dev:kernel</span> (port 4000) — the Boardroom keeps retrying.
+          {/^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:|\/|$)/.test(kernelBase())
+            ? <>Kernel unreachable at <span className="kbd">{kernelBase()}</span>. Start it with <span className="kbd">pnpm dev:kernel</span> (port 4000) — the Boardroom keeps retrying.</>
+            : <>Kernel unreachable at <span className="kbd">{kernelBase() || '(no URL configured)'}</span> — the Boardroom keeps retrying.</>}
         </div>
       )}
       <div className="toast-stack">

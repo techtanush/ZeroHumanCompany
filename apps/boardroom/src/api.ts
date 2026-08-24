@@ -9,7 +9,24 @@ const defaultKernelUrl = env.VITE_KERNEL_URL ?? '';
 const defaultKernelToken = env.VITE_KERNEL_SHARED_TOKEN ?? 'dev-only-token';
 
 export function kernelToken(): string { return localStorage.getItem(TOKEN_KEY) || defaultKernelToken; }
-export function kernelBase(): string { return localStorage.getItem(KERNEL_URL_KEY) || defaultKernelUrl; }
+
+/**
+ * A dev-only override lets you point the Boardroom at a local kernel via
+ * SettingsPanel. That override is a footgun once it leaks into a deployed
+ * origin's localStorage (e.g. tested locally in the same browser, or copied
+ * profile) — a page served from a real domain can never reach `localhost`, so
+ * a stored localhost override there would silently break prod forever. Ignore
+ * it whenever the page itself isn't running on localhost.
+ */
+export function kernelBase(): string {
+  const stored = localStorage.getItem(KERNEL_URL_KEY);
+  const pageIsLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  if (stored && (pageIsLocal || !/^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:|\/|$)/.test(stored))) {
+    return stored;
+  }
+  if (stored) localStorage.removeItem(KERNEL_URL_KEY); // stale localhost override on a deployed origin
+  return defaultKernelUrl;
+}
 
 export class ApiError extends Error {
   constructor(public status: number, public code: string, message: string, public details?: unknown) { super(message); }

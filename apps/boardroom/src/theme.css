@@ -235,6 +235,49 @@ a { color: var(--filament-2); }
 .landing-bands b { color: var(--paper-on-void); }
 .landing-bands span { color: var(--paper-on-void-2); font-size: 14px; }
 
+/* ── Landing: scroll-triggered sections ─────────────────────────────────── */
+.scroll-cue { margin-top: 22px; opacity: .6; animation: cue-bob 2.2s ease-in-out infinite; }
+@keyframes cue-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+.reveal { opacity: 0; transform: translateY(36px) rotateX(6deg); transform-origin: top center; transition: opacity 640ms var(--ease), transform 640ms var(--ease); will-change: opacity, transform; }
+.reveal.in { opacity: 1; transform: translateY(0) rotateX(0deg); }
+
+.landing-section { padding: 96px clamp(24px, 6vw, 82px); border-top: 1px solid var(--bone-on-void); perspective: 1400px; }
+.section-head { max-width: 680px; margin: 0 0 48px; }
+.section-head h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(28px, 4vw, 44px); line-height: 1.08; letter-spacing: -0.01em; margin: 8px 0 0; }
+.section-lede { margin: 14px 0 0; color: var(--paper-on-void-2); font-size: 16px; max-width: 560px; }
+
+.dept-grid-3d { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; perspective: 1200px; }
+.tilt-card { transform: perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)); transition: transform 220ms var(--ease), border-color 200ms var(--ease), box-shadow 200ms var(--ease); transform-style: preserve-3d; }
+.dept-card-3d { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 22px 20px; min-height: 190px; border: 1px solid var(--bone-on-void); border-radius: var(--r-3); background: linear-gradient(165deg, var(--void-2), var(--void)); box-shadow: 0 16px 34px rgba(0,0,0,.25); cursor: default; }
+.dept-card-3d:hover { border-color: var(--filament-3); box-shadow: 0 22px 46px rgba(0,0,0,.4), 0 0 0 1px rgba(230,106,44,.25); }
+.dept-card-face { font-family: var(--font-mono); font-size: 26px; color: var(--filament-2); transform: translateZ(24px); }
+.dept-card-id { transform: translateZ(18px); }
+.dept-card-3d b { font-size: 15px; transform: translateZ(20px); }
+.dept-card-3d p { margin: 0; font-size: 13px; color: var(--paper-on-void-2); line-height: 1.5; transform: translateZ(12px); }
+
+.landing-flow { background: linear-gradient(180deg, var(--void), var(--void-2) 60%, var(--void)); }
+.flow-timeline { display: flex; flex-direction: column; gap: 0; max-width: 780px; }
+.flow-step { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 22px; padding: 26px 0; border-top: 1px solid var(--bone-on-void); }
+.flow-step:first-child { border-top: none; }
+.flow-n { font-size: 30px; color: var(--filament-3); opacity: .8; }
+.flow-step b { font-size: 17px; }
+.flow-step p { margin: 6px 0 0; color: var(--paper-on-void-2); font-size: 14px; max-width: 520px; }
+
+.integrations-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.integration-chip { display: flex; flex-direction: column; gap: 4px; padding: 18px 20px; border: 1px solid var(--bone-on-void); border-radius: var(--r-2); background: var(--void-2); transition: border-color 200ms var(--ease), transform 200ms var(--ease); }
+.integration-chip:hover { border-color: var(--filament-3); transform: translateY(-3px); }
+.integration-chip b { font-size: 14px; }
+.integration-chip span { font-size: 12px; color: var(--paper-on-void-2); }
+
+.landing-cta { padding: 110px clamp(24px, 6vw, 82px) 130px; border-top: 1px solid var(--bone-on-void); background: radial-gradient(ellipse at 50% 0%, rgba(230,106,44,.10), transparent 60%); text-align: center; }
+.landing-cta-inner { display: flex; flex-direction: column; align-items: center; gap: 22px; max-width: 620px; margin: 0 auto; }
+.landing-cta h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(30px, 5vw, 50px); margin: 0; letter-spacing: -0.01em; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal.in, .tilt-card, .scroll-cue { transition: none; animation: none; transform: none; opacity: 1; }
+}
+
 .phone-transfer { padding: 12px 56px; display: flex; gap: 10px; align-items: center; border-top: 1px solid var(--bone-on-void); background: rgba(20,26,43,0.96); }
 .dept-status-strip { position: absolute; top: 78px; left: 96px; right: 22px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; z-index: 5; pointer-events: none; }
 .dept-status-strip .chip, .dept-status-strip .muted { pointer-events: auto; }

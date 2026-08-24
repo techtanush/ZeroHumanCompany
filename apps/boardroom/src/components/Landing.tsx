@@ -45,6 +45,61 @@ const FLOW: Array<{ n: string; title: string; body: string }> = [
   { n: '07', title: 'It watches itself', body: 'Support, Finance and the Chief of Staff keep the loop closed, spotting gaps and proposing fixes.' },
 ];
 
+// Same 240×128 pixel-art spritesheet the real HQ canvas animates its agents
+// with (src/hq/scene.ts) — 10 characters, 3×4 walk frames each, 16px cells.
+const SHEET = { blockW: 48, blockH: 64, cell: 16, perRow: 5 };
+const WALK_FRAMES = [1, 0, 1, 2];
+let spriteImg: HTMLImageElement | null = null;
+function loadedSprite(): HTMLImageElement {
+  if (!spriteImg) { spriteImg = new Image(); spriteImg.src = '/assets/sprites.png'; }
+  return spriteImg;
+}
+
+/** One pixel-art employee, walking back and forth on a little track. */
+function SpriteWalker({ char, dir = 2, size = 40, track = 120, speed = 42, phase = 0 }: {
+  char: number; dir?: 0 | 1 | 2 | 3; size?: number; track?: number; speed?: number; phase?: number;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.imageSmoothingEnabled = false;
+    const img = loadedSprite();
+    let raf = 0;
+    const start = performance.now() - phase;
+    const cycle = track * 2;
+    const draw = (now: number) => {
+      const t = now - start;
+      const u = (t * speed / 1000) % cycle;
+      const goingRight = u < track;
+      const x = goingRight ? u : cycle - u;
+      const facing = goingRight ? dir : (dir === 2 ? 1 : dir === 1 ? 2 : dir);
+      const frame = WALK_FRAMES[Math.floor(t / 130) % WALK_FRAMES.length];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (img.complete && img.naturalWidth) {
+        const bx = (char % SHEET.perRow) * SHEET.blockW;
+        const by = Math.floor(char / SHEET.perRow) * SHEET.blockH;
+        ctx.drawImage(img, bx + frame * SHEET.cell, by + facing * SHEET.cell, SHEET.cell, SHEET.cell, x, 0, size, size);
+      }
+      raf = requestAnimationFrame(draw);
+    };
+    raf = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(raf);
+  }, [char, dir, size, track, speed, phase]);
+  return <canvas ref={canvasRef} width={track + size} height={size} className="sprite-walker" style={{ width: track + size, height: size }} />;
+}
+
+const TEAM: Array<{ char: number; name: string; role: string; doing: string }> = [
+  { char: 0, name: 'Priya', role: 'D07 Build', doing: 'shipping your PR' },
+  { char: 1, name: 'Sam', role: 'D10 Sales', doing: 'following up a lead' },
+  { char: 2, name: 'Jordan', role: 'D03 Research', doing: 'sizing a niche' },
+  { char: 3, name: 'Riya', role: 'D04 Outreach', doing: 'booking a call' },
+  { char: 4, name: 'Chen', role: 'D11 Finance', doing: 'reconciling the wallet' },
+  { char: 5, name: 'Morgan', role: 'D12 Support', doing: 'closing a ticket' },
+];
+
 const INTEGRATIONS: Array<{ name: string; note: string }> = [
   { name: 'Anthropic + OpenAI', note: 'the two brains behind every department' },
   { name: 'Stripe', note: 'the wallet — funded, gated, metered' },
@@ -134,6 +189,9 @@ export function Landing({ onStart }: LandingProps) {
             </div>
           ))}
           <div className="hq-core">Boardroom</div>
+          <div className="hq-walker w0"><SpriteWalker char={0} dir={2} track={140} speed={40} /></div>
+          <div className="hq-walker w1"><SpriteWalker char={3} dir={1} track={110} speed={34} phase={600} /></div>
+          <div className="hq-walker w2"><SpriteWalker char={6} dir={2} track={90} speed={30} phase={1200} /></div>
         </div>
       </section>
 
@@ -141,6 +199,25 @@ export function Landing({ onStart }: LandingProps) {
         <div><b>Gated spending</b><span>Stripe wallet plus money_out review before a cent leaves.</span></div>
         <div><b>Phone approvals</b><span>Linq texts the founder when a real decision is needed.</span></div>
         <div><b>Real build path</b><span>Workspace folder, GitHub, Replay QA, then Vercel/Render deploy gates.</span></div>
+      </section>
+
+      <section className="landing-section landing-team">
+        <Reveal className="section-head">
+          <div className="spec muted">meet the team</div>
+          <h2>Not one agent — a whole office, on the clock right now.</h2>
+        </Reveal>
+        <div className="team-strip">
+          {TEAM.map((p, i) => (
+            <Reveal key={p.name} delay={i * 70}>
+              <div className="team-member">
+                <SpriteWalker char={p.char} dir={i % 2 === 0 ? 2 : 1} track={64} speed={26} phase={i * 300} size={44} />
+                <b>{p.name}</b>
+                <span className="spec muted">{p.role}</span>
+                <div className="team-bubble">{p.doing}…</div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
       </section>
 
       <section className="landing-section">
